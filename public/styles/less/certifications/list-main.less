@@ -1,0 +1,119 @@
+.page-header{
+  background-color: @page-header;
+  height: 70px;
+  padding-top: 10px;
+  h1{
+    color: @page-header-text;
+    font-weight: normal;
+    font-size: 25px;
+    letter-spacing: 0.5px;
+  }
+}
+
+.content{
+  box-sizing: content-box;
+  padding-top: 60px;
+  padding-bottom: 40px;
+  h1{
+    color: @green;
+    font-size: 14px;
+  }
+  .filters{
+      display: inline-block;
+      vertical-align: top;
+      margin-right: 20px;
+      width: 200px;
+      .filter{
+        position: relative;
+        h1{
+          padding-left: 10px;
+          margin-bottom: 5px;
+          color: @filter-header;
+          font-size: 14px;
+        }
+        ul{
+          padding-left: 10px;
+          padding-top: 10px;
+          color: @filter-item;
+          border-top: 2px solid;
+          li{
+            cursor: pointer;
+            position: relative;
+            height: 20px;
+            line-height: 20px;
+            text-indent: 25px;
+            &:before{
+              content: "";
+              border: 1px solid;
+              position: absolute;
+              top: 8px;
+              left: 5px;
+              height: 5px;
+              width: 5px;
+            }
+            &[data-state='S']:before{
+              background-color: @green;
+            }
+            &[data-state='A']{
+              background-color: @outside;
+            }
+            &[data-state='X']{
+              background-color: @excluded;
+              color: @excluded-text;
+            }
+          }
+        }
+      }
+  }
+  .list, .detail{
+    display: inline-block;
+    box-sizing: border-box;
+    .table{
+      ul{
+        li{
+          position: relative;
+          div{
+            border: 1px solid @filter-item;
+            box-sizing: border-box;
+            position: relative;
+            display: inline-block;
+            width: 80%;
+            margin-left: 20%;
+            padding: 10px;
+            font-size: 14px;
+            color: @table-detail;
+            border-bottom: none;
+            &:first-of-type{
+              width: 20%;
+              height: 100%;
+              color: @table-title;
+              position: absolute;
+              margin-left: 0;
+              border-right: none;
+            }
+          }
+          &:last-of-type{
+            div{
+              border-bottom: 1px solid @filter-item;
+            }
+          }
+          &:nth-child(odd){
+            background-color: @table-odd-background;
+          }
+          &.table-header{
+            div{
+              color: @table-header;
+              font-weight: bold;
+            }
+          }
+        }
+      }
+    }
+  }
+  .detail{
+    width: 100%;
+  }
+  .list{
+    width: ~"calc(100% - 220px)";
+  }
+}

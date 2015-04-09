@@ -1,0 +1,60 @@
+.footer{
+  height: 200px;
+  padding-top: 40px;
+  background-color: @footer;
+  color: white;
+  .footblock{
+    font-size: 11px;
+    float: left;
+    margin-right: 20px;
+    ul{
+      li:first-of-type{
+        font-weight: bold;
+      }
+      li{
+        height: 18px;
+        line-height: 18px;
+        letter-spacing: 0.5px;
+      }
+    }
+  }
+  .social{
+      float: right;
+      text-align: right;
+      li{
+        display: inline-block;
+        height: 30px;
+        width: 30px;
+        line-height: 30px;
+        font-size: 28px;
+        margin-left: 4px;
+        color: @social;
+        background-size: contain;
+        background-repeat: no-repeat;
+        &[data-icon='twitter']{
+          background-image: url(../resources/twitter.png);
+        }
+        &[data-icon='linkedin']{
+          background-image: url(../resources/linkedin.png);
+        }
+        &[data-icon='facebook']{
+          background-image: url(../resources/facebook.png);
+        }
+        &[data-icon='google']{
+          background-image: url(../resources/google.png);
+        }
+        &[data-icon='more']{
+          background: url(../resources/+.png) right center no-repeat;
+          background-size: 15px;
+          width: 15px;
+        }
+      }
+  }
+  .foot-title{
+    float: right;
+    text-align: right;
+    font-size: 14px;
+    color: @social;
+    margin-top: 40px;
+  }
+}

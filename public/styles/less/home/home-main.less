@@ -1,0 +1,87 @@
+.banner{
+  position: relative;
+  height: 350px;
+  background-image: url(../resources/banner_image.png);
+  background-size: cover;
+  .banner-text{
+    position: absolute;
+    top: ~"calc(50% - 30px)";
+    font-size: 30px;
+    color: @page-header-text;
+    .button{
+      margin-top: 20px;
+      display: block;
+      background-color: @green;
+      font-size: 14px;
+      letter-spacing: 1px;
+      height: 40px;
+      width: 150px;
+      line-height: 40px;
+      text-align: center;
+    }
+  }
+}
+
+.overview{
+  padding-top: 20px;
+  padding-bottom: 20px;
+  background-color: @light-grey;
+  .container{
+    background: url(../resources/illustration.png) right center no-repeat;
+    background-size: contain;
+  }
+  .overview-content{
+    width: 50%;
+    h1{
+      color: @green;
+      font-size: 16px;
+    }
+    h2{
+      font-weight: normal;
+      color: @section-text;
+    }
+  }
+}
+
+.features{
+  padding-top: 40px;
+  padding-bottom: 30px;
+
+  h1{
+    color: @green;
+    font-size: 16px;
+  }
+  h2{
+    font-weight: normal;
+  }
+  li{
+    display: inline-block;
+    width: 33%;
+    font-size: 14px;
+    padding-top: 90px;
+    div{
+      width: 85%;
+    }
+    span{
+      font-weight: bold;
+    }
+    &.feature-one{
+      background: url('../resources/featureOne.png') top left no-repeat;
+    }
+    &.feature-two{
+      background: url('../resources/featureTwo.png') top left no-repeat;
+    }
+    &.feature-three{
+      background: url('../resources/featureThree.png') top left no-repeat;
+    }
+    &.feature-four{
+      background: url('../resources/featureFour.png') top left no-repeat;
+    }
+    &.feature-five{
+      background: url('../resources/featureFive.png') top left no-repeat;
+    }
+    &.feature-six{
+      background: url('../resources/featureSix.png') top left no-repeat;
+    }
+  }
+}
