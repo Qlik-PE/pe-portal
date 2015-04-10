@@ -14,3 +14,4 @@ app.use('/qsocks', express.static(__dirname + '/node_modules/qsocks'));
 app.use('/bower_components', express.static(__dirname + '/bower_components'));
 
 app.listen(3003);
+console.log('server listening on 3003');
