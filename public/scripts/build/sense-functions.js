@@ -1,11 +1,16 @@
+// var config = {
+//   host: '10.211.55.3',
+//   port: 8080,
+//   isSecure: false
+// };
+
 var config = {
-  host: '10.211.55.3',
-  port: 8080,
-  isSecure: false
+  host: '52.11.126.107/peportal',
+  isSecure: true
 };
 
 qsocks.Connect(config).then(function(global){
-  global.openDoc('c9ece11e-274f-4045-8d1d-402ca46496fc').then(render, function(error) {
+  global.openDoc('00f34d95-0049-41f5-aa98-73e8c4b3e96d').then(render, function(error) {
       if (error.code == '1002') { //app already opened on server
           global.getActiveDoc().then(render);
       } else {
