@@ -6,7 +6,7 @@
 
 var config = {
   host: '52.11.126.107/peportal',
-  isSecure: true
+  isSecure: false
 };
 
 qsocks.Connect(config).then(function(global){
