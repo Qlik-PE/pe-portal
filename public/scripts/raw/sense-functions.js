@@ -9,6 +9,8 @@ var config = {
   isSecure: false
 };
 
+var senseApp;
+
 qsocks.Connect(config).then(function(global){
   global.openDoc('39fa6d98-4360-4273-a20b-529776cf722c').then(render, function(error) {
       if (error.code == '1002') { //app already opened on server
@@ -23,7 +25,7 @@ var objects = {};
 
 function render(app){
   console.log(app);
-
+  senseApp = app;
   //if the url contains additional parameters then we need to use them to make a selection on the data
   var query = window.location.search.substring(1);
   if(query){
@@ -85,6 +87,14 @@ $('.filter').on('click', 'li', function(event){
 
 $('.table').on('click','li', function(event){
   var qElemNumber = $(this).attr('data-elem');
+});
+
+$('.clear-selections').on('click', function(event){
+  senseApp.clearAll().then(function(){
+    $('[data-object]').each(function(){
+      renderObject($(this).attr('data-handle'), $(this).attr('data-object'))
+    });
+  });
 });
 
 function renderObject(handle, objectType){
