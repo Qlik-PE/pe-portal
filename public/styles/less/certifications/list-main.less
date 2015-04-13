@@ -1,7 +1,7 @@
 .page-header{
   background-color: @page-header;
   height: 70px;
-  padding-top: 10px;
+  line-height: 70px;
   h1{
     color: @page-header-text;
     font-weight: normal;
@@ -73,7 +73,7 @@
         li{
           position: relative;
           div{
-            border: 1px solid @filter-item;
+            border: 1px solid @filter-item-border;
             box-sizing: border-box;
             position: relative;
             display: inline-block;
@@ -94,7 +94,7 @@
           }
           &:last-of-type{
             div{
-              border-bottom: 1px solid @filter-item;
+              border-bottom: 1px solid @filter-item-border;
             }
           }
           &:nth-child(odd){
