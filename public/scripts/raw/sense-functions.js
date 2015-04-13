@@ -10,7 +10,7 @@ var config = {
 };
 
 qsocks.Connect(config).then(function(global){
-  global.openDoc('00f34d95-0049-41f5-aa98-73e8c4b3e96d').then(render, function(error) {
+  global.openDoc('39fa6d98-4360-4273-a20b-529776cf722c').then(render, function(error) {
       if (error.code == '1002') { //app already opened on server
           global.getActiveDoc().then(render);
       } else {
