@@ -10,13 +10,34 @@
   }
 }
 
+.summary{
+  background-color: @detail-summary;
+  color: @detail-summary-text;
+  padding: 20px 0;
+  font-size: 14px;
+  .col{
+    display: inline-block;
+    width: 50%;
+    vertical-align: top;
+  }
+  label{
+    font-weight: bold;
+  }
+}
+
 .content{
   box-sizing: content-box;
-  padding-top: 60px;
+  padding-top: 30px;
   padding-bottom: 40px;
   h1{
     color: @green;
     font-size: 14px;
+  }
+  .clear-selections{
+    color: @dark-grey;
+    font-size: 14px;
+    cursor: pointer;
+    margin-bottom: 20px;
   }
   .filters{
       display: inline-block;
@@ -36,6 +57,7 @@
           padding-top: 10px;
           color: @filter-item;
           border-top: 2px solid;
+          font-size: 14px;
           li{
             cursor: pointer;
             position: relative;
@@ -73,11 +95,15 @@
         li{
           position: relative;
           div{
-            border: 1px solid @filter-item-border;
+
             box-sizing: border-box;
             position: relative;
             display: inline-block;
-            width: 80%;
+            width: 20%;
+            &:first-child:nth-last-child(2),
+            li:first-child:nth-last-child(2) ~ li {
+              width: 80%;
+            }
             margin-left: 20%;
             padding: 10px;
             font-size: 14px;
@@ -94,7 +120,7 @@
           }
           &:last-of-type{
             div{
-              border-bottom: 1px solid @filter-item-border;
+
             }
           }
           &:nth-child(odd){

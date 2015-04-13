@@ -11,7 +11,13 @@
         {{#if @first}}
           <div><a href='/certifications/detail?{{@root.idField}}={{qElemNumber}}'>{{qText}}</a></div>
         {{else}}
-          <div>{{qText}}</div>
+          <div>
+            {{#if qText}}
+              {{qText}}
+            {{else}}
+              No Data
+            {{/if}}
+          </div>
         {{/if}}
       {{/each}}
     </li>

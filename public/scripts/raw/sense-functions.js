@@ -105,7 +105,7 @@ function renderObject(handle, objectType){
           objects[handle].getHyperCubeData('/qHyperCubeDef', [{qTop:0, qLeft:0, qHeight:layout.qHyperCube.qSize.qcy, qWidth: layout.qHyperCube.qSize.qcx }]).then(function(data){
             console.log(data);
             var template = Handlebars.compile(html);
-            $("[data-handle="+handle+"]").html(template({title: layout.title , labels: layout.qHyperCube.qDimensionInfo, rows:data[0].qMatrix, idField:"Title"}));
+            $("[data-handle="+handle+"]").html(template({title: layout.title , labels: layout.qHyperCube.qDimensionInfo, rows:data[0].qMatrix, idField:"cert_title"}));
           });
           break;
         case 'text':
