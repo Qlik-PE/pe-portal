@@ -30,10 +30,22 @@ function render(app){
   var query = window.location.search.substring(1);
   if(query){
     query = query.split('=');
-    app.getField(query[0]).then(function(response){
-      var field = new qsocks.Field(response.connection, response.handle);
-      field.lowLevelSelect([parseInt(query[1])], false, false).then(function(result){
-        console.log(result);
+    var lbDef = {
+      qInfo:{
+        qType: 'ListObject'
+      },
+      qListObjectDef:{
+        qStateName: '$',
+        qDef:{
+          qFieldDefs:[query[0]]
+        }
+      }
+    };
+    app.createSessionObject(lbDef).then(function(response){
+      $(that).attr('data-handle', response.handle);
+      var lb = new qsocks.GenericObject(response.connection, response.handle);
+      lb.selectListObjectValues('/qListObjectDef', [query[1]], true, false).then(function(response){
+
       });
     });
 
