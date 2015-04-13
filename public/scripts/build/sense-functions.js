@@ -10,7 +10,7 @@ var config = {
 };
 
 qsocks.Connect(config).then(function(global){
-  global.openDoc('00f34d95-0049-41f5-aa98-73e8c4b3e96d').then(render, function(error) {
+  global.openDoc('39fa6d98-4360-4273-a20b-529776cf722c').then(render, function(error) {
       if (error.code == '1002') { //app already opened on server
           global.getActiveDoc().then(render);
       } else {
@@ -88,16 +88,17 @@ $('.table').on('click','li', function(event){
 });
 
 function renderObject(handle, objectType){
-  var templateUrl = objectType=='listbox' ? '/templates/filter.html' : '/templates/table.html'
+  var templateUrl = objectType=='listbox'||objectType=='session-listbox' ? '/templates/filter.html' : '/templates/table.html'
   $.get(templateUrl).success(function(html){
     objects[handle].getLayout().then(function(layout){
       console.log(layout);
       switch(objectType){
         case 'listbox':
+        case 'session-listbox':
           objects[handle].getListObjectData('/qListObjectDef', [{qTop:0, qLeft:0, qHeight:layout.qListObject.qSize.qcy, qWidth: 1 }]).then(function(data){
             console.log(data);
             var template = Handlebars.compile(html);
-            $("[data-handle="+handle+"]").html(template({title: layout.title , items:data[0].qMatrix}));
+            $("[data-handle="+handle+"]").html(template({title: $("[data-handle="+handle+"]").attr('data-title') , items:data[0].qMatrix}));
           });
           break;
         case 'table':

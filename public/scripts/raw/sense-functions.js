@@ -88,16 +88,17 @@ $('.table').on('click','li', function(event){
 });
 
 function renderObject(handle, objectType){
-  var templateUrl = objectType=='listbox' ? '/templates/filter.html' : '/templates/table.html'
+  var templateUrl = objectType=='listbox'||objectType=='session-listbox' ? '/templates/filter.html' : '/templates/table.html'
   $.get(templateUrl).success(function(html){
     objects[handle].getLayout().then(function(layout){
       console.log(layout);
       switch(objectType){
         case 'listbox':
+        case 'session-listbox':
           objects[handle].getListObjectData('/qListObjectDef', [{qTop:0, qLeft:0, qHeight:layout.qListObject.qSize.qcy, qWidth: 1 }]).then(function(data){
             console.log(data);
             var template = Handlebars.compile(html);
-            $("[data-handle="+handle+"]").html(template({title: layout.title , items:data[0].qMatrix}));
+            $("[data-handle="+handle+"]").html(template({title: $("[data-handle="+handle+"]").attr('data-title') , items:data[0].qMatrix}));
           });
           break;
         case 'table':
