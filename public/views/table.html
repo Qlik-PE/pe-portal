@@ -8,8 +8,8 @@
   {{#each rows}}
     <li>
       {{#each this}}
-        {{#if @first}}
-          <div><a href='/certifications/detail?{{@root.idField}}={{qElemNumber}}'>{{qText}}</a></div>
+        {{#compareLabel @index @root.hyperlink}}
+          <div><a href='/certifications/detail?{{@root.hyperlink}}={{qElemNumber}}'>{{qText}}</a></div>
         {{else}}
           <div>
             {{#if qText}}
@@ -18,7 +18,7 @@
               No Data
             {{/if}}
           </div>
-        {{/if}}
+        {{/compareLabel}}
       {{/each}}
     </li>
   {{/each}}

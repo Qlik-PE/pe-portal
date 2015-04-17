@@ -110,6 +110,14 @@ $('.clear-selections').on('click', function(event){
 
 function renderObject(handle, objectType){
   var templateUrl = objectType=='listbox'||objectType=='session-listbox' ? '/templates/filter.html' : '/templates/table.html'
+  Handlebars.registerHelper('compareLabel', function(index, name, options){
+    if(options.data.root.labels[index].qFallbackTitle==name){
+      return options.fn(this);
+    }
+    else{
+      return options.inverse(this);
+    }
+  });
   $.get(templateUrl).success(function(html){
     objects[handle].getLayout().then(function(layout){
       console.log(layout);
@@ -126,7 +134,7 @@ function renderObject(handle, objectType){
           objects[handle].getHyperCubeData('/qHyperCubeDef', [{qTop:0, qLeft:0, qHeight:layout.qHyperCube.qSize.qcy, qWidth: layout.qHyperCube.qSize.qcx }]).then(function(data){
             console.log(data);
             var template = Handlebars.compile(html);
-            $("[data-handle="+handle+"]").html(template({title: layout.title , labels: layout.qHyperCube.qDimensionInfo, rows:data[0].qMatrix, idField:"cert_title"}));
+            $("[data-handle="+handle+"]").html(template({title: layout.title , labels: layout.qHyperCube.qDimensionInfo, rows:data[0].qMatrix, hyperlink:$("[data-handle="+handle+"]").attr('data-hyperlink')}));
           });
           break;
         case 'text':
