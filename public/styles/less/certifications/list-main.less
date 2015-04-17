@@ -94,16 +94,17 @@
       ul{
         li{
           position: relative;
+          &:first-child:nth-last-child(2),
+          div:first-child:nth-last-child(2) ~ div {
+            width: 80%;
+          }
           div{
 
             box-sizing: border-box;
             position: relative;
             display: inline-block;
             width: 20%;
-            &:first-child:nth-last-child(2),
-            li:first-child:nth-last-child(2) ~ li {
-              width: 80%;
-            }
+
             margin-left: 20%;
             padding: 10px;
             font-size: 14px;

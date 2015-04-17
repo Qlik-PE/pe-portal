@@ -12,7 +12,7 @@ var config = {
 var senseApp;
 
 qsocks.Connect(config).then(function(global){
-  global.openDoc('39fa6d98-4360-4273-a20b-529776cf722c').then(render, function(error) {
+  global.openDoc('0d7f85c2-fbf0-4964-9d6d-0a8804672c2f').then(render, function(error) {
       if (error.code == '1002') { //app already opened on server
           global.getActiveDoc().then(render);
       } else {
@@ -42,9 +42,8 @@ function render(app){
       }
     };
     app.createSessionObject(lbDef).then(function(response){
-      $(that).attr('data-handle', response.handle);
       var lb = new qsocks.GenericObject(response.connection, response.handle);
-      lb.selectListObjectValues('/qListObjectDef', [query[1]], true, false).then(function(response){
+      lb.selectListObjectValues('/qListObjectDef', [parseInt(query[1])], true, false).then(function(response){
 
       });
     });
