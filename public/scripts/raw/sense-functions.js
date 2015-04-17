@@ -111,7 +111,7 @@ $('.clear-selections').on('click', function(event){
 function renderObject(handle, objectType){
   var templateUrl = objectType=='listbox'||objectType=='session-listbox' ? '/templates/filter.html' : '/templates/table.html'
   Handlebars.registerHelper('compareLabel', function(index, name, options){
-    if(options.data.root.labels[index].qFallbackTitle==name){
+    if(options.data.root.labels[index].qGroupFieldDefs[0]==name){
       return options.fn(this);
     }
     else{
