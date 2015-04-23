@@ -1,4 +1,5 @@
 var certifications = require('./certifications');
+var partners = require('./partners');
 
 module.exports = function(app){
   //index
@@ -6,4 +7,5 @@ module.exports = function(app){
     res.render('../server/views/index.jade');
   });
   app.use('/certifications', certifications);
+  app.use('/partners', partners);
 };
