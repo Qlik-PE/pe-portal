@@ -1,0 +1,7 @@
+<h2>My Validations</h2>
+<ul>
+  <li ng-repeat="validation in validations">
+    <a href="#myvalidations/{{validation._id}}">{{validation.title}}</a>
+    <div ng-click="delete('{{validation._id}}')">Delete</div>
+  </li>
+</ul>

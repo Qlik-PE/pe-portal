@@ -1,0 +1,44 @@
+doctype html
+html(ng-app='peportal')
+  head
+    title('Qlik Partner Portal')
+    link(rel='stylesheet', href='/bower_components/bootstrap/dist/css/bootstrap.css')
+    link(rel='stylesheet', href='/css/main.css')
+    script(src='/bower_components/jquery/dist/jquery.min.js')
+    script(src='/bower_components/angular/angular.min.js')
+    script(src='/bower_components/angular-resource/angular-resource.min.js')
+    script(src='/bower_components/angular-ui-router/release/angular-ui-router.min.js')
+    script(src='/js/app.js')
+  body
+    div.header
+      div.container
+        div.logo
+          a(href='#/') Home
+        ul.nav.navbar-nav.navbar-right
+          li
+            a(href="#validations") Validations     
+            if isAuthenticated
+              li.dropdown
+                a.dropdown-toggle(
+                    href="#" 
+                    data-toggle="dropdown" 
+                    role="button" 
+                    aria-expanded="false" 
+                    data-count=notificationCount||''
+                  ) #{user.name}
+                  span.caret
+                ul.dropdown-menu(role="menu")
+                  if user.role == 'admin'
+                    li
+                      a(href="#myvalidations") Manage Validations
+                  else if user.role == 'partner'
+                    li
+                      a(href="#myvalidations") My Validations
+                  li
+                    a(href="/auth/logout") Logout
+            else     
+              li(style="color: rgb(94,168,63);")
+                a(href="#loginsignup") Login
+    div.container
+      div(ui-view)
+      script(src='/bower_components/bootstrap/dist/js/bootstrap.min.js')
