@@ -26,16 +26,33 @@ router.get('/', Auth.isLoggedIn, function(req, res){
   }
 });
 
+
+
+router.post('/', Auth.isLoggedIn, function(req, res){
+  var user = req.user;
+  if(user.role=='qlik' || user.role=='partner'){
+    var data = req.body;
+    data.partner = user.partner;
+    data.user = user._id;
+    Validations.save(null, data, function(result){
+      res.json({redirect:'#myvalidations/'+result._id});
+    });
+  }
+  else{
+    res.json({errorCode:401, errorText:'Insufficient Permissions'});
+  }
+});
+
 router.get('/:id', Auth.isLoggedIn, function(req, res){
   var user = req.user;
   Validations.get({_id: req.params.id},function(validations){
     if(validations.length>0){
       if(user.role=='qlik'){
-        res.json(validations[0]);
+        res.json(validations);
       }
       else if(user.role=='partner'){
         if(validations[0].partner.toString()==user.partner.toString()){
-          res.json(validations[0]);
+          res.json(validations);
         }
         else{
           res.json({errorCode:401, errorText:'Incorrect Ownership'});

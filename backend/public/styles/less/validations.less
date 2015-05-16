@@ -1,0 +1,40 @@
+.validation{
+  position: relative;
+  h1{
+    width: 50%;
+  }
+  .validation-detail{
+    padding-bottom: 10px;
+    label{
+      width: 25%;
+    }
+    input.form-control{
+      height: 25px;
+      line-height: 25px;
+      display: inline-block;
+      width: 70%;
+    }
+
+    .tabs{
+      margin: 10px 0;
+      li{
+        color: @headers;
+        display: inline-block;
+        height: 30px;
+        line-height: 30px;
+        width: 100px;
+
+        &.active{
+          font-weight: bold;
+          color: @green;
+        }
+      }
+    }
+  }
+
+  .btn-save{
+    position: absolute;
+    top: 0;
+    right: 0;
+  }
+}

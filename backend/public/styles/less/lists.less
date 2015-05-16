@@ -1,0 +1,17 @@
+.validation-list{
+  padding: 10px 5px;
+  li{
+    height: 30px;
+    line-height: 30px;
+    background-color: white;
+    text-indent: 10px;
+    &:nth-child(odd){
+      background-color: @table-odd-background;
+    }
+    .delete{
+      float: right;
+      color: @green;
+      margin-right: 10px;
+    }
+  }
+}

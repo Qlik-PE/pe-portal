@@ -1,1 +1,30 @@
-<h2>{{validation.title}}</h2>
+<div class="validation">
+  <h1><input class="form-control title"  placeholder="Title" ng-model="validations[0].title"/></h1>
+  <button ng-click="save()" class="btn btn-default btn-save">Save</button>
+  <div class="row validation-detail">
+    <div class="content col-md-12">
+      <h2>Description</h2>
+      <textarea class="form-control" ng-model="validations[0].content">{{validations[0].content}}</textarea>
+      <ul class="tabs">
+        <li ng-class="{active:activeTab===0}">
+          <a ng-click="setTab(0)">Detail</a>
+        </li>
+        <li ng-class="{active:activeTab===1}">
+          <a ng-click="setTab(1)">Steps</a>
+        </li>
+        <li ng-class="{active:activeTab===2}">
+          <a ng-click="setTab(2)">Screenshots</a>
+        </li>
+      </ul>
+    </div>
+    <div ng-show="activeTab==0">
+      <ng-include src="'/views/validations/detail-detail.html'"></ng-include>
+    </div>
+    <div ng-show="activeTab==1">
+      <ng-include src="'/views/validations/detail-steps.html'"></ng-include>
+    </div>
+    <div ng-show="activeTab==2">
+      <ng-include src="'/views/validations/detail-screenshots.html'"></ng-include>
+    </div>
+  </div>
+</div>

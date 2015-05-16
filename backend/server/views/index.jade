@@ -28,7 +28,7 @@ html(ng-app='peportal')
                   ) #{user.name}
                   span.caret
                 ul.dropdown-menu(role="menu")
-                  if user.role == 'admin'
+                  if user.role == 'qlik'
                     li
                       a(href="#myvalidations") Manage Validations
                   else if user.role == 'partner'
@@ -41,4 +41,8 @@ html(ng-app='peportal')
                 a(href="#loginsignup") Login
     div.container
       div(ui-view)
+    div.footer
+      div.container        
+        div.foot-title
+          span Qlik Partner Engineering Portal
       script(src='/bower_components/bootstrap/dist/js/bootstrap.min.js')
