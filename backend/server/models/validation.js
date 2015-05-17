@@ -110,4 +110,4 @@ var ValidationSchema = new Schema({
   }
 });
 
-module.exports = mongoose.model('cert', ValidationSchema);
+module.exports = mongoose.model('validation', ValidationSchema);

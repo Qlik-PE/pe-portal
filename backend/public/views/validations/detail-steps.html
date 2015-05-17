@@ -1,1 +1,20 @@
-Steps
+<div class="steps col-md-12" ng-controller="validationstepController">
+  <ul ng-hide="steps.length==0" class="validation-step-list">
+    <li class="table-header">
+      <label>Name</label>
+      <label>Description</label>
+      <label>Type</label>
+      <label>Status</label>
+    </li>
+    <li ng-repeat="step in steps">
+      <input class="form-control" ng-blur="save(step._id)" ng-model="step.name"/>
+      <input class="form-control"  ng-blur="save(step._id)" ng-model="step.content"/>
+      <select class="form-control" ng-blur="save(step._id)" ng-model="step.type" ng-options="item.name for item in stepTypes track by item._id">
+      <select>
+      <select class="form-control" ng-blur="save(step._id)" ng-model="step.status">
+      <select>
+      <div class="delete" ng-click="delete('{{validation._id}}')">Delete</div>
+    </li>
+    <ng-include ng-show="{{validations.length==0}}" src="'/views/noresults.html'"></ng-include>
+  </ul>
+</div>

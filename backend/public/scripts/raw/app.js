@@ -41,6 +41,12 @@
         url: '/myvalidations/:id',
         templateUrl: '/views/validations/detail.html',
         controller: 'validationController'
+      })
+      // route for viewing a specific step
+      .state('validationstep',{
+        url: '/myvalidations/:vid/step/:sid',
+        templateUrl: '/views/validationstep/detail.html',
+        controller: 'validationstepController'
       });
 
   }]);
@@ -48,5 +54,6 @@
   //Controllers
   include "./controllers/main.js"
   include "./controllers/validations.js"
+  include "./controllers/validation-step.js"
   include "./controllers/user.js"
 })();

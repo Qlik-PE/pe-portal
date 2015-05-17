@@ -11,6 +11,8 @@ mongoose.connect('mongodb://localhost:27017/pe-portal');
 require(__dirname+'/server/models/user');
 require(__dirname+'/server/models/partner');
 require(__dirname+'/server/models/validation');
+require(__dirname+'/server/models/validation-step');
+require(__dirname+'/server/models/validation-step-types');
 
 //configure passport strategies
 require(__dirname+'/server/controllers/passport/passport')(passport);

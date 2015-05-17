@@ -1,4 +1,4 @@
-.validation-list{
+.validation-list,.validation-step-list {
   padding: 10px 5px;
   li{
     height: 30px;
@@ -12,6 +12,23 @@
       float: right;
       color: @green;
       margin-right: 10px;
+    }
+  }
+}
+
+.validation-step-list{
+  li{
+    height: 45px;
+    line-height: 45px;
+    label, input, select{
+      width: 22% !important;
+    }
+    select{
+      display: inline-block;
+    }
+    input.form-control{
+      height: 34px !important;
+      line-height: 34px !important;
     }
   }
 }

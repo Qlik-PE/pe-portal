@@ -5,7 +5,7 @@ module.exports = {
       next();
     }
     else{
-      res.json({errorCode: 401, errorText: 'User not logged in', redirect: '#login'})
+      res.json([{errorCode: 401, errorText: 'User not logged in', redirect: '#login'}])
     }
   }
 }

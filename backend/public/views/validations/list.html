@@ -1,11 +1,11 @@
-<div class="validations">
+<div class="validation">
   <h2>Validations</h2>
   <a href="#myvalidations/new" class="btn btn-default btn-save">Create New</a>
-  <ul class="validation-list">
-    <li ng-hide="validations.length==0" ng-repeat="validation in validations">
+  <ul class="validation-list" ng-hide="validations.length==0">
+    <li ng-repeat="validation in validations">
       <a href="#myvalidations/{{validation._id}}">{{validation.title}}</a>
       <div class="delete" ng-click="delete('{{validation._id}}')">Delete</div>
     </li>
-    <!--<ng-include ng-show="{{validations.length==0}}" src="/views/noresults.html"></ng-include>-->
   </ul>
+  <ng-include ng-show="{{validations.length==0}}" src="'/views/noresults.html'"></ng-include>
 </div>
