@@ -6,6 +6,11 @@ app.controller('validationstepController', ['$scope', '$resource', '$stateParams
     $scope.stepTypes = result;
   });  //this creates a GET query to api/steps/types
 
+  Step.query({stepId:'status'}, function(result){
+    console.log(result);
+    $scope.stepStatus = result;
+  });  //this creates a GET query to api/steps/statuses
+
   ValidationStep.query({validationId:$stateParams.id, validationstepId:$stateParams.sid||''}, function(result){
     if(result[0].redirect){
       window.location = result[0].redirect;
@@ -38,6 +43,27 @@ app.controller('validationstepController', ['$scope', '$resource', '$stateParams
       //add notifications & error handling here
     });  //currently we're only allowing a save from the detail page, in which case we should only have 1 validation in the array
   };
+
+  $scope.new = function(){
+    var data = {};
+    data.name = $scope.newStepName;
+    data.content = $scope.newStepContent;
+    data.type = $scope.newStepType;
+    data.status = $scope.newStepStatus;
+    ValidationStep.save({validationId: $stateParams.id}, data, function(result){
+      //need to add error handling
+      if($scope.steps){
+        $scope.steps.push(result);
+      }
+      else{
+        $scope.steps = [result];
+      }
+      $scope.newStepName = null;
+      $scope.newStepContent = null;
+      $scope.newStepType = null;
+      $scope.newStepStatus = null;
+    });
+  }
 
   $scope.getStepById = function(id){
     for(var i=0;i<$scope.steps.length;i++){

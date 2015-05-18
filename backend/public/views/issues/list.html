@@ -1,0 +1,10 @@
+<div class="issue">
+  <h2>Issues</h2>
+  <a href="#myvalidations/new" class="btn btn-default btn-save">Create New</a>
+  <div ng-show="step">
+    Step Info Goes Here
+  </div>
+  <ul class="issue-list" ng-hide="issues.length==0">
+  </ul>
+<ng-include ng-show="{{issues.length==0}}" src="'/views/noresults.html'"></ng-include>
+</div>

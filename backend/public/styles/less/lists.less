@@ -10,6 +10,11 @@
     }
     .delete{
       float: right;
+      color: @red;
+      margin-right: 10px;
+    }
+    .new{
+      float: right;
       color: @green;
       margin-right: 10px;
     }
@@ -21,7 +26,17 @@
     height: 45px;
     line-height: 45px;
     label, input, select{
-      width: 22% !important;
+      width: 20% !important;
+    }
+    label, input{
+      &:nth-of-type(2){
+        width: 25% !important;
+      }
+    }
+    label{
+      &:last-of-type{
+        width: 5% !important;
+      }
     }
     select{
       display: inline-block;

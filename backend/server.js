@@ -3,7 +3,10 @@ var express = require('express'),
     passport = require('passport'),
     expressSession = require('express-session'),
     bodyParser = require('body-parser'),
-    mongoose = require('mongoose');
+    mongoose = require('mongoose'),
+    busboy = require('connect-busboy');
+
+app.use(busboy());
 
 mongoose.connect('mongodb://localhost:27017/pe-portal');
 
@@ -13,6 +16,9 @@ require(__dirname+'/server/models/partner');
 require(__dirname+'/server/models/validation');
 require(__dirname+'/server/models/validation-step');
 require(__dirname+'/server/models/validation-step-types');
+require(__dirname+'/server/models/validation-step-status');
+require(__dirname+'/server/models/image');
+require(__dirname+'/server/models/issue');
 
 //configure passport strategies
 require(__dirname+'/server/controllers/passport/passport')(passport);

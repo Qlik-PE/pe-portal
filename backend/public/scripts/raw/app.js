@@ -47,6 +47,11 @@
         url: '/myvalidations/:vid/step/:sid',
         templateUrl: '/views/validationstep/detail.html',
         controller: 'validationstepController'
+      })
+      .state('issues', {
+        url: '/issues/:vid/step/:sid/issue',
+        templateUrl: '/views/issues/list.html',
+        controller: 'issueController'
       });
 
   }]);

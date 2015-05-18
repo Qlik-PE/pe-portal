@@ -2,7 +2,9 @@ var express = require('express'),
     router = express.Router(),
     Validations = require('../../controllers/validation'),
     ValidationStep = require('../../controllers/validation-step'),
-    Auth = require('../../controllers/auth');
+    Images = require('../../controllers/image'),
+    Auth = require('../../controllers/auth'),
+    busboy = require('connect-busboy');
 
 //router.use(Auth.isLoggedIn());
 
@@ -100,12 +102,76 @@ router.post('/:id', Auth.isLoggedIn, function(req, res){
   });
 });
 
+router.post('/:id/image', Auth.isLoggedIn, function(req, res){
+  var user = req.user;
+  Validations.get({_id: req.params.id},function(validations){
+    req.pipe(req.busboy);
+    req.busboy.on('file', function (fieldname, file, filename, encoding, mimetype) {
+      var data = {};
+      data.content = "";
+      data.mimetype = mimetype;
+      data.filename= filename;
+      data.entityid = req.params.id;
+      file.on('data', function(chunk){
+        data.content += chunk;
+      });
+      file.on('end', function(){
+        data.content = new Buffer(data.content);
+        Images.create(data, function(result){
+          if(result._id){
+            validations[0].screenshots.push(result._id);
+            validations[0].save();
+            res.json(result);
+          }
+        })
+      });
+    });
+  });
+});
+
 //get the steps for a validation
 router.get('/:id/step', Auth.isLoggedIn, function(req, res){
   console.log('getting steps');
   ValidationStep.get({validationid:req.params.id}, function(steps){
+
     console.log(steps);
     res.json(steps);
+  });
+});
+
+
+//add a new step to the specified validation
+router.post('/:vid/step', Auth.isLoggedIn, function(req, res){
+  console.log('posting without id');
+  var user = req.user;
+  var data = req.body;
+  Validations.get({_id: req.params.vid},function(validations){
+    if(validations.length>0){
+      data.validationid = req.params.vid;
+      data.user = user._id;
+      if(user.role=='qlik'){
+        ValidationStep.save(null, data, function(result){
+          console.log(result);
+          res.json(result);
+        });
+      }
+      else if(user.role=='partner'){
+        if(validations[0].partner.toString()==user.partner.toString()){
+          ValidationStep.save(null, data, function(result){
+            res.json(result);
+          });
+        }
+        else{
+          res.json({errorCode:401, errorText:'Incorrect Ownership'});
+        }
+      }
+      else{
+        res.json({errorCode:401, errorText:'Insufficient Permissions'});
+      }
+    }
+    else{
+      res.json({errorCode:404, errorText:'Validation Not Found'});
+    }
   });
 });
 
@@ -136,6 +202,35 @@ router.post('/:vid/step/:sid', Auth.isLoggedIn, function(req, res){
       else{
         res.json({errorCode:401, errorText:'Insufficient Permissions'});
       }
+    }
+    else{
+      res.json({errorCode:404, errorText:'Validation Not Found'});
+    }
+  });
+});
+
+//get the issue for the given validationid and stepid
+router.get('/:vid/step/:sid/issue', Auth.isLoggedIn, function(req, res){
+  var user = req.user;
+  ValidationStep.getWithValidation({_id: req.params.sid},function(steps){
+    if(steps.length>0){
+      Issues.get({}, function(issues){
+        steps[0].issues = issues;
+        if(user.role=='qlik'){
+          res.json(steps);
+        }
+        else if(user.role=='partner'){
+          if(steps[0].validationid.partner.toString()==user.partner.toString()){
+            res.json(result);
+          }
+          else{
+            res.json({errorCode:401, errorText:'Incorrect Ownership'});
+          }
+        }
+        else{
+          res.json({errorCode:401, errorText:'Insufficient Permissions'});
+        }
+      });
     }
     else{
       res.json({errorCode:404, errorText:'Validation Not Found'});

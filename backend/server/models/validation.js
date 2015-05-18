@@ -107,7 +107,8 @@ var ValidationSchema = new Schema({
   user: {
     type: Schema.ObjectId,
     ref: 'User'
-  }
+  },
+  screenshots:[{type:String}]
 });
 
 module.exports = mongoose.model('validation', ValidationSchema);

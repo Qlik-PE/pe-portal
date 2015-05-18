@@ -1,13 +1,12 @@
-<div class="steps col-md-12" ng-controller="validationstepController">
-  <ul ng-hide="steps.length==0" class="validation-step-list">
+<div class="issues col-md-12" ng-controller="validationstepController">
+  <ul ng-hide="steps.length==0" class="validation-step-issue-list">
     <li class="table-header">
       <label>Name</label>
       <label>Description</label>
-      <label>Type</label>
       <label>Status</label>
-      <label>Issues</label>
+      <label>Resolution</label>
     </li>
-    <li ng-repeat="step in steps">
+    <li ng-repeat="issue in issues">
       <input class="form-control" ng-blur="save(step._id)" ng-model="step.name"/>
       <input class="form-control"  ng-blur="save(step._id)" ng-model="step.content"/>
       <select class="form-control" ng-change="save(step._id)" ng-model="step.type" ng-options="item.name for item in stepTypes track by item._id">
@@ -15,6 +14,8 @@
       <select class="form-control" ng-change="save(step._id)" ng-model="step.status" ng-options="item.name for item in stepStatus track by item._id">
       <select>
       <a ng-click="toggleIssues()">{{step.issues.length}}</a>
+      <div id="issues_{{step._id}}" ng-include="/views/validations/detail-step-issues.html">
+      </div>
       <div class="delete" ng-click="delete('{{validation._id}}')">Delete</div>
     </li>
     <li>

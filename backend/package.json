@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.12.4",
+    "connect-busboy": "0.0.2",
     "crypto": "0.0.3",
     "express": "^4.12.3",
     "express-session": "^1.11.2",

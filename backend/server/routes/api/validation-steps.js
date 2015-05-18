@@ -2,10 +2,17 @@ var express = require('express'),
     router = express.Router(),
     Validations = require('../../controllers/validation'),
     Step = require('../../controllers/validation-step'),
+    Issue = require('../../controllers/issue'),
     Auth = require('../../controllers/auth');
 
 router.get('/types', function(req, res){
   Step.getTypes(function(results){
+    res.json(results);
+  })
+});
+
+router.get('/status', function(req, res){
+  Step.getStatus(function(results){
     res.json(results);
   })
 });
