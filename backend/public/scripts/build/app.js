@@ -1,57 +1,77 @@
 (function() {
-  var app = angular.module('peportal', ['ui.router', 'ngResource']);
+  var app = angular.module("peportal", ["ui.router", "ngResource"]);
 
-  app.config(['$stateProvider','$urlRouterProvider', function($stateProvider, $urlRouterProvider) {
-    $urlRouterProvider.otherwise('/');
+  app.config(["$stateProvider","$urlRouterProvider", function($stateProvider, $urlRouterProvider) {
+    $urlRouterProvider.otherwise("/");
     $stateProvider
 
       // route for the home page
-      .state('home', {
-        url: '/',
-        templateUrl : '/views/home.html',
-        controller  : 'mainController'
+      .state("home", {
+        url: "/",
+        templateUrl : "/views/home.html",
+        controller  : "mainController"
       })
-      // route for the certs page
-      .state('validations', {
-        url: '/validations',
-        templateUrl : '/views/validations.html',
-        controller  : 'validationController'
+      // route for the users dashboard page
+      .state("dashboard", {
+        url: "/dashboard",
+        templateUrl : "/views/dashboard.html",
+        controller  : "dashboardController"
       })
       // route for the login and signup page
-      .state('loginsignup', {
-        url: '/loginsignup',
-        templateUrl : '/views/loginsignup.html',
-        controller  : 'userController'
+      .state("loginsignup", {
+        url: "/loginsignup",
+        templateUrl : "/views/loginsignup.html",
+        controller  : "userController"
       })
       // route for the login page.
       //used if a session has expired of someone tries to navigate to a page that requires authentication
-      .state('login', {
-        url: '/login',
-        templateUrl : '/views/login.html',
-        controller  : 'userController'
+      .state("login", {
+        url: "/login",
+        templateUrl : "/views/login.html",
+        controller  : "userController"
       })
-      // route for viewing 'my' validations
-      .state('myvalidations', {
-        url: '/myvalidations',
-        templateUrl: '/views/validations/list.html',
-        controller: 'validationController'
+      // route to manage users
+      .state("users", {
+        url: "/users",
+        templateUrl : "/views/users/list.html",
+        controller  : "userController"
+      })
+      // route for viewing validations
+      .state("validations", {
+        url: "/validations",
+        templateUrl: "/views/validations/list.html",
+        controller: "validationController"
       })
       // route for viewing a specific validation
-      .state('validation', {
-        url: '/myvalidations/:id',
-        templateUrl: '/views/validations/detail.html',
-        controller: 'validationController'
+      .state("validations.detail", {
+        url: "/:Id",
+        views: {
+          "@":{
+            templateUrl: "/views/validations/detail.html",
+            controller: "validationController"
+          }
+        }
+
       })
       // route for viewing a specific step
-      .state('validationstep',{
-        url: '/myvalidations/:vid/step/:sid',
-        templateUrl: '/views/validationstep/detail.html',
-        controller: 'validationstepController'
+      .state("step",{
+        url: "/step/:stepId",
+        templateUrl: "/views/steps/detail.html",
+        controller: "stepController"
       })
-      .state('issues', {
-        url: '/issues/:vid/step/:sid/issue',
-        templateUrl: '/views/issues/list.html',
-        controller: 'issueController'
+      .state("step.issues",{
+        url: "/",
+        views:{
+          "@":{
+            templateUrl: "/views/steps/detail.html",
+            controller: "stepController",
+          }
+        }
+      })
+      .state("issues", {
+        url: "/issues/:issueId",
+        templateUrl: "/views/issues/list.html",
+        controller: "issueController"
       });
 
   }]);
@@ -65,14 +85,14 @@
     var Validations = $resource('api/validations/:validationId', {validationId:'@id'});
     var ValidationImages = $resource('api/validations/:validationId/image', {validationId: '@id'});
 
-    if($stateParams.id!="new"){
-      Validations.query({validationId:$stateParams.id||''}, function(result){
+    if($stateParams.Id!="new"){
+      Validations.query({validationId:$stateParams.Id||''}, function(result){
         if(result[0].redirect){
           window.location = result[0].redirect;
         }
         else{
           $scope.validations = result;
-          $scope.imageUploadPath = "/api/validations/"+$stateParams.id+"/image";
+          $scope.imageUploadPath = "/api/validations/"+$stateParams.Id+"/image";
         }
       })
     }
@@ -88,7 +108,7 @@
     };
 
     $scope.save = function(){
-      var id = $stateParams.id=="new"?"":$stateParams.id;
+      var id = $stateParams.Id=="new"?"":$stateParams.Id;
       Validations.save({validationId:id}, $scope.validations[0], function(result){
         if(result.redirect){
           window.location = result.redirect;
@@ -124,48 +144,57 @@
     $scope.getPath = function(id){
       return "/api/images/"+id;
     }
-    
+
     $scope.delete = function(){
       console.log('delete me');
     };
   }]);
 
-  app.controller('validationstepController', ['$scope', '$resource', '$stateParams', function($scope, $resource, $stateParams){
-    var ValidationStep = $resource('api/validations/:validationId/step/:validationstepId', {validationId:'@id', validationstepId:'@sid'});
-    var Step = $resource('api/steps/:stepId', {stepId: '@stepId'});
+  app.controller("stepController", ["$scope", "$resource", "$state", "$stateParams", function($scope, $resource, $state, $stateParams){
+    var Step = $resource("api/steps/:stepId", {stepId: "@stepId"});
 
-    Step.query({stepId:'types'}, function(result){
+    Step.query({stepId:"types"}, function(result){
       $scope.stepTypes = result;
     });  //this creates a GET query to api/steps/types
 
-    Step.query({stepId:'status'}, function(result){
-      console.log(result);
+    Step.query({stepId:"status"}, function(result){
       $scope.stepStatus = result;
     });  //this creates a GET query to api/steps/statuses
 
-    ValidationStep.query({validationId:$stateParams.id, validationstepId:$stateParams.sid||''}, function(result){
-      if(result[0].redirect){
-        window.location = result[0].redirect;
-      }
-      else{
-        $scope.steps = result;
-      }
-    });
+    if($stateParams.Id){  //We have a validation to work with
+      Step.query({stepId:$stateParams.stepId||"", validationid:$stateParams.Id||""}, function(result){
+        if(result[0] && result[0].redirect){
+          window.location = result[0].redirect;
+        }
+        else{
+          $scope.steps = result;
+        }
+      });
+    }
+    else{ //We should be working with an individual step
+      Step.query({stepId: $stateParams.stepId}, function(result){
+        if(result[0] && result[0].redirect){
+          window.location = result[0].redirect;
+        }
+        else{
+          $scope.steps = result;
+        }
+      })
+    }
 
-
-    $scope.activeTab = 0;
+    $scope.activeTab = $state.current.name == "step.issues" ? 1 : 0;
 
     $scope.setTab = function(index){
       $scope.activeTab = index;
     }
 
     $scope.delete = function(id){
-      console.log('delete me');
+      console.log("delete me");
     };
 
     $scope.save = function(id){
-      console.log('saving');
-      ValidationStep.save({validationId: $stateParams.id, validationstepId:id}, $scope.getStepById(id), function(result){
+      console.log("saving");
+      Step.save({stepId:id, validationid: $stateParams.Id}, $scope.getStepById(id), function(result){
         if(result.redirect){
           window.location = result.redirect;
         }
@@ -173,7 +202,7 @@
           //notify the user that the validation was successfully saved
         }
         //add notifications & error handling here
-      });  //currently we're only allowing a save from the detail page, in which case we should only have 1 validation in the array
+      });  //currently we"re only allowing a save from the detail page, in which case we should only have 1 validation in the array
     };
 
     $scope.new = function(){
@@ -182,7 +211,8 @@
       data.content = $scope.newStepContent;
       data.type = $scope.newStepType;
       data.status = $scope.newStepStatus;
-      ValidationStep.save({validationId: $stateParams.id}, data, function(result){
+      data.validationid = $stateParams.Id;
+      Step.save(data, function(result){
         //need to add error handling
         if($scope.steps){
           $scope.steps.push(result);
@@ -206,10 +236,137 @@
     }
   }]);
 
-  app.controller('userController', ['$scope', '$resource', function($scope, $resource){
-    //var User = $resource('api/users');
+  app.controller("issueController", ["$scope", "$resource", "$state", "$stateParams", function($scope, $resource, $state, $stateParams){
+    var Issue = $resource("api/issues/:issueId", {issueId: "@issueId"});
 
-    //User.query();
+    Issue.query({issueId:"status"}, function(result){
+      $scope.issueStatus = result;
+    });  //this creates a GET query to api/issues/statuses
+
+    if($stateParams.stepId){  //We have a validation to work with
+      Issue.query({issueId:$stateParams.issueId||"", step:$stateParams.stepId||""}, function(result){
+        if(result[0] && result[0].redirect){
+          window.location = result[0].redirect;
+        }
+        else{
+          $scope.issues = result;
+        }
+      });
+    }
+    else{ //We should be working with an individual step
+      Issue.query({issueId: $stateParams.issueId}, function(result){
+        if(result[0] && result[0].redirect){
+          window.location = result[0].redirect;
+        }
+        else{
+          $scope.issues = result;
+        }
+      })
+    }
+
+    $scope.activeTab = 0;
+
+    $scope.setTab = function(index){
+      $scope.activeTab = index;
+    }
+
+    $scope.delete = function(id){
+      console.log("delete me");
+    };
+
+    $scope.save = function(id){
+      console.log("saving");
+      Issue.save({issueId:id, step: $stateParams.stepId}, $scope.getIssueById(id), function(result){
+        if(result.redirect){
+          window.location = result.redirect;
+        }
+        else {
+          //notify the user that the validation was successfully saved
+        }
+        //add notifications & error handling here
+      });  //currently we"re only allowing a save from the detail page, in which case we should only have 1 validation in the array
+    };
+
+    $scope.new = function(){
+      var data = {};
+      data.name = $scope.newIssueName;
+      data.content = $scope.newIssueContent;
+      data.status = $scope.newIssueStatus;
+      data.step = $stateParams.stepId;
+      Issue.save(data, function(result){
+        //need to add error handling
+        if($scope.issues){
+          $scope.issues.push(result);
+        }
+        else{
+          $scope.issues = [result];
+        }
+        $scope.newIssueName = null;
+        $scope.newIssueContent = null;
+        $scope.newIssueType = null;
+        $scope.newIssueStatus = null;
+      });
+    }
+
+    $scope.getIssueById = function(id){
+      for(var i=0;i<$scope.issues.length;i++){
+        if($scope.issues[i]._id == id){
+          return $scope.issues[i];
+        }
+      };
+    }
+  }]);
+
+  app.controller("userController", ["$scope", "$resource", "$state", "$stateParams", function($scope, $resource, $state, $stateParams){
+    var User = $resource("api/users/:userId", {userId: "@userId"});
+
+    User.query({userId:"roles"}, function(result){
+      $scope.userRoles = result;
+    });  //this creates a GET query to api/users/roles
+
+
+    User.query({userId: $stateParams.userId}, function(result){
+      if(result[0] && result[0].redirect){
+        window.location = result[0].redirect;
+      }
+      else{
+        $scope.users = result;
+      }
+    })
+
+    $scope.delete = function(id){
+      console.log("delete me");
+    };
+
+    $scope.save = function(user){
+      console.log("saving");
+      User.save({userId:user._id}, user, function(result){
+        if(result.redirect){
+          window.location = result.redirect;
+        }
+        else {
+          //notify the user that the validation was successfully saved
+        }
+        //add notifications & error handling here
+      });  //currently we"re only allowing a save from the detail page, in which case we should only have 1 validation in the array
+    };
+  }]);
+
+  app.controller("dashboardController", ["$scope", "$resource", "$state", "$stateParams", function($scope, $resource, $state, $stateParams){
+    var Validation = $resource("api/validations/:Id", {validationId: "@Id"});
+    var Issue = $resource("api/issues/:issueId", {issueId: "@issueId"});
+    var User = $resource("api/users/:userId", {userId: "@userId"});
+
+
+    User.query({userId:'count', 'role.name': 'partner'}, function(result){   //  /api/users/count
+      if(result[0] && result[0].redirect){
+        window.location = result[0].redirect;
+      }
+      else{
+        $scope.pendingUsers = result[0];
+      }
+    }); //this fetches user that aren't authorised (or in other words 'user' users)
+
   }]);
 
 })();

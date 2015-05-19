@@ -1,4 +1,4 @@
-.validation-list,.validation-step-list {
+.validation-list,.validation-step-list, .step-issue-list, .user-list {
   padding: 10px 5px;
   li{
     height: 30px;
@@ -21,15 +21,18 @@
   }
 }
 
-.validation-step-list{
+.validation-step-list, .step-issue-list, .user-list{
   li{
     height: 45px;
     line-height: 45px;
-    label, input, select{
+    a.link{
+      display: inline-block;
+    }
+    label, input, select, a.link{
       width: 20% !important;
     }
     label, input{
-      &:nth-of-type(2){
+      &.description{
         width: 25% !important;
       }
     }
@@ -41,7 +44,7 @@
     select{
       display: inline-block;
     }
-    input.form-control{
+    input.form-control, select.form-control{
       height: 34px !important;
       line-height: 34px !important;
     }

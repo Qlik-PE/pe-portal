@@ -2,7 +2,7 @@ var express = require('express'),
     router = express.Router(),
     mongoose = require('mongoose'),
     Schema = mongoose.Schema,
-    Images = require('../../controllers/image'),
+    Images = require('../../controllers/images'),
     Auth = require('../../controllers/auth');
 
 router.get('/', Auth.isLoggedIn, function(req, res){

@@ -28,12 +28,13 @@ html(ng-app='peportal')
                   ) #{user.name}
                   span.caret
                 ul.dropdown-menu(role="menu")
-                  if user.role == 'qlik'
+                  if user.role.name == 'qlik' || user.role.name == 'partner'
                     li
-                      a(href="#myvalidations") Manage Validations
-                  else if user.role == 'partner'
+                      a(ui-sref="dashboard") Dashboard
                     li
-                      a(href="#myvalidations") My Validations
+                      a(ui-sref="validations") Manage Validations                   
+                    li
+                      a(ui-sref="users") Manage Users                            
                   li
                     a(href="/auth/logout") Logout
             else     

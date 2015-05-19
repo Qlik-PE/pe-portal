@@ -1,25 +1,17 @@
-var model = require('../models/validation-step'),
-    stepTypes = require('../models/validation-step-types'),
-    stepStatus = require('../models/validation-step-status');
+var model = require('../models/steps'),
+    stepTypes = require('../models/step-types'),
+    stepStatus = require('../models/step-status');
 
 module.exports = {
   get: function(query, callbackFn){
     console.log(query);
-    model.find(query).populate('type status issues').exec(function(err, results){
+    model.find(query).populate('type status issues partner user').exec(function(err, results){
       if(err){
         console.log(err);
       }
       callbackFn.call(null, results);
     });
   },
-  // getWithValidation:function(query, callbackFn){
-  //   model.find(query).populate('type status validation').exec(function(err, results){
-  //     if(err){
-  //       console.log(err);
-  //     }
-  //     callbackFn.call(null, results);
-  //   });
-  // },
   getTypes: function(callbackFn){
     stepTypes.find({},function(err, results){
       if(err){

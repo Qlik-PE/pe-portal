@@ -11,14 +11,14 @@ app.use(busboy());
 mongoose.connect('mongodb://localhost:27017/pe-portal');
 
 //load the models
-require(__dirname+'/server/models/user');
-require(__dirname+'/server/models/partner');
-require(__dirname+'/server/models/validation');
-require(__dirname+'/server/models/validation-step');
-require(__dirname+'/server/models/validation-step-types');
-require(__dirname+'/server/models/validation-step-status');
-require(__dirname+'/server/models/image');
-require(__dirname+'/server/models/issue');
+require(__dirname+'/server/models/users');
+require(__dirname+'/server/models/partners');
+require(__dirname+'/server/models/validations');
+require(__dirname+'/server/models/steps');
+require(__dirname+'/server/models/step-types');
+require(__dirname+'/server/models/step-status');
+require(__dirname+'/server/models/images');
+require(__dirname+'/server/models/issues');
 
 //configure passport strategies
 require(__dirname+'/server/controllers/passport/passport')(passport);
@@ -40,9 +40,7 @@ app.use(expressSession({secret: 'qlikPEPortal'})); //ATTENTION - need to find ou
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.get('/', function(req, res){
-  //res.sendFile(__dirname+'/public/views/index.html');
-  console.log(req.user);
+app.get('/', function(req, res){    
   res.render(__dirname+'/server/views/index.jade', {isAuthenticated: req.isAuthenticated(), user: req.user});
 });
 

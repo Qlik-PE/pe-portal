@@ -10,7 +10,7 @@ var PartnerSchema = new Schema({
     type: Date,
     default: Date.now
   },
-  partnername: {
+  name: {
     type: String,
     required: true,
     trim: true

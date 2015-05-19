@@ -7,14 +7,14 @@ var express = require('express'),
 //   res.redirect('/');
 // });
 
-router.post('/login', passport.authenticate('local',{successRedirect: '/', failureRedirect: ''}));
+router.post('/login', passport.authenticate('local',{successRedirect: '/#dashboard', failureRedirect: ''}));
 router.get('/logout', function(req, res){
   req.logout();
   res.redirect('/');
 });
 
 router.post('/signup', passport.authenticate('signup'), function(req, res){
-  res.redirect('/')
+  res.redirect('/#dashboard')
 });
 
 module.exports = router;

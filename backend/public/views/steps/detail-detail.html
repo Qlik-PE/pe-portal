@@ -1,0 +1,25 @@
+<div class="col-md-6">
+  <label>Technology Partner: </label>
+  <span>{{steps[0].partner.partnername}}</span>
+  <br>
+  <label>User: </label>
+  <span>{{steps[0].user.name}}</span>
+  <br>
+  <label>Created: </label>
+  <span>{{steps[0].created}}</span>
+  <br>
+  <label>#Issues: </label>
+  <span>{{steps[0].issues.length}}</span>
+</div>
+<div class="col-md-6">
+  <label>Type: </label>
+  <select class="form-control" ng-change="save(steps[0]._id)" ng-model="steps[0].type" ng-options="item.name for item in stepTypes track by item._id">
+  <select>
+  <br>
+  <label>Status: </label>
+  <select class="form-control" ng-change="save(steps[0]._id)" ng-model="steps[0].status" ng-options="item.name for item in stepStatus track by item._id">
+  <select>
+  <br>
+  <label>Num: </label>
+  <input class="form-control" ng-blur="save()" ng-model="steps[0].num"/>
+</div>

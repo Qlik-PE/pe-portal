@@ -21,7 +21,8 @@ var ValidationstepSchema = new Schema({
     required: false
   },
   validationid: {
-    type: String,
+    type: Schema.ObjectId,
+    ref: 'validation',
     required: true
   },
   status: {
@@ -43,10 +44,14 @@ var ValidationstepSchema = new Schema({
     type: Schema.ObjectId,
     ref: 'user'
   },
+  partner: {  //User associated with the certstep
+    type: Schema.ObjectId,
+    ref: 'partner'
+  },
   issues:[{
     type: Schema.ObjectId,
     ref: 'issue'
   }]
 });
 
-module.exports = mongoose.model('validationstep', ValidationstepSchema);
+module.exports = mongoose.model('step', ValidationstepSchema);

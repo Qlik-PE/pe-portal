@@ -1,4 +1,4 @@
-var model = require('../models/image');
+var model = require('../models/images');
 
 module.exports = {
   get: function(query, callbackFn){

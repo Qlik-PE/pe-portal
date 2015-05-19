@@ -1,14 +1,12 @@
-var User = require('../../models/user');
+var User = require('../../models/users');
 
 module.exports = function(passport){
   passport.serializeUser(function(user, done) {
-    console.log('serializing user - '+user._id);
     done(null, user._id);
   });
 
   passport.deserializeUser(function(id, done) {
-    console.log('de-serializing user');
-    User.findById(id, function(err, user) {
+    User.findById(id).populate('role').exec(function(err, user) {      
       done(err, user);
     });
   });

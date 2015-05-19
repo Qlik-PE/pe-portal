@@ -2,14 +2,14 @@ app.controller('validationController', ['$scope', '$resource', '$stateParams', f
   var Validations = $resource('api/validations/:validationId', {validationId:'@id'});
   var ValidationImages = $resource('api/validations/:validationId/image', {validationId: '@id'});
 
-  if($stateParams.id!="new"){
-    Validations.query({validationId:$stateParams.id||''}, function(result){
+  if($stateParams.Id!="new"){
+    Validations.query({validationId:$stateParams.Id||''}, function(result){
       if(result[0].redirect){
         window.location = result[0].redirect;
       }
       else{
         $scope.validations = result;
-        $scope.imageUploadPath = "/api/validations/"+$stateParams.id+"/image";
+        $scope.imageUploadPath = "/api/validations/"+$stateParams.Id+"/image";
       }
     })
   }
@@ -25,7 +25,7 @@ app.controller('validationController', ['$scope', '$resource', '$stateParams', f
   };
 
   $scope.save = function(){
-    var id = $stateParams.id=="new"?"":$stateParams.id;
+    var id = $stateParams.Id=="new"?"":$stateParams.Id;
     Validations.save({validationId:id}, $scope.validations[0], function(result){
       if(result.redirect){
         window.location = result.redirect;
@@ -61,7 +61,7 @@ app.controller('validationController', ['$scope', '$resource', '$stateParams', f
   $scope.getPath = function(id){
     return "/api/images/"+id;
   }
-  
+
   $scope.delete = function(){
     console.log('delete me');
   };

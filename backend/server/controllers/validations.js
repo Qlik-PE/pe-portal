@@ -1,4 +1,4 @@
-var model = require('../models/validation');
+var model = require('../models/validations');
 
 module.exports = {
   get: function(query, callbackFn){

@@ -11,7 +11,7 @@ module.exports = function(passport, User){
             // check in mongo if a user with username exists or not
             User.findOne({
               email: email
-            }, function(err, user) {
+            }).populate('partner role').exec(function(err, user) {
               if (err) {
                 return done(err);
               }
