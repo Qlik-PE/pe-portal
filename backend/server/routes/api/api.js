@@ -7,11 +7,16 @@ var issueRoutes = require('./issues');
 var imageRoutes = require('./images');
 var userRoutes = require('./users');
 
-router.use('/validations', validationRoutes);
-router.use('/steps', stepRoutes);
-router.use('/issues', issueRoutes);
-router.use('/images', imageRoutes);
-router.use('/users', userRoutes);
+var masterRoutes = require('./master');
+
+// router.use('/validations', validationRoutes);
+// router.use('/steps', stepRoutes);
+// router.use('/issues', issueRoutes);
+// router.use('/images', imageRoutes);
+// router.use('/users', userRoutes);
+
+router.use('/', masterRoutes);
+
 module.exports = router;
 
 //NOTE: all GET api calls should return an array of results

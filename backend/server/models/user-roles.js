@@ -6,7 +6,9 @@ var UserRoleSchema = new Schema({
     type: String,
     required: true,
     trim: true
-  }
+  },
+  onlyOwn: Boolean,
+  permissions:{}
 });
 
 module.exports = mongoose.model('userrole', UserRoleSchema);

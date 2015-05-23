@@ -37,7 +37,13 @@ app.controller("stepController", ["$scope", "$resource", "$state", "$stateParams
   }
 
   $scope.delete = function(id){
-    console.log("delete me");
+    Step.delete({stepId:id}, function(result){
+      for(var i=0;i<$scope.steps.length;i++){
+        if($scope.steps[i]._id == id){
+          $scope.steps.splice(i,1);
+        }
+      }
+    });
   };
 
   $scope.save = function(id){

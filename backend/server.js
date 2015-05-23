@@ -28,10 +28,12 @@ var apiRoutes = require(__dirname+'/server/routes/api/api');
 var authRoutes = require(__dirname+'/server/routes/auth');
 
 app.use('/views', express.static(__dirname + '/public/views'));
+app.use('/templates', express.static(__dirname + '/public/templates'));
 app.use('/css', express.static(__dirname + '/public/styles/css'));
 app.use('/resources', express.static(__dirname + '/public/resources'));
 app.use('/js', express.static(__dirname + '/public/scripts/build'));
 app.use('/bower_components', express.static(__dirname + '/bower_components'));
+app.use('/qsocks', express.static(__dirname + '/node_modules/qsocks'));
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded());
@@ -40,7 +42,7 @@ app.use(expressSession({secret: 'qlikPEPortal'})); //ATTENTION - need to find ou
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.get('/', function(req, res){    
+app.get('/', function(req, res){
   res.render(__dirname+'/server/views/index.jade', {isAuthenticated: req.isAuthenticated(), user: req.user});
 });
 

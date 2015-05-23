@@ -10,21 +10,19 @@ module.exports = {
       callbackFn.call(null, results);
     });
   },
-  getRoles: function(callbackFn){
-    UserRoles.find({}, function(err, result){
+  getRoles: function(query, callbackFn){    
+    UserRoles.find(query, function(err, result){
       if(err){
         console.log(err);
       }
       callbackFn.call(null, result);
     });
   },
-  getCount: function(partnerId, query, callbackFn){
-    console.log(query);
-    model.find({partner: partnerId}).populate('role').count({'user.role':{name:'partner'}}, function(err, result){
+  getCount: function(query, callbackFn){
+    model.count(query, function(err, result){
       if(err){
         console.log(err);
       }
-      console.log(result);
       callbackFn.call(null, result);
     });
   },

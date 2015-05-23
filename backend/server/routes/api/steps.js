@@ -81,4 +81,16 @@ router.post("/:id", Auth.isLoggedIn, function(req, res){
   });
 });
 
+router.delete('/:id', Auth.isLoggedIn, function(req, res){
+  var query = {
+    "_id":req.params.id
+  };
+  if(req.user.role.name=="partner"){ //we add the partnerId to the query to add an extra layer of security
+    query['partner']=req.user.partner;
+  }
+  Step.delete(query, function(result){
+    res.json(result);
+  })
+});
+
 module.exports = router;

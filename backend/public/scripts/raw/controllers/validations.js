@@ -1,8 +1,10 @@
-app.controller('validationController', ['$scope', '$resource', '$stateParams', function($scope, $resource, $stateParams){
+app.controller('validationController', ['$scope', '$resource', '$state', '$stateParams', function($scope, $resource, $state, $stateParams){
   var Validations = $resource('api/validations/:validationId', {validationId:'@id'});
   var ValidationImages = $resource('api/validations/:validationId/image', {validationId: '@id'});
 
-  if($stateParams.Id!="new"){
+  console.log($state.current.name);
+
+  if($state.current.name !="validations.new"){
     Validations.query({validationId:$stateParams.Id||''}, function(result){
       if(result[0].redirect){
         window.location = result[0].redirect;
@@ -21,7 +23,13 @@ app.controller('validationController', ['$scope', '$resource', '$stateParams', f
   }
 
   $scope.delete = function(id){
-    console.log('delete me');
+    Validations.delete({validationId:id}, function(result){
+      for(var i=0;i<$scope.validations.length;i++){
+        if($scope.validations[i]._id == id){
+          $scope.validations.splice(i,1);
+        }
+      }
+    });
   };
 
   $scope.save = function(){
@@ -62,7 +70,4 @@ app.controller('validationController', ['$scope', '$resource', '$stateParams', f
     return "/api/images/"+id;
   }
 
-  $scope.delete = function(){
-    console.log('delete me');
-  };
 }]);

@@ -21,20 +21,26 @@
       .state("loginsignup", {
         url: "/loginsignup",
         templateUrl : "/views/loginsignup.html",
-        controller  : "userController"
+        controller  : "authController"
       })
       // route for the login page.
       //used if a session has expired of someone tries to navigate to a page that requires authentication
       .state("login", {
         url: "/login",
         templateUrl : "/views/login.html",
-        controller  : "userController"
+        controller  : "authController"
       })
       // route to manage users
       .state("users", {
         url: "/users",
         templateUrl : "/views/users/list.html",
         controller  : "userController"
+      })
+      // route to public validations page
+      .state("publicvalidations", {
+        url: "/public/validations",
+        templateUrl: "/views/public/validations/list.html",
+        controller: "senseController"
       })
       // route for viewing validations
       .state("validations", {
@@ -45,6 +51,17 @@
       // route for viewing a specific validation
       .state("validations.detail", {
         url: "/:Id",
+        views: {
+          "@":{
+            templateUrl: "/views/validations/detail.html",
+            controller: "validationController"
+          }
+        }
+
+      })
+      // route for viewing a specific validation
+      .state("validations.new", {
+        url: "/new",
         views: {
           "@":{
             templateUrl: "/views/validations/detail.html",
@@ -70,17 +87,25 @@
       })
       .state("issues", {
         url: "/issues/:issueId",
-        templateUrl: "/views/issues/list.html",
+        templateUrl: "/views/issues/detail.html",
         controller: "issueController"
+      })
+      .state("adminsettings", {
+        url: "/admin",
+        templateUrl: "/views/admin/index.html",
+        controller: "adminController"
       });
 
   }]);
 
   //Controllers
   include "./controllers/main.js"
+  include "./controllers/auth.js"
   include "./controllers/validations.js"
   include "./controllers/steps.js"
   include "./controllers/issues.js"
   include "./controllers/users.js"
   include "./controllers/dashboard.js"
+  include "./controllers/admin.js"
+
 })();

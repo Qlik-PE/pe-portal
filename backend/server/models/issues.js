@@ -17,8 +17,7 @@ var IssueSchema = new Schema({
   name: String,
   content: String,
   status: {
-    type: Schema.ObjectId,
-    ref: 'issuestatus'
+    type: Schema.ObjectId, ref: 'issuestatus'
   },
   resolution: String,
   created: {

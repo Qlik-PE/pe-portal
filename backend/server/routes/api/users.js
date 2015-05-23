@@ -16,14 +16,22 @@ router.get("/", Auth.isLoggedIn, function(req, res){
 
 //Get a list of User Roles
 router.get("/roles", Auth.isLoggedIn, function(req, res){
-  User.getRoles(function(results){
+  var query = {};
+  if(req.user.role.name=="partner"){
+    query.name = {$not:/qlik/};
+  }
+  User.getRoles(query, function(results){
     res.json(results);
   })
 });
 
 //Get a count of users that match the provided query parameters
 router.get("/count", Auth.isLoggedIn, function(req, res){
-  User.getCount(req.user.partner, req.query, function(result){
+  var query = req.query || {};
+  if(req.user.role.name=="partner"){
+    query['partner'] = req.user.partner; //we add the partnerId to the query to add an extra layer of security
+  }
+  User.getCount(query, function(result){
     res.json([result]);
   })
 });
@@ -32,7 +40,7 @@ router.get("/count", Auth.isLoggedIn, function(req, res){
 router.get("/:id", Auth.isLoggedIn, function(req, res){
   var query = req.query || {};
   if(req.user.role.name=="partner"){
-    query['partner._id'] = req.user.partner; //we add the partnerId to the query to add an extra layer of security
+    query['partner'] = req.user.partner; //we add the partnerId to the query to add an extra layer of security
   }
   query["_id"] = req.params.id;
   console.log(query);
@@ -48,7 +56,7 @@ router.post("/:id", Auth.isLoggedIn, function(req, res){
     "_id": req.params.id
   };
   if(req.user.role.name=="parter"){
-    query['partner._id'] = req.user.partner;
+    query['partner'] = req.user.partner;
   }
   User.get(query, function(users){
     if(users.length>0){

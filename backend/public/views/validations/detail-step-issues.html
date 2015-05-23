@@ -16,7 +16,7 @@
       <a ng-click="toggleIssues()">{{step.issues.length}}</a>
       <div id="issues_{{step._id}}" ng-include="/views/validations/detail-step-issues.html">
       </div>
-      <div class="delete" ng-click="delete('{{validation._id}}')">Delete</div>
+      <div class="delete" ng-click="delete(issue._id)">Delete</div>
     </li>
     <li>
       <input class="form-control" ng-model="newStepName" />

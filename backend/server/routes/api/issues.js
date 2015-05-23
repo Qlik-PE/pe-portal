@@ -20,6 +20,17 @@ router.get("/status", Auth.isLoggedIn, function(req, res){
   })
 });
 
+//Get a count of users that match the provided query parameters
+router.get("/count", Auth.isLoggedIn, function(req, res){
+  var query = req.query || {};
+  if(req.user.role.name=="partner"){
+    query['partner'] = req.user.partner; //we add the partnerId to the query to add an extra layer of security
+  }
+  Issue.getCount(query, function(result){
+    res.json([result]);
+  })
+});
+
 //Get a issue by _id
 router.get("/:id", Auth.isLoggedIn, function(req, res){
   var query = req.query || {};
@@ -67,6 +78,18 @@ router.post("/:id", Auth.isLoggedIn, function(req, res){
       res.json({errorCode: 1, errorText: "Issue does not exist or you do not have sufficient permissions."});
     }
   });
+});
+
+router.delete('/:id', Auth.isLoggedIn, function(req, res){
+  var query = {
+    "_id":req.params.id
+  };
+  if(req.user.role.name=="partner"){ //we add the partnerId to the query to add an extra layer of security
+    query['partner']=req.user.partner;
+  }
+  Issue.delete(query, function(result){
+    res.json(result);
+  })
 });
 
 module.exports = router;

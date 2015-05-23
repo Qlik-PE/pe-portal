@@ -18,6 +18,17 @@ router.get("/", Auth.isLoggedIn, function(req, res){
   });
 });
 
+//Get a count of validations that match the provided query parameters
+router.get("/count", Auth.isLoggedIn, function(req, res){
+  var query = req.query || {};
+  if(req.user.role.name=="partner"){
+    query['partner'] = req.user.partner; //we add the partnerId to the query to add an extra layer of security
+  }
+  Validations.getCount(query, function(result){
+    res.json([result]);
+  })
+});
+
 router.get("/:id", Auth.isLoggedIn, function(req, res){
   var query = {
     "_id":req.params.id
@@ -62,6 +73,19 @@ router.post("/:id", Auth.isLoggedIn, function(req, res){
       res.json({errorCode: 1, errorText: "Validation does not exist or you do not have sufficient permissions."});
     }
   });
+});
+
+
+router.delete('/:id', Auth.isLoggedIn, function(req, res){
+  var query = {
+    "_id":req.params.id
+  };
+  if(req.user.role.name=="partner"){ //we add the partnerId to the query to add an extra layer of security
+    query['partner']=req.user.partner;
+  }
+  Validations.delete(query, function(result){
+    res.json(result);
+  })
 });
 
 //cleaned to here
@@ -147,10 +171,10 @@ router.get("/:vid/step/:sid/issue", Auth.isLoggedIn, function(req, res){
     if(steps.length>0){
       Issues.get({}, function(issues){
         steps[0].issues = issues;
-        if(user.role=="qlik"){
+        if(user.role.name=="qlik"){
           res.json(steps);
         }
-        else if(user.role=="partner"){
+        else if(user.role.name=="partner"){
           if(steps[0].validationid.partner.toString()==user.partner.toString()){
             res.json(result);
           }

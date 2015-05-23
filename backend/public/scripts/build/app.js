@@ -21,20 +21,26 @@
       .state("loginsignup", {
         url: "/loginsignup",
         templateUrl : "/views/loginsignup.html",
-        controller  : "userController"
+        controller  : "authController"
       })
       // route for the login page.
       //used if a session has expired of someone tries to navigate to a page that requires authentication
       .state("login", {
         url: "/login",
         templateUrl : "/views/login.html",
-        controller  : "userController"
+        controller  : "authController"
       })
       // route to manage users
       .state("users", {
         url: "/users",
         templateUrl : "/views/users/list.html",
         controller  : "userController"
+      })
+      // route to public validations page
+      .state("publicvalidations", {
+        url: "/public/validations",
+        templateUrl: "/views/public/validations/list.html",
+        controller: "senseController"
       })
       // route for viewing validations
       .state("validations", {
@@ -45,6 +51,17 @@
       // route for viewing a specific validation
       .state("validations.detail", {
         url: "/:Id",
+        views: {
+          "@":{
+            templateUrl: "/views/validations/detail.html",
+            controller: "validationController"
+          }
+        }
+
+      })
+      // route for viewing a specific validation
+      .state("validations.new", {
+        url: "/new",
         views: {
           "@":{
             templateUrl: "/views/validations/detail.html",
@@ -70,8 +87,13 @@
       })
       .state("issues", {
         url: "/issues/:issueId",
-        templateUrl: "/views/issues/list.html",
+        templateUrl: "/views/issues/detail.html",
         controller: "issueController"
+      })
+      .state("adminsettings", {
+        url: "/admin",
+        templateUrl: "/views/admin/index.html",
+        controller: "adminController"
       });
 
   }]);
@@ -81,11 +103,17 @@
     
   }]);
 
-  app.controller('validationController', ['$scope', '$resource', '$stateParams', function($scope, $resource, $stateParams){
+  app.controller('authController', ['$scope', function($scope){
+
+  }]);
+
+  app.controller('validationController', ['$scope', '$resource', '$state', '$stateParams', function($scope, $resource, $state, $stateParams){
     var Validations = $resource('api/validations/:validationId', {validationId:'@id'});
     var ValidationImages = $resource('api/validations/:validationId/image', {validationId: '@id'});
 
-    if($stateParams.Id!="new"){
+    console.log($state.current.name);
+
+    if($state.current.name !="validations.new"){
       Validations.query({validationId:$stateParams.Id||''}, function(result){
         if(result[0].redirect){
           window.location = result[0].redirect;
@@ -104,7 +132,13 @@
     }
 
     $scope.delete = function(id){
-      console.log('delete me');
+      Validations.delete({validationId:id}, function(result){
+        for(var i=0;i<$scope.validations.length;i++){
+          if($scope.validations[i]._id == id){
+            $scope.validations.splice(i,1);
+          }
+        }
+      });
     };
 
     $scope.save = function(){
@@ -145,9 +179,6 @@
       return "/api/images/"+id;
     }
 
-    $scope.delete = function(){
-      console.log('delete me');
-    };
   }]);
 
   app.controller("stepController", ["$scope", "$resource", "$state", "$stateParams", function($scope, $resource, $state, $stateParams){
@@ -189,7 +220,13 @@
     }
 
     $scope.delete = function(id){
-      console.log("delete me");
+      Step.delete({stepId:id}, function(result){
+        for(var i=0;i<$scope.steps.length;i++){
+          if($scope.steps[i]._id == id){
+            $scope.steps.splice(i,1);
+          }
+        }
+      });
     };
 
     $scope.save = function(id){
@@ -238,31 +275,53 @@
 
   app.controller("issueController", ["$scope", "$resource", "$state", "$stateParams", function($scope, $resource, $state, $stateParams){
     var Issue = $resource("api/issues/:issueId", {issueId: "@issueId"});
+    var Step = $resource("api/steps/:stepId", {stepId: "@stepId"});
+    var Validation = $resource("api/validations/:validationId", {validationId: "@validationId"});
 
     Issue.query({issueId:"status"}, function(result){
-      $scope.issueStatus = result;
+      if(result[0] && result[0].redirect){
+        window.location = result[0].redirect;
+      }
+      else{
+        $scope.issueStatus = result;
+      }
     });  //this creates a GET query to api/issues/statuses
 
-    if($stateParams.stepId){  //We have a validation to work with
-      Issue.query({issueId:$stateParams.issueId||"", step:$stateParams.stepId||""}, function(result){
-        if(result[0] && result[0].redirect){
-          window.location = result[0].redirect;
-        }
-        else{
-          $scope.issues = result;
-        }
-      });
+    if($state.current.name!="issues.new"){
+      if($stateParams.stepId){  //We have a validation to work with
+        Issue.query({issueId:$stateParams.issueId||"", step:$stateParams.stepId||""}, function(result){
+          if(result[0] && result[0].redirect){
+            window.location = result[0].redirect;
+          }
+          else{
+            $scope.issues = result;
+          }
+        });
+      }
+      else{ //We should be working with an individual issue
+        Issue.query({issueId: $stateParams.issueId}, function(result){
+          if(result[0] && result[0].redirect){
+            window.location = result[0].redirect;
+          }
+          else{
+            $scope.issues = result;
+            //first get the step, then the validation
+            Step.query({stepId: $scope.issues[0].step}, function(step){
+              $scope.step = step[0].name;
+              Validation.query({validationId: step[0].validationid}, function(validation){
+                $scope.validation = validation[0].title;
+              });
+            })
+          }
+        })
+      }
+
     }
-    else{ //We should be working with an individual step
-      Issue.query({issueId: $stateParams.issueId}, function(result){
-        if(result[0] && result[0].redirect){
-          window.location = result[0].redirect;
-        }
-        else{
-          $scope.issues = result;
-        }
-      })
+    else{
+      //get a list of validations
     }
+
+
 
     $scope.activeTab = 0;
 
@@ -271,7 +330,13 @@
     }
 
     $scope.delete = function(id){
-      console.log("delete me");
+      Issue.delete({issueId:id}, function(result){
+        for(var i=0;i<$scope.issues.length;i++){
+          if($scope.issues[i]._id == id){
+            $scope.issues.splice(i,1);
+          }
+        }
+      });
     };
 
     $scope.save = function(id){
@@ -358,15 +423,61 @@
     var User = $resource("api/users/:userId", {userId: "@userId"});
 
 
-    User.query({userId:'count', 'role.name': 'partner'}, function(result){   //  /api/users/count
-      if(result[0] && result[0].redirect){
-        window.location = result[0].redirect;
+    Validation.query({Id:"count"}, function(result){
+      $scope.validationCount = result[0];
+    });
+
+    User.query({userId:"roles"}, function(result){
+      $scope.userRoles = result;
+      User.query({userId:'count', role: getUserRoleId('user')}, function(result){   //  /api/users/count
+        if(result[0] && result[0].redirect){
+          window.location = result[0].redirect;
+        }
+        else{
+          $scope.pendingUsers = result[0];
+        }
+      }); //this fetches user that aren't authorised (or in other words 'user' users)
+    });
+
+
+    Issue.query({issueId:"status"}, function(result){
+      $scope.issueStatus = result;
+      Issue.query({issueId:'count', status: getIssueStatusId('Open')}, function(result){   //  /api/users/count
+        if(result[0] && result[0].redirect){
+          window.location = result[0].redirect;
+        }
+        else{
+          $scope.pendingIssues = result[0];
+        }
+      }); //this fetches user that aren't authorised (or in other words 'user' users)
+
+    });
+
+    function getUserRoleId(name){
+      for(var i=0;i<$scope.userRoles.length;i++){
+        if($scope.userRoles[i].name == name){
+          return $scope.userRoles[i]._id;
+        }
       }
-      else{
-        $scope.pendingUsers = result[0];
+    }
+
+    function getIssueStatusId(name){
+      for(var i=0;i<$scope.issueStatus.length;i++){
+        if($scope.issueStatus[i].name == name){
+          return $scope.issueStatus[i]._id;
+        }
       }
-    }); //this fetches user that aren't authorised (or in other words 'user' users)
+    }
 
   }]);
+
+  app.controller('adminController', ['$scope', function($scope){
+    $scope.activeTab = 0;
+
+    $scope.setTab = function(index){
+      $scope.activeTab = index;
+    }
+  }]);
+
 
 })();

@@ -4,7 +4,7 @@
   <ul class="validation-list" ng-hide="validations.length==0">
     <li ng-repeat="validation in validations">
       <a ui-sref=".detail({Id:'{{validation._id}}'})">{{validation.title}}</a>
-      <div class="delete" ng-click="delete('{{validation._id}}')">Delete</div>
+      <div class="delete" ng-click="delete(validation._id)">Delete</div>
     </li>
   </ul>
   <ng-include ng-show="{{validations.length==0}}" src="'/views/noresults.html'"></ng-include>

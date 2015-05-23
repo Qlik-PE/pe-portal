@@ -15,7 +15,7 @@
       <select class="form-control" ng-change="save(step._id)" ng-model="step.status" ng-options="item.name for item in stepStatus track by item._id">
       <select>
       <a class="issue-count" ui-sref="step.issues({stepId:'{{step._id}}'})">{{step.issues.length}}</a>
-      <div class="delete" ng-click="delete('{{step._id}}')">Delete</div>
+      <div class="delete" ng-click="delete(step._id)">Delete</div>
     </li>
     <li>
       <input class="form-control" ng-model="newStepName" />

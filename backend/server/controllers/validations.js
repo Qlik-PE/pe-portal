@@ -9,6 +9,16 @@ module.exports = {
       callbackFn.call(null, results);
     });
   },
+  getCount: function(query, callbackFn){
+    console.log('getting count of validations');
+    model.count(query, function(err, result){
+      if(err){
+        console.log(err);
+      }
+      console.log(result);
+      callbackFn.call(null, result);
+    });
+  },
   save: function(id, data, callbackFn){
     if(id){ //update
       //before saving we'll remove the partner data from the validation object
@@ -28,5 +38,15 @@ module.exports = {
         callbackFn.call(null, result);
       });
     }
+  },
+  delete: function(query, callbackFn){
+    model.findOne(query).remove().exec(function(err){
+      if(err){
+        callbackFn.call(null, error);
+      }
+      else{
+        callbackFn.call(null, {result: "success"})
+      }
+    })
   }
 };

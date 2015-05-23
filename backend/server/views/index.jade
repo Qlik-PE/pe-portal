@@ -16,7 +16,7 @@ html(ng-app='peportal')
           a(href='#/') Home
         ul.nav.navbar-nav.navbar-right
           li
-            a(href="#validations") Validations     
+            a(ui-sref="publicvalidations") Validations     
             if isAuthenticated
               li.dropdown
                 a.dropdown-toggle(
@@ -28,18 +28,21 @@ html(ng-app='peportal')
                   ) #{user.name}
                   span.caret
                 ul.dropdown-menu(role="menu")
-                  if user.role.name == 'qlik' || user.role.name == 'partner'
+                  if user.role.name != 'user'
                     li
                       a(ui-sref="dashboard") Dashboard
                     li
                       a(ui-sref="validations") Manage Validations                   
                     li
-                      a(ui-sref="users") Manage Users                            
+                      a(ui-sref="users") Manage Users    
+                  if user.role.name == "admin"
+                    li
+                      a(ui-sref="adminsettings") Settings    
                   li
                     a(href="/auth/logout") Logout
             else     
               li(style="color: rgb(94,168,63);")
-                a(href="#loginsignup") Login
+                a(ui-sref="loginsignup") Login
     div.container
       div(ui-view)
     div.footer

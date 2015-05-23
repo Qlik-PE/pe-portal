@@ -1,0 +1,27 @@
+<div class="adminconsole">
+  <h1>Admin Console</h1>
+    <div class="col-md-12">
+      <ul class="tabs">
+        <li ng-class="{active:activeTab===0}">
+          <a ng-click="setTab(0)">User Roles</a>
+        </li>
+        <li ng-class="{active:activeTab===1}">
+          <a ng-click="setTab(1)">Step Templates</a>
+        </li>
+        <li ng-class="{active:activeTab===2}">
+          <a ng-click="setTab(2)">Page Content</a>
+        </li>
+      </ul>
+    </div>
+    <div class="col-md-12">
+      <div ng-show="activeTab==0">
+        <ng-include src="'/views/admin/admin-userroles.html'"></ng-include>
+      </div>
+      <div ng-show="activeTab==1">
+        <ng-include src="'/views/admin/admin-steptemplates.html'"></ng-include>
+      </div>
+      <div ng-show="activeTab==2">
+        <ng-include src="'/views/admin/admin-pagecontent.html'"></ng-include>
+      </div>
+    </div>
+</div>

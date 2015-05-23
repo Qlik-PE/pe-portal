@@ -21,6 +21,16 @@ module.exports = {
       callbackFn.call(null, results);
     });
   },
+  getCount: function(query, callbackFn){
+    console.log(query);
+    model.count(query, function(err, result){
+      if(err){
+        console.log(err);
+      }
+      console.log(result);
+      callbackFn.call(null, result);
+    });
+  },
   save: function(id, data, callbackFn){
     if(id){ //update
       model.findOneAndUpdate({_id:id}, data, function(err, result){
@@ -50,5 +60,15 @@ module.exports = {
         })
       });
     }
+  },
+  delete: function(query, callbackFn){
+    model.findOne(query).remove().exec(function(err){
+      if(err){
+        callbackFn.call(null, error);
+      }
+      else{
+        callbackFn.call(null, {result: "success"})
+      }
+    })
   }
 };

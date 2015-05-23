@@ -29,6 +29,7 @@ module.exports = function(passport, User){
                         newUser.salt = newUser.makeSalt();
                         newUser.hashed_password = newUser.hashPassword(password);
                         newUser.email = req.param('email');
+												newUser.username = req.param('email');
                         console.log(newUser);
                         // save the user
                         newUser.save(function(err) {

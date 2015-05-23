@@ -52,5 +52,15 @@ module.exports = {
         });
       });
     }
+  },
+  delete: function(query, callbackFn){
+    model.findOne(query).remove().exec(function(err){
+      if(err){
+        callbackFn.call(null, error);
+      }
+      else{
+        callbackFn.call(null, {result: "success"})
+      }
+    })
   }
 };

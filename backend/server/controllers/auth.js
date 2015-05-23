@@ -2,7 +2,7 @@ module.exports = {
   isLoggedIn: function(req, res, next){
     console.log('checking auth');
     if(req.isAuthenticated() || hasHeaderAuthentication(req)){
-      if(req.user.role.name.name=="user"){
+      if(req.user.role.name=="user"){
         res.json({errorCode:401, errorText:'Insufficient Permissions'});
       }
       else{

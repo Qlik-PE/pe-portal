@@ -2,7 +2,19 @@
   <h2>Dashboard</h2>
   <ul>
     <li>
-      <a>
+      <a ui-sref="validations">
+        {{validationCount}}
+        <h3>Total Validations</h3>
+      </a>
+    </li>
+    <li>
+      <a ui-sref="issues">
+        {{pendingIssues}}
+        <h3>Oustanding Issues</h3>
+      </a>
+    </li>
+    <li>
+      <a ui-sref="users">
         {{pendingUsers}}
         <h3>Pending User Requests</h3>
       </a>
