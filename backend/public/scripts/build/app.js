@@ -411,9 +411,11 @@
     }
   }]);
 
-  app.controller("userController", ["$scope", "$resource", "$state", "$stateParams", function($scope, $resource, $state, $stateParams){
+  app.controller("userController", ["$scope", "$resource", "$state", "$stateParams", "userPermissions", function($scope, $resource, $state, $stateParams, userPermissions){
     var User = $resource("api/users/:userId", {userId: "@userId"});
     var UserRoles = $resource("api/userroles/:roleId", {roleId: "@roleId"});
+
+    $scope.permissions = userPermissions;
 
     UserRoles.query({}, function(result){
       $scope.userRoles = result;
