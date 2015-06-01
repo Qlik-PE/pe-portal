@@ -98,6 +98,9 @@
 
   }]);
 
+  //Services
+  include "./services/permissions.js"
+
   //Controllers
   include "./controllers/main.js"
   include "./controllers/auth.js"

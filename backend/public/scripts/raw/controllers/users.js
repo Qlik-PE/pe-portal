@@ -1,7 +1,8 @@
 app.controller("userController", ["$scope", "$resource", "$state", "$stateParams", function($scope, $resource, $state, $stateParams){
   var User = $resource("api/users/:userId", {userId: "@userId"});
+  var UserRoles = $resource("api/userroles/:roleId", {roleId: "@roleId"});
 
-  User.query({userId:"roles"}, function(result){
+  UserRoles.query({}, function(result){
     $scope.userRoles = result;
   });  //this creates a GET query to api/users/roles
 

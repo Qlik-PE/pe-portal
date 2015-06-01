@@ -6,5 +6,10 @@ module.exports = {
   insufficientPermissions: {
     errCode: 1,
     errText: "Insufficient Permissions"
+  },
+  notLoggedIn:{
+    errCode: 2,
+    errText: "User not logged in"
+
   }
 }

@@ -1,8 +1,8 @@
 .adminconsole{
+  width: 100%;
   .tabs{
     li{
       color: @headers;
-      display: inline-block;
       height: 30px;
       line-height: 30px;
       font-size: 14px;
@@ -12,6 +12,23 @@
         font-weight: bold;
         color: @green;
       }
+    }
+  }
+
+  .tabs.horizontal{
+    li{
+      display: inline-block;
+    }
+  }
+
+  .permission-summary{
+    padding: 5px;
+    label{
+      margin-right: 5px;
+    }
+    input{
+      display: inline-block;
+      width: 30%;
     }
   }
 }

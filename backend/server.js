@@ -24,6 +24,7 @@ require(__dirname+'/server/models/issues');
 require(__dirname+'/server/controllers/passport/passport')(passport);
 
 //route controllers
+var systemRoutes = require(__dirname+'/server/routes/system/system');
 var apiRoutes = require(__dirname+'/server/routes/api/api');
 var authRoutes = require(__dirname+'/server/routes/auth');
 
@@ -47,6 +48,7 @@ app.get('/', function(req, res){
 });
 
 //load the routes
+app.use('/system', systemRoutes);
 app.use('/api', apiRoutes);
 app.use('/auth', authRoutes);
 

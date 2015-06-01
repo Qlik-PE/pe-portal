@@ -1,14 +1,21 @@
-app.controller("dashboardController", ["$scope", "$resource", "$state", "$stateParams", function($scope, $resource, $state, $stateParams){
+app.controller("dashboardController", ["$scope", "$resource", "$state", "$stateParams",'userPermissions',  function($scope, $resource, $state, $stateParams, userPermissions){
   var Validation = $resource("api/validations/:Id", {validationId: "@Id"});
   var Issue = $resource("api/issues/:issueId", {issueId: "@issueId"});
   var User = $resource("api/users/:userId", {userId: "@userId"});
+  var UserRoles = $resource("api/userroles/:roleId", {userId: "@roleId"});  
 
+  $scope.permissions = userPermissions;
 
   Validation.query({Id:"count"}, function(result){
-    $scope.validationCount = result[0];
+    if(result[0] && result[0].redirect){
+      window.location = result[0].redirect;
+    }
+    else{
+      $scope.validationCount = result[0];
+    }
   });
 
-  User.query({userId:"roles"}, function(result){
+  UserRoles.query({}, function(result){
     $scope.userRoles = result;
     User.query({userId:'count', role: getUserRoleId('user')}, function(result){   //  /api/users/count
       if(result[0] && result[0].redirect){
@@ -33,6 +40,7 @@ app.controller("dashboardController", ["$scope", "$resource", "$state", "$stateP
     }); //this fetches user that aren't authorised (or in other words 'user' users)
 
   });
+
 
   function getUserRoleId(name){
     for(var i=0;i<$scope.userRoles.length;i++){

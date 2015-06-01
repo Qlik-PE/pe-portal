@@ -98,6 +98,33 @@
 
   }]);
 
+  //Services
+  app.service('userPermissions', ['$resource', function($resource){
+    var System = $resource("system/:path", {path: "@path"});
+    this.permissions = {};
+    var that = this;
+    this.canCreate = function(entity){
+      return this.permissions[entity] && this.permissions[entity].create && this.permissions[entity].create==true
+    }
+    this.canRead = function(entity){
+      console.log(entity);
+      return this.permissions[entity] && this.permissions[entity].read && this.permissions[entity].read==true
+    }
+    this.canUpdate = function(entity){
+      return this.permissions[entity] && this.permissions[entity].update && this.permissions[entity].update==true
+    }
+    this.canDelete = function(entity){
+      return this.permissions[entity] && this.permissions[entity].delete && this.permissions[entity].delete==true
+    }
+    this.refresh = function(){
+      System.get({path:'userpermissions'}, function(result){
+        that.permissions = result;
+      });
+    }
+    this.refresh();
+  }]);
+
+
   //Controllers
   app.controller('mainController', ['$scope', function($scope){
     
@@ -107,9 +134,11 @@
 
   }]);
 
-  app.controller('validationController', ['$scope', '$resource', '$state', '$stateParams', function($scope, $resource, $state, $stateParams){
+  app.controller('validationController', ['$scope', '$resource', '$state', '$stateParams', 'userPermissions', function($scope, $resource, $state, $stateParams, userPermissions){
     var Validations = $resource('api/validations/:validationId', {validationId:'@id'});
     var ValidationImages = $resource('api/validations/:validationId/image', {validationId: '@id'});
+
+    $scope.permissions = userPermissions;
 
     console.log($state.current.name);
 
@@ -384,8 +413,9 @@
 
   app.controller("userController", ["$scope", "$resource", "$state", "$stateParams", function($scope, $resource, $state, $stateParams){
     var User = $resource("api/users/:userId", {userId: "@userId"});
+    var UserRoles = $resource("api/userroles/:roleId", {roleId: "@roleId"});
 
-    User.query({userId:"roles"}, function(result){
+    UserRoles.query({}, function(result){
       $scope.userRoles = result;
     });  //this creates a GET query to api/users/roles
 
@@ -417,17 +447,24 @@
     };
   }]);
 
-  app.controller("dashboardController", ["$scope", "$resource", "$state", "$stateParams", function($scope, $resource, $state, $stateParams){
+  app.controller("dashboardController", ["$scope", "$resource", "$state", "$stateParams",'userPermissions',  function($scope, $resource, $state, $stateParams, userPermissions){
     var Validation = $resource("api/validations/:Id", {validationId: "@Id"});
     var Issue = $resource("api/issues/:issueId", {issueId: "@issueId"});
     var User = $resource("api/users/:userId", {userId: "@userId"});
+    var UserRoles = $resource("api/userroles/:roleId", {userId: "@roleId"});  
 
+    $scope.permissions = userPermissions;
 
     Validation.query({Id:"count"}, function(result){
-      $scope.validationCount = result[0];
+      if(result[0] && result[0].redirect){
+        window.location = result[0].redirect;
+      }
+      else{
+        $scope.validationCount = result[0];
+      }
     });
 
-    User.query({userId:"roles"}, function(result){
+    UserRoles.query({}, function(result){
       $scope.userRoles = result;
       User.query({userId:'count', role: getUserRoleId('user')}, function(result){   //  /api/users/count
         if(result[0] && result[0].redirect){
@@ -453,6 +490,7 @@
 
     });
 
+
     function getUserRoleId(name){
       for(var i=0;i<$scope.userRoles.length;i++){
         if($scope.userRoles[i].name == name){
@@ -471,11 +509,48 @@
 
   }]);
 
-  app.controller('adminController', ['$scope', function($scope){
+  app.controller("adminController", ["$scope", "$resource", "$state", "$stateParams", "userPermissions", function($scope, $resource, $state, $stateParams, userPermissions){
+    var UserRoles = $resource("api/userroles/:roleId", {roleId: "@roleId"});
+    var System = $resource("system/:path", {path: "@path"});
+    $scope.permissions = userPermissions;
+    $scope.collections = [
+      "validations",
+      "steps",
+      "issues",
+      "users",
+      "userroles",
+      "steptypes",
+      "stepstatus",
+      "issuestatus"
+    ];
+
+    UserRoles.query({}, function(result){
+      if(result[0] && result[0].redirect){
+        window.location = result[0].redirect;
+      }
+      else{
+        $scope.roles = result;
+      }
+    });
+
+    $scope.activeRole = 0;
+
     $scope.activeTab = 0;
 
     $scope.setTab = function(index){
       $scope.activeTab = index;
+    }
+
+    $scope.setRole = function(index){
+      $scope.activeRole = index;
+    }
+
+    $scope.saveRole = function(){
+      console.log($scope.roles[$scope.activeRole]);
+      UserRoles.save({roleId:$scope.roles[$scope.activeRole]._id}, $scope.roles[$scope.activeRole], function(result){
+        console.log('Success');
+        $scope.permissions.refresh();
+      });
     }
   }]);
 

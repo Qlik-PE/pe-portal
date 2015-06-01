@@ -9,7 +9,8 @@ var controllers = {
     validations : require("../../controllers/validations"),
     steps       : require("../../controllers/steps"),
     issues      : require("../../controllers/issues"),
-    users       : require("../../controllers/users")
+    users       : require("../../controllers/users"),
+    userroles       : require("../../controllers/user-roles")
 };
 
 //This route is for getting a list of results for the specified entity
@@ -19,18 +20,41 @@ router.get("/:entity", Auth.isLoggedIn, function(req, res){
   var query = req.query || {};
   var entity = req.params.entity;
   var user = req.user;
-  console.log(req.user.role.permissions);
   var userPermissions = req.user.role.permissions[entity];
   //check that the user has sufficient permissions for this operation
-  if(!userPermissions || userPermissions.read==false){
+  if(!userPermissions || userPermissions.read!=true){
     res.json([Error.insufficientPermissions]);
   }
   else{
-    if(user.role.onlyOwn==true){
+    if(userPermissions.allOwners!=true){
       query['partner']=user.partner;
     }
+    console.log(query);
     controllers[entity].get(query, function(results){
       res.json(results);
+    });
+  }
+});
+
+//This route is for getting a count of results for the specified entity
+//url parameters can be used to add filtering
+//Requires 'read' permission on the specified entity
+router.get("/:entity/count", Auth.isLoggedIn, function(req, res){
+  var query = req.query || {};
+  var entity = req.params.entity;
+  var user = req.user;
+  var userPermissions = req.user.role.permissions[entity];
+  //check that the user has sufficient permissions for this operation
+  if(!userPermissions || userPermissions.read!=true){
+    res.json([Error.insufficientPermissions]);
+  }
+  else{
+    if(userPermissions.allOwners!=true){
+      query['partner']=user.partner;
+    }
+    console.log(query);
+    controllers[entity].getCount(query, function(results){
+      res.json([results]);
     });
   }
 });
@@ -38,21 +62,80 @@ router.get("/:entity", Auth.isLoggedIn, function(req, res){
 //This route is for getting a specific result from the specified entity
 //url parameters can be used to add filtering
 //Requires 'read' permission on the specified entity
-router.get("/:id", Auth.isLoggedIn, function(req, res){
+router.get("/:entity/:id", Auth.isLoggedIn, function(req, res){
   var query = {
     "_id":req.params.id
   };
-  if(req.user.role.name=="partner"){ //we add the partnerId to the query to add an extra layer of security
-    query['partner']=req.user.partner;
+  var entity = req.params.entity;
+  var user = req.user;
+  var userPermissions = req.user.role.permissions[entity];
+  //check that the user has sufficient permissions for this operation
+  if(!userPermissions || userPermissions.read==false){
+    res.json([Error.insufficientPermissions]);
   }
-  Validations.get(query,function(validations){
-    if(validations.length>0){
-      res.json(validations);
+  else{
+    if(userPermissions.allOwners!=true){
+      query['partner']=user.partner;
     }
-    else{
-      res.json({errorCode: 1, errorText: "Validation does not exist or you do not have sufficient permissions."});
+    controllers[entity].get(query,function(results){
+      if(results.length>0){
+        res.json(results);
+      }
+      else{
+        res.json([Error.insufficientPermissions]);
+      }
+    });
+  }
+});
+
+//This route is for creating a new record on the specified entity and returning the new record
+//Requires 'create' permission on the specified entity
+router.post("/:entity/", Auth.isLoggedIn, function(req, res){
+  var entity = req.params.entity;
+  var user = req.user;
+  var userPermissions = req.user.role.permissions[entity];
+  if(!userPermissions || userPermissions.create!=true){
+    res.json(Error.insufficientPermissions);
+  }
+  else{
+    controllers[entity].save(null, req.body, function(result){
+      res.json(result);
+    });
+  }
+});
+
+
+//This route is for saving a specific record on the specified entity
+//url parameters can be used to add filtering
+//Requires 'update' permission on the specified entity
+router.post("/:entity/:id", Auth.isLoggedIn, function(req, res){
+  var query = {
+    "_id": req.params.id
+  };
+  var entity = req.params.entity;
+  var user = req.user;
+  var userPermissions = req.user.role.permissions[entity];
+  console.log(userPermissions);
+  //check that the user has sufficient permissions for this operation
+  if(!userPermissions || userPermissions.update!=true){
+    res.json(Error.insufficientPermissions);
+  }
+  else{
+    if(userPermissions.allOwners!=true){
+      query['partner']=user.partner;
     }
-  });
+
+    controllers[entity].get(query, function(records){
+      if(records.length > 0){
+        controllers[entity].save(req.params.id, req.body, function(result){
+          res.json(result);
+        });
+      }
+      else{
+        res.json(Error.noRecord);
+      }
+    });
+  }
 });
 
 module.exports = router;

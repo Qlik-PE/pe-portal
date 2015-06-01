@@ -1,4 +1,4 @@
-.validation-list,.validation-step-list, .step-issue-list, .user-list {
+.validation-list,.validation-step-list, .step-issue-list, .user-list, .permissions-list {
   padding: 10px 5px;
   li{
     height: 30px;
@@ -21,7 +21,19 @@
   }
 }
 
-.validation-step-list, .step-issue-list, .user-list{
+.roles-list{
+  .new{
+    float: right;
+    color: @green;
+    margin-right: 10px;
+  }
+  input{
+    display: inline-block;
+    width: 80%;
+  }
+}
+
+.validation-step-list, .step-issue-list, .user-list, .permissions-list{
   li{
     height: 45px;
     line-height: 45px;
@@ -36,17 +48,43 @@
         width: 25% !important;
       }
     }
-    label{
-      &:last-of-type{
-        width: 5% !important;
-      }
-    }
+
     select{
       display: inline-block;
     }
     input.form-control, select.form-control{
       height: 34px !important;
       line-height: 34px !important;
+    }
+  }
+}
+
+.validation-step-list{
+  li{
+    label{
+      &:last-of-type{
+        width: 5% !important;
+      }
+    }
+  }
+}
+
+.permissions-list{
+  li{
+    height: 34px !important;
+    line-height: 34px !important;
+
+    :not(:first-child){
+      width: 10% !important;
+      display: inline-block;
+      text-indent: 0;
+      &[type='checkbox']{
+        border: none;
+        box-shadow: none;
+      }
+    }
+    :first-child{
+      width: 30% !important;
     }
   }
 }

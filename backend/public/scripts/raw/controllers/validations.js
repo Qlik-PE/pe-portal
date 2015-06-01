@@ -1,6 +1,8 @@
-app.controller('validationController', ['$scope', '$resource', '$state', '$stateParams', function($scope, $resource, $state, $stateParams){
+app.controller('validationController', ['$scope', '$resource', '$state', '$stateParams', 'userPermissions', function($scope, $resource, $state, $stateParams, userPermissions){
   var Validations = $resource('api/validations/:validationId', {validationId:'@id'});
   var ValidationImages = $resource('api/validations/:validationId/image', {validationId: '@id'});
+
+  $scope.permissions = userPermissions;
 
   console.log($state.current.name);
 
