@@ -21,7 +21,7 @@
         <span>{{issues[0].user.name}}</span>
         <br>
         <label>Created: </label>
-        <span>{{issues[0].created}}</span>
+        <span>{{issues[0].created | date:'mediumDate'}}</span>
         <br>
         <label>Status: </label>
         <select class="form-control" ng-change="save(issues[0]._id)" ng-model="issues[0].status" ng-options="item.name for item in issueStatus track by item._id">

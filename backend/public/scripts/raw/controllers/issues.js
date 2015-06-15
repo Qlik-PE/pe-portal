@@ -1,9 +1,12 @@
-app.controller("issueController", ["$scope", "$resource", "$state", "$stateParams", function($scope, $resource, $state, $stateParams){
+app.controller("issueController", ["$scope", "$resource", "$state", "$stateParams", "userPermissions", function($scope, $resource, $state, $stateParams, userPermissions){
   var Issue = $resource("api/issues/:issueId", {issueId: "@issueId"});
+  var IssueStatus = $resource("api/issuestatus/:statusId", {statusId: "@statusId"});
   var Step = $resource("api/steps/:stepId", {stepId: "@stepId"});
   var Validation = $resource("api/validations/:validationId", {validationId: "@validationId"});
 
-  Issue.query({issueId:"status"}, function(result){
+  $scope.permissions = userPermissions;
+
+  IssueStatus.query({}, function(result){
     if(result[0] && result[0].redirect){
       window.location = result[0].redirect;
     }

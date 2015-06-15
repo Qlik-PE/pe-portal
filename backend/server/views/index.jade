@@ -1,19 +1,24 @@
 doctype html
-html(ng-app='peportal')
+html(ng-app="peportal")
   head
-    title('Qlik Partner Portal')
-    link(rel='stylesheet', href='/bower_components/bootstrap/dist/css/bootstrap.css')
-    link(rel='stylesheet', href='/css/main.css')
-    script(src='/bower_components/jquery/dist/jquery.min.js')
-    script(src='/bower_components/angular/angular.min.js')
-    script(src='/bower_components/angular-resource/angular-resource.min.js')
-    script(src='/bower_components/angular-ui-router/release/angular-ui-router.min.js')
-    script(src='/js/app.js')
-  body
+    title("Qlik Partner Portal")
+    link(rel="stylesheet", href="/bower_components/bootstrap/dist/css/bootstrap.css")
+    link(rel="stylesheet" href="bower_components/ng-notifications-bar/dist/ngNotificationsBar.min.css")
+    link(rel="stylesheet", href="/css/main.css")    
+    script(src="/bower_components/jquery/dist/jquery.min.js")
+    script(src="/bower_components/angular/angular.min.js")
+    script(src="/bower_components/angular-resource/angular-resource.min.js")
+    script(src="/bower_components/angular-ui-router/release/angular-ui-router.min.js")    
+    script(src="/bower_components/angular-sanitize/angular-sanitize.js")
+    script(src="/bower_components/ng-notifications-bar/dist/ngNotificationsBar.min.js")
+    script(src="/bower_components/angular-utils-ui-breadcrumbs/uiBreadcrumbs.js")
+    script(src="/js/app.js")
+  body    
+    notifications-bar.notifications.container
     div.header
-      div.container
+      div.container        
         div.logo
-          a(href='#/') Home
+          a(href="#/") Home
         ul.nav.navbar-nav.navbar-right
           li
             a(ui-sref="publicvalidations") Validations     
@@ -24,11 +29,11 @@ html(ng-app='peportal')
                     data-toggle="dropdown" 
                     role="button" 
                     aria-expanded="false" 
-                    data-count=notificationCount||''
+                    data-count=notificationCount||""
                   ) #{user.name}
                   span.caret
                 ul.dropdown-menu(role="menu")
-                  if user.role.name != 'user'
+                  if user.role.name != "user"
                     li
                       a(ui-sref="dashboard") Dashboard
                     li
@@ -43,10 +48,10 @@ html(ng-app='peportal')
             else     
               li(style="color: rgb(94,168,63);")
                 a(ui-sref="loginsignup") Login
-    div.container
-      div(ui-view)
+    div.container    
+      div(ui-view)        
     div.footer
       div.container        
         div.foot-title
           span Qlik Partner Engineering Portal
-      script(src='/bower_components/bootstrap/dist/js/bootstrap.min.js')
+      script(src="/bower_components/bootstrap/dist/js/bootstrap.min.js")

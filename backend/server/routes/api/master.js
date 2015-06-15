@@ -1,16 +1,52 @@
 var express = require('express'),
     router = express.Router(),
     Auth = require('../../controllers/auth'),
-    Error = require('../../controllers/error');
+    Error = require('../../controllers/error'),
+    MasterController = require('../../controllers/master');
 
 //Include all Controllers for now
 //This should later be changed for a 'master' controller
-var controllers = {
-    validations : require("../../controllers/validations"),
-    steps       : require("../../controllers/steps"),
-    issues      : require("../../controllers/issues"),
-    users       : require("../../controllers/users"),
-    userroles       : require("../../controllers/user-roles")
+var entities = {
+    validations   : {
+      model: require("../../models/validations"),
+      populates: 'partner',
+      exemptFromOwnership: false
+    },
+    steps         : {
+      model: require("../../models/steps"),
+      populates: 'type status issues partner user',
+      exemptFromOwnership: false
+    },
+    steptypes     : {
+      model: require("../../models/step-types"),
+      populates: '',
+      exemptFromOwnership: true
+    },
+    stepstatus    : {
+      model: require("../../models/step-status"),
+      populates: '',
+      exemptFromOwnership: true
+    },
+    issues        : {
+      model: require("../../models/issues"),
+      populates: 'status',
+      exemptFromOwnership: false
+    },
+    issuestatus   : {
+      model: require("../../models/issue-status"),
+      populates: '',
+      exemptFromOwnership: true
+    },
+    users         : {
+      model: require("../../models/users"),
+      populates: 'partner role',
+      exemptFromOwnership: false
+    },
+    userroles     : {
+      model: require("../../models/user-roles"),
+      populates: '',
+      exemptFromOwnership: true
+    }
 };
 
 //This route is for getting a list of results for the specified entity
@@ -26,12 +62,13 @@ router.get("/:entity", Auth.isLoggedIn, function(req, res){
     res.json([Error.insufficientPermissions]);
   }
   else{
-    if(userPermissions.allOwners!=true){
+    if(userPermissions.allOwners!=true && entities[entity].exemptFromOwnership!=true){
       query['partner']=user.partner;
     }
     console.log(query);
-    controllers[entity].get(query, function(results){
-      res.json(results);
+    MasterController.get(query, entities[entity], function(results){
+      console.log('GET results are - '+results);
+      res.json(results || []);
     });
   }
 });
@@ -53,8 +90,8 @@ router.get("/:entity/count", Auth.isLoggedIn, function(req, res){
       query['partner']=user.partner;
     }
     console.log(query);
-    controllers[entity].getCount(query, function(results){
-      res.json([results]);
+    MasterController.count(query, entities[entity], function(results){
+      res.json([results]||[]);
     });
   }
 });
@@ -63,9 +100,8 @@ router.get("/:entity/count", Auth.isLoggedIn, function(req, res){
 //url parameters can be used to add filtering
 //Requires 'read' permission on the specified entity
 router.get("/:entity/:id", Auth.isLoggedIn, function(req, res){
-  var query = {
-    "_id":req.params.id
-  };
+  var query = req.query || {};
+  query["_id"] = req.params.id;
   var entity = req.params.entity;
   var user = req.user;
   var userPermissions = req.user.role.permissions[entity];
@@ -77,9 +113,9 @@ router.get("/:entity/:id", Auth.isLoggedIn, function(req, res){
     if(userPermissions.allOwners!=true){
       query['partner']=user.partner;
     }
-    controllers[entity].get(query,function(results){
+    MasterController.get(query, entities[entity],function(results){
       if(results.length>0){
-        res.json(results);
+        res.json(results || []);
       }
       else{
         res.json([Error.insufficientPermissions]);
@@ -94,11 +130,13 @@ router.post("/:entity/", Auth.isLoggedIn, function(req, res){
   var entity = req.params.entity;
   var user = req.user;
   var userPermissions = req.user.role.permissions[entity];
+  var data = req.body;
   if(!userPermissions || userPermissions.create!=true){
     res.json(Error.insufficientPermissions);
   }
   else{
-    controllers[entity].save(null, req.body, function(result){
+    data.partner = user.partner;  //add the partnerid of the current user to the record
+    MasterController.save(null, data, entities[entity], function(result){
       res.json(result);
     });
   }
@@ -109,12 +147,12 @@ router.post("/:entity/", Auth.isLoggedIn, function(req, res){
 //url parameters can be used to add filtering
 //Requires 'update' permission on the specified entity
 router.post("/:entity/:id", Auth.isLoggedIn, function(req, res){
-  var query = {
-    "_id": req.params.id
-  };
+  var query = req.query || {};
+  query["_id"] = req.params.id;
   var entity = req.params.entity;
   var user = req.user;
   var userPermissions = req.user.role.permissions[entity];
+  var data = req.body;
   console.log(userPermissions);
   //check that the user has sufficient permissions for this operation
   if(!userPermissions || userPermissions.update!=true){
@@ -124,16 +162,58 @@ router.post("/:entity/:id", Auth.isLoggedIn, function(req, res){
     if(userPermissions.allOwners!=true){
       query['partner']=user.partner;
     }
-
-    controllers[entity].get(query, function(records){
+    MasterController.get(query, entities[entity], function(records){
       if(records.length > 0){
-        controllers[entity].save(req.params.id, req.body, function(result){
+        MasterController.save(query, data, entities[entity], function(result){
           res.json(result);
         });
       }
       else{
         res.json(Error.noRecord);
       }
+    });
+  }
+});
+
+//This route is for deleting a list of records on the specified entity
+//url parameters can be used to add filtering
+//Requires 'delete' permission on the specified entity
+router.delete("/:entity", Auth.isLoggedIn, function(req, res){
+  var query = req.query || {};
+  var entity = req.params.entity;
+  var user = req.user;
+  var userPermissions = req.user.role.permissions[entity];
+  if(!userPermissions || userPermissions.delete!=true){
+    res.json(Error.insufficientPermissions);
+  }
+  else{
+    if(userPermissions.allOwners!=true){
+      query['partner']=user.partner;
+    }
+    MasterController.delete(query, entities[entity], function(result){
+      res.json(result);
+    });
+  }
+});
+
+//This route is for deleting a specific record on the specified entity
+//url parameters can be used to add filtering
+//Requires 'delete' permission on the specified entity
+router.delete("/:entity/:id", Auth.isLoggedIn, function(req, res){
+  var query = req.query || {};
+  query["_id"] = req.params.id;
+  var entity = req.params.entity;
+  var user = req.user;
+  var userPermissions = req.user.role.permissions[entity];
+  if(!userPermissions || userPermissions.delete!=true){
+    res.json(Error.insufficientPermissions);
+  }
+  else{
+    if(userPermissions.allOwners!=true){
+      query['partner']=user.partner;
+    }
+    MasterController.delete(query, entities[entity], function(result){
+      res.json(result);
     });
   }
 });

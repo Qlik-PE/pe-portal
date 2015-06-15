@@ -1,6 +1,6 @@
 <div class="col-md-6">
-  <label>Technology Partner: </label>
-  <span>{{validations[0].partner.partnername}}</span>
+  <label ng-show="permissions.canSeeAll('validations')">Technology Partner: </label>
+  <span>{{validations[0].partner.name}}</span>
   <br>
   <label>Connectivity Method: </label>
   <input class="form-control" ng-disabled="!permissions.canUpdate('validations')" ng-blur="save()" ng-model="validations[0].connect_method"/>
@@ -15,7 +15,7 @@
   <input class="form-control" ng-disabled="!permissions.canUpdate('validations')" ng-blur="save()" ng-model="validations[0].host_physVm"/>
   <br>
   <label>Host in Cloud?: </label>
-  <input class="form-control" ng-disabled="!permissions.canUpdate('validations')" ng-blur="save()" ng-model="validations[0].host_cloudFg"/>
+  <input class="form-control" type="checkbox" ng-disabled="!permissions.canUpdate('validations')" ng-change="save()" ng-model="validations[0].host_cloudFg"/>
   <br>
   <label>Partner Software: </label>
   <input class="form-control" ng-disabled="!permissions.canUpdate('validations')" ng-blur="save()" ng-model="validations[0].partnersw"/>

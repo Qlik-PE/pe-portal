@@ -1,4 +1,5 @@
 var LocalStrategy    = require('passport-local').Strategy;
+var Partner = require('../partners');
 
 module.exports = function(passport, User){
 	passport.use('signup', new LocalStrategy({
@@ -23,6 +24,8 @@ module.exports = function(passport, User){
                     } else {
                         // if there is no user with that email
                         // create the user
+												//create a new partner if no partnerid exists against the user data
+
                         var newUser = new User(req.body);
 
                         // set the user's local credentials
@@ -32,14 +35,32 @@ module.exports = function(passport, User){
 												newUser.username = req.param('email');
                         console.log(newUser);
                         // save the user
-                        newUser.save(function(err) {
-                            if (err){
-                                console.log('Error in Saving user: '+err);
-                                throw err;
-                            }
-                            console.log('User Registration succesful');
-                            return done(null, newUser);
-                        });
+												console.log('body partnerid is - '+req.body.partner);
+												console.log('newuser partnerid is - '+newUser.partner);
+												if(!newUser.partner && req.body.partnername){
+													Partner.save(null, {name: req.body.partnername}, function(result){
+															newUser.partner = result._id
+															newUser.save(function(err) {
+			                            if (err){
+			                                console.log('Error in Saving user: '+err);
+			                                throw err;
+			                            }
+			                            console.log('User Registration succesful');
+			                            return done(null, newUser);
+			                        });
+													});
+												}
+												else{
+													newUser.save(function(err) {
+															if (err){
+																	console.log('Error in Saving user: '+err);
+																	throw err;
+															}
+															console.log('User Registration succesful');
+															return done(null, newUser);
+													});
+												}
+
                     }
                 });
             };

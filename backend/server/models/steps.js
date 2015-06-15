@@ -40,9 +40,20 @@ var ValidationstepSchema = new Schema({
     required: false,
     trim: true
   },
-  user: {  //User associated with the certstep
+  createuser: {  //User associated with the certstep
     type: Schema.ObjectId,
     ref: 'user'
+  },
+  assigneduser: {  //User associated with the certstep
+    type: Schema.ObjectId,
+    ref: 'user'
+  },
+  lastedituser: {  //User associated with the certstep
+    type: Schema.ObjectId,
+    ref: 'user'
+  },
+  lasteditdata:{
+    type: Date
   },
   partner: {  //User associated with the certstep
     type: Schema.ObjectId,

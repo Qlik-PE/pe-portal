@@ -104,9 +104,20 @@ var ValidationSchema = new Schema({
     //required: false,
     trim: true
   },
-  user: {
+  createuser: {
     type: Schema.ObjectId,
     ref: 'User'
+  },
+  assigneduser: {  //User associated with the certstep
+    type: Schema.ObjectId,
+    ref: 'user'
+  },
+  lastedituser: {  //User associated with the certstep
+    type: Schema.ObjectId,
+    ref: 'user'
+  },
+  lasteditdate:{
+    type: Date
   },
   screenshots:[{type:String}]
 });

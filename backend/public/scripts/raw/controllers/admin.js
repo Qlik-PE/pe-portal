@@ -1,6 +1,7 @@
 app.controller("adminController", ["$scope", "$resource", "$state", "$stateParams", "userPermissions", function($scope, $resource, $state, $stateParams, userPermissions){
   var UserRoles = $resource("api/userroles/:roleId", {roleId: "@roleId"});
   var System = $resource("system/:path", {path: "@path"});
+  
   $scope.permissions = userPermissions;
   $scope.collections = [
     "validations",

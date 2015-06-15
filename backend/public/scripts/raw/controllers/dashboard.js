@@ -1,8 +1,9 @@
-app.controller("dashboardController", ["$scope", "$resource", "$state", "$stateParams",'userPermissions',  function($scope, $resource, $state, $stateParams, userPermissions){
+app.controller("dashboardController", ["$scope", "$resource", "$state", "$stateParams","userPermissions", "notifications",  function($scope, $resource, $state, $stateParams, userPermissions, notifications){
   var Validation = $resource("api/validations/:Id", {validationId: "@Id"});
   var Issue = $resource("api/issues/:issueId", {issueId: "@issueId"});
+  var IssueStatus = $resource("api/issuestatus/:statusId", {statusId: "@statusId"});
   var User = $resource("api/users/:userId", {userId: "@userId"});
-  var UserRoles = $resource("api/userroles/:roleId", {userId: "@roleId"});  
+  var UserRoles = $resource("api/userroles/:roleId", {userId: "@roleId"});
 
   $scope.permissions = userPermissions;
 
@@ -17,27 +18,27 @@ app.controller("dashboardController", ["$scope", "$resource", "$state", "$stateP
 
   UserRoles.query({}, function(result){
     $scope.userRoles = result;
-    User.query({userId:'count', role: getUserRoleId('user')}, function(result){   //  /api/users/count
+    User.query({userId:"count", role: getUserRoleId("user")}, function(result){   //  /api/users/count
       if(result[0] && result[0].redirect){
         window.location = result[0].redirect;
       }
       else{
         $scope.pendingUsers = result[0];
       }
-    }); //this fetches user that aren't authorised (or in other words 'user' users)
+    }); //this fetches user that aren"t authorised (or in other words "user" users)
   });
 
 
-  Issue.query({issueId:"status"}, function(result){
+  IssueStatus.query({}, function(result){
     $scope.issueStatus = result;
-    Issue.query({issueId:'count', status: getIssueStatusId('Open')}, function(result){   //  /api/users/count
+    Issue.query({issueId:"count", status: getIssueStatusId("Open")}, function(result){   //  /api/users/count
       if(result[0] && result[0].redirect){
         window.location = result[0].redirect;
       }
       else{
         $scope.pendingIssues = result[0];
       }
-    }); //this fetches user that aren't authorised (or in other words 'user' users)
+    }); //this fetches user that aren"t authorised (or in other words "user" users)
 
   });
 

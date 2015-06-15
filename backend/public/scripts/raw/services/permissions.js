@@ -15,6 +15,9 @@ app.service('userPermissions', ['$resource', function($resource){
   this.canDelete = function(entity){
     return this.permissions[entity] && this.permissions[entity].delete && this.permissions[entity].delete==true
   }
+  this.canSeeAll = function(entity){
+    return this.permissions[entity] && this.permissions[entity].allOwners && this.permissions[entity].allOwners==true
+  }
   this.refresh = function(){
     System.get({path:'userpermissions'}, function(result){
       that.permissions = result;

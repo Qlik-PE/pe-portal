@@ -1,6 +1,6 @@
 <div class="content">
   <h1><input class="form-control title"  ng-disabled="!permissions.canUpdate('validations')" ng-blur="save()" placeholder="Title" ng-model="validations[0].title"/></h1>
-  <button ng-click="delete()" ng-hide="!permissions.canDelete('validations')" class="btn btn-default btn-delete">Delete</button>
+  <button ng-click="delete(validations[0]._id)" ng-hide="!permissions.canDelete('validations')" class="btn btn-default btn-delete">Delete</button>
   <div class="row content-detail">
     <div class="content col-md-12">
       <h2>Description</h2>

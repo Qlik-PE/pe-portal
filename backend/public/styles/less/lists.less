@@ -1,6 +1,8 @@
 .validation-list,.validation-step-list, .step-issue-list, .user-list, .permissions-list {
   padding: 10px 5px;
   li{
+    white-space: nowrap;
+    overflow: hidden;
     height: 30px;
     line-height: 30px;
     background-color: white;
@@ -12,11 +14,13 @@
       float: right;
       color: @red;
       margin-right: 10px;
+      cursor: pointer;
     }
     .new{
       float: right;
       color: @green;
       margin-right: 10px;
+      cursor: pointer;
     }
   }
 }
@@ -26,6 +30,7 @@
     float: right;
     color: @green;
     margin-right: 10px;
+    cursor: pointer;
   }
   input{
     display: inline-block;

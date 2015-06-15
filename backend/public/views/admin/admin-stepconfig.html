@@ -1,0 +1,13 @@
+<div class="col-md-3" style="padding-left:0px;">
+  <h2>Validation Type</h2>
+  <ul class="tabs roles-list">
+    <li ng-class="{active:activeRole===$index}" ng-repeat="role in roles" ng-click="setRole($index)">
+      <a>{{role.name}}</a>
+    </li>
+    <li ng-show="permissions.canCreate('userroles')" >
+      <input class="form-control" placeholder="New Role"/>
+      <div class="new" ng-click="new()">Add</div>
+    </li>
+  </ul>
+</div>
+<div class="col-md-9">

@@ -6,7 +6,7 @@
       <a class="link">{{user.partner.name}}</a>
       <select class="form-control" ng-disabled="!permissions.canUpdate('users')" ng-change="save(user)" ng-model="user.role" ng-options="item.name for item in userRoles track by item._id">
       <select>
-      <div class="delete" ng-show="permissions.canDelete('users')" ng-click="delete('{{user._id}}')">Delete</div>
+      <div class="delete" ng-show="permissions.canDelete('users')" ng-click="delete(user._id)">Delete</div>
     </li>
   </ul>
   <ng-include ng-show="{{users.length==0}}" src="'/views/noresults.html'"></ng-include>

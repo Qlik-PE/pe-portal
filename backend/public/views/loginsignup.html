@@ -3,22 +3,35 @@
     <div class="col-md-1"></div>
     <div class="col-md-4">
       <h2>Signup</h2>
-      <form action='/auth/signup' method='post'>
-        <input class='form-control' name='partner' placeholder='Partner'>
-        <input class='form-control' name='name' placeholder='Fullname'>
-        <input class='form-control' name='email' placeholder='Email'>
-        <input class='form-control' name='password' placeholder='Password' type='password'>
-        <input class='form-control' placeholder='Confirm Password' type='password'>
-        <button class='btn btn-submit btn-register' type='submit'>Signup</button>
+      <div class="smokescreen" ng-if="showSuggestions">
+        <div class="partner-suggestions">
+          <h2>Join Partner</h2>
+          <span>Do you belong to one of these partners?</span>
+          <ul>
+            <li ng-repeat="partner in partners" data-id="partner._id">
+              <a ng-click="selectPartner(partner)">{{partner.name}}</a>
+            </li>
+          </ul>
+          <button class="btn btn-default" ng-click="hideSuggestions()">No</button>
+        </div>
+      </div>
+      <form action="/auth/signup" method="post">
+        <input class="form-control" name="partnername" placeholder="Partner" ng-model="partnername" ng-blur="checkPartner()">
+        <input class="form-control" ng-hide="true" name="partner" ng-model="partner">
+        <input class="form-control" name="name" placeholder="Fullname">
+        <input class="form-control" name="email" placeholder="Email">
+        <input class="form-control" name="password" placeholder="Password" type="password">
+        <input class="form-control" placeholder="Confirm Password" type="password">
+        <button class="btn btn-submit btn-register" type="submit">Signup</button>
       </form>
     </div>
     <div class="col-md-2"></div>
     <div class="col-md-4">
       <h2>Login</h2>
-      <form action='auth/login' method='post'>
-        <input class='form-control' name='email' placeholder='Email'>
-        <input class='form-control' name='password' placeholder='Password' type='password'>
-        <button class='btn btn-submit btn-login' type='submit'>Login</button>
+      <form action="auth/login" method="post">
+        <input class="form-control" name="email" placeholder="Email">
+        <input class="form-control" name="password" placeholder="Password" type="password">
+        <button class="btn btn-submit btn-login" type="submit">Login</button>
       </form>
 
     </div>

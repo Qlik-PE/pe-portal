@@ -17,12 +17,12 @@ var PartnerSchema = new Schema({
   },
   content: {
     type: String,
-    required: true,
+    //required: true,
     trim: true
   },
   technology: {
     type: String,
-    required: true,
+    //required: true,
     trim: true
   },
   weburl: {

@@ -1,8 +1,13 @@
 (function() {
-  var app = angular.module("peportal", ["ui.router", "ngResource"]);
+  var app = angular.module("peportal", ["ui.router", "ngResource", "ngNotificationsBar", "ngSanitize"]);
 
-  app.config(["$stateProvider","$urlRouterProvider", function($stateProvider, $urlRouterProvider) {
+  app.config(["$stateProvider","$urlRouterProvider", "notificationsConfigProvider", function($stateProvider, $urlRouterProvider, notificationsConfigProvider) {
     $urlRouterProvider.otherwise("/");
+
+    notificationsConfigProvider.setAutoHide(true);
+
+    notificationsConfigProvider.setHideDelay(1500);
+
     $stateProvider
 
       // route for the home page
@@ -57,7 +62,6 @@
             controller: "validationController"
           }
         }
-
       })
       // route for viewing a specific validation
       .state("validations.new", {
@@ -86,7 +90,12 @@
         }
       })
       .state("issues", {
-        url: "/issues/:issueId",
+        url: "/issues",
+        templateUrl: "/views/issues/list.html",
+        controller: "issueController"
+      })
+      .state("issues.detail", {
+        url: "/:issueId",
         templateUrl: "/views/issues/detail.html",
         controller: "issueController"
       })
