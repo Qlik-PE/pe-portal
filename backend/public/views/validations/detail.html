@@ -3,6 +3,9 @@
   <button ng-click="delete(validations[0]._id)" ng-hide="!permissions.canDelete('validations')" class="btn btn-default btn-delete">Delete</button>
   <div class="row content-detail">
     <div class="content col-md-12">
+      <label  style="width: auto">Technology Type: </label>
+      <select style="width: 200px; height: 34px; line-height: 34px;" class="form-control" ng-disabled="!permissions.canUpdate('validations')" ng-change="setSteps()" ng-model="validations[0].technology_type" ng-options="item.name for item in technologytypes track by item._id">
+      <select>
       <h2>Description</h2>
       <textarea class="form-control" ng-disabled="!permissions.canUpdate('validations')" ng-blur="save()" ng-model="validations[0].content">{{validations[0].content}}</textarea>
       <ul class="tabs">

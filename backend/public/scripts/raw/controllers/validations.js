@@ -1,7 +1,8 @@
-app.controller("validationController", ["$scope", "$resource", "$state", "$stateParams", "userPermissions", "notifications", function($scope, $resource, $state, $stateParams, userPermissions, notifications){
+app.controller("validationController", ["$scope", "$resource", "$state", "$stateParams", "userPermissions", "notifications", "resultHandler", function($scope, $resource, $state, $stateParams, userPermissions, notifications, resultHandler){
   var Validations = $resource("api/validations/:validationId", {validationId:"@id"});
   var Steps = $resource("api/steps/:stepId", {stepId:"@stepId"});
   var Issues = $resource("api/issues/:issueId", {issueId:"@issueId"});
+  var TechnologyTypes = $resource("api/technologytypes/:techtypeId", {techtypeId: "@techtypeId"});
 
   $scope.permissions = userPermissions;
 
@@ -9,18 +10,21 @@ app.controller("validationController", ["$scope", "$resource", "$state", "$state
 
   if($state.current.name !="validations.new"){
     Validations.query({validationId:$stateParams.Id||""}, function(result){
-      if(result[0] && result[0].redirect){
-        window.location = result[0].redirect;
-      }
-      else if(result.errCode){
-        notifications.showError({message: result.errText})
-      }
-      else{
+      if(resultHandler.process(result)){
         $scope.validations = result;
         $scope.imageUploadPath = "/api/validations/"+$stateParams.Id+"/image";
       }
-    })
+    });
   }
+
+  TechnologyTypes.query({}, function(result){
+    if(result[0] && result[0].redirect){
+      window.location = result[0].redirect;
+    }
+    else{
+      $scope.technologytypes = result;
+    }
+  });
 
   $scope.activeTab = 0;
 
@@ -28,43 +32,51 @@ app.controller("validationController", ["$scope", "$resource", "$state", "$state
     $scope.activeTab = index;
   }
 
+  $scope.setSteps = function(){
+    Steps.query({validationid:$stateParams.Id}, function(stepresult){
+      if(resultHandler.process(stepresult)){
+        if(stepresult.length > 0){
+          resultHandler.process({errCode:true, errText: "Validation already has steps."});
+        }
+        else{
+          for(var i=0;i<$scope.validations[0].technology_type.steps.length;i++){
+            var s = $scope.validations[0].technology_type.steps[i];
+            s.validationid = $stateParams.Id;
+            s.status = "5559a3937730da518d2dc00f";
+            Steps.save({}, s, function(result){
+              if(i==$scope.validations[0].technology_type.steps.length){
+                resultHandler.process(result, "Steps set ");
+                $scope.save();
+                window.location="#validations/"+$stateParams.Id;
+              }
+            });
+          }
+        }
+      }
+    });
+  }
+
   $scope.delete = function(id){
     //first we need to get the list of steps for the validation
     //then for each step get the issues and delete them
     //then we delete the step and finally delete the validation
     Steps.query({validationid:id}, function(stepresult){
-      if(stepresult[0] && stepresult[0].redirect){
-        window.location = stepresult[0].redirect;
-      }
-      else if(stepresult.errCode){
-        notifications.showError({message: stepresult.errText})
-      }
-      else{
+      if(resultHandler.process(stepresult)){
         if(stepresult.length>0){
           for (var i=0;i<stepresult.length;i++){
             var stepId = stepresult[i]._id;       //this variable is used to avoid probelms where i is changed before callbacks are executed
             var isLast = i==stepresult.length-1;  //this variable is used to avoid probelms where i is changed before callbacks are executed
             Issues.delete({stepId: stepId}, function(issueresult){
-              if(issueresult.errCode){
-                notifications.showError({message: issueresult.errText})
-              }
-              else{
+              if(resultHandler.process(issueresult)){
                 Steps.delete({stepId:stepId}, function(result){
-                  if(result.errCode){
-                    notifications.showError({message: result.errText})
-                  }
-                  else if(isLast){
+                  if(resultHandler.process(result)){
                     Validations.delete({validationId: id}, function(result){
-                      if(result.errCode){
-                        notifications.showError({message: result.errText})
-                      }
-                      else{
+                      if(resultHandler.process(result, "Delete")){
                         for(var j=0;j<$scope.validations.length;j++){
                           if($scope.validations[j]._id == id){
                             $scope.validations.splice(j,1);
                           }
                         }
-                        notifications.showSuccess({message: "Successfully Deleted"});
                         window.location = "#validations";
                       }
                     });
@@ -76,16 +88,12 @@ app.controller("validationController", ["$scope", "$resource", "$state", "$state
         }
         else{
           Validations.delete({validationId: id}, function(result){
-            if(result.errCode){
-              notifications.showError({message: result.errText})
-            }
-            else{
+            if(resultHandler.process(result, "Delete")){
               for(var j=0;j<$scope.validations.length;j++){
                 if($scope.validations[j]._id == id){
                   $scope.validations.splice(j,1);
                 }
               }
-              notifications.showSuccess({message: "Successfully Deleted"});
               window.location = "#validations";
             }
           });
@@ -97,20 +105,10 @@ app.controller("validationController", ["$scope", "$resource", "$state", "$state
   $scope.save = function(){
     var id = $stateParams.Id=="new"?"":$stateParams.Id;
     Validations.save({validationId:id}, $scope.validations[0], function(result){
-      if(result.redirect){
-        window.location = result.redirect;
-      }
-      else if($state.current.name =="validations.new"){
-        console.log('saved new');
-        window.location = "/#validations/"+result._id;
-        notifications.showSuccess({message: "Successfully Saved"});
-        //notify the user that the validation was successfully saved
-      }
-      else if (result.errCode) {
-        notifications.showError({message: result.errText});
-      }
-      else{
-        notifications.showSuccess({message: "Successfully Saved"});
+      if(resultHandler.process(result, "Save")){
+        if($state.current.name =="validations.new"){
+          window.location = "/#validations/"+result._id;
+        }
       }
     });  //currently we"re only allowing a save from the detail page, in which case we should only have 1 validation in the array
   };

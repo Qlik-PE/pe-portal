@@ -9,7 +9,11 @@ var ImageSchema = new Schema({
   entityid: Schema.ObjectId,
   mimetype: String,
   filename: String,
-  content: Buffer
+  content: Buffer,
+  createuser: {
+    type: Schema.ObjectId,
+    ref: 'User'
+  }
 });
 
 module.exports = mongoose.model('image', ImageSchema);

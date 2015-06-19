@@ -5,16 +5,16 @@
       <a>{{role.name}}</a>
     </li>
     <li ng-show="permissions.canCreate('userroles')" >
-      <input class="form-control" placeholder="New Role"/>
-      <div class="new" ng-click="new()">Add</div>
+      <input class="form-control" ng-model="newrolename" placeholder="New Role"/>
+      <div class="new" ng-click="newRole(newrolename)">Add</div>
     </li>
   </ul>
 </div>
 <div class="col-md-9">
   <div class="permission-summary">
-    <label>Name:</label><input class="form-control" ng-change="saveRole()" ng-model="roles[activeRole].name"/>
-    <div class="copy" ng-show="permissions.canCreate('userroles')" ng-click="copy(roles[activeRole]._id)">Copy</div>
-    <button ng-click="delete()" ng-show="permissions.canDelete('userroles')" class="btn btn-default btn-delete">Delete</button>
+    <label>Name:</label><input class="form-control" ng-change="saveRole()" ng-model="copyRoleName"/>
+    <div class="copy" ng-show="permissions.canCreate('userroles')" ng-click="copyRole(copyRoleName)">Copy</div>
+    <button ng-click="delete(activeRole)" ng-show="permissions.canDelete('userroles')" class="btn btn-default btn-delete">Delete</button>
   </div>
   <ul class="permissions-list">
     <li class="table-header">
@@ -26,7 +26,7 @@
       <label>Delete</label>
     </li>
     <li ng-repeat="entity in collections">
-      <label>{{entity}}</label>
+      <input class="form-control list-label" ng-disabled="true" ng-model="entity"/>
       <input class="form-control" type="checkbox" ng-change="saveRole()" ng-model="roles[activeRole].permissions[entity].allOwners"/>
       <input class="form-control" type="checkbox" ng-change="saveRole()" ng-model="roles[activeRole].permissions[entity].create"/>
       <input class="form-control" type="checkbox" ng-change="saveRole()" ng-model="roles[activeRole].permissions[entity].read"/>

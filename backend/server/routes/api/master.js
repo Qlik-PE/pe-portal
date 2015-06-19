@@ -46,6 +46,11 @@ var entities = {
       model: require("../../models/user-roles"),
       populates: '',
       exemptFromOwnership: true
+    },
+    technologytypes     : {
+      model: require("../../models/technology-type"),
+      populates: '',
+      exemptFromOwnership: true
     }
 };
 
@@ -135,6 +140,7 @@ router.post("/:entity/", Auth.isLoggedIn, function(req, res){
     res.json(Error.insufficientPermissions);
   }
   else{
+    data.createuser = user._id;
     data.partner = user.partner;  //add the partnerid of the current user to the record
     MasterController.save(null, data, entities[entity], function(result){
       res.json(result);

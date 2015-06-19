@@ -33,6 +33,10 @@ var PartnerSchema = new Schema({
   user: {  //User associated with the partner
     type: Schema.ObjectId,
     ref: 'User'
+  },
+  createuser: {
+    type: Schema.ObjectId,
+    ref: 'User'
   }
 });
 

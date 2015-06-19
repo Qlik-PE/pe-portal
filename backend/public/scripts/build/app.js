@@ -136,6 +136,30 @@
     this.refresh();
   }]);
 
+  app.service('resultHandler', ["notifications", function(notifications){
+    this.process = function(result, action){   //deals with the result in a generic way. Return true if the result is a success otherwise returns false
+      if(result.redirect || (result[0] && result[0].redirect)){
+        window.location = result.redirect || result[0].redirect;
+        return false;
+      }
+      else if (result.errCode || (result[0] && result[0].errCode)) {
+        notifications.showError({
+          message: result.errText || result[0].errText,
+          hideDelay: 3000,
+          hide: true
+        });
+        return false;
+      }
+      else {
+        //if an action has been passed notify the user of it's success
+        if(action){
+          notifications.showSuccess({message: action + " Successful"});
+        }
+        return true;
+      }
+    }
+  }]);
+
 
   //Controllers
   app.controller('mainController', ['$scope', function($scope){
@@ -180,10 +204,11 @@
 
   }]);
 
-  app.controller("validationController", ["$scope", "$resource", "$state", "$stateParams", "userPermissions", "notifications", function($scope, $resource, $state, $stateParams, userPermissions, notifications){
+  app.controller("validationController", ["$scope", "$resource", "$state", "$stateParams", "userPermissions", "notifications", "resultHandler", function($scope, $resource, $state, $stateParams, userPermissions, notifications, resultHandler){
     var Validations = $resource("api/validations/:validationId", {validationId:"@id"});
     var Steps = $resource("api/steps/:stepId", {stepId:"@stepId"});
     var Issues = $resource("api/issues/:issueId", {issueId:"@issueId"});
+    var TechnologyTypes = $resource("api/technologytypes/:techtypeId", {techtypeId: "@techtypeId"});
 
     $scope.permissions = userPermissions;
 
@@ -191,18 +216,21 @@
 
     if($state.current.name !="validations.new"){
       Validations.query({validationId:$stateParams.Id||""}, function(result){
-        if(result[0] && result[0].redirect){
-          window.location = result[0].redirect;
-        }
-        else if(result.errCode){
-          notifications.showError({message: result.errText})
-        }
-        else{
+        if(resultHandler.process(result)){
           $scope.validations = result;
           $scope.imageUploadPath = "/api/validations/"+$stateParams.Id+"/image";
         }
-      })
+      });
     }
+
+    TechnologyTypes.query({}, function(result){
+      if(result[0] && result[0].redirect){
+        window.location = result[0].redirect;
+      }
+      else{
+        $scope.technologytypes = result;
+      }
+    });
 
     $scope.activeTab = 0;
 
@@ -210,43 +238,51 @@
       $scope.activeTab = index;
     }
 
+    $scope.setSteps = function(){
+      Steps.query({validationid:$stateParams.Id}, function(stepresult){
+        if(resultHandler.process(stepresult)){
+          if(stepresult.length > 0){
+            resultHandler.process({errCode:true, errText: "Validation already has steps."});
+          }
+          else{
+            for(var i=0;i<$scope.validations[0].technology_type.steps.length;i++){
+              var s = $scope.validations[0].technology_type.steps[i];
+              s.validationid = $stateParams.Id;
+              s.status = "5559a3937730da518d2dc00f";
+              Steps.save({}, s, function(result){
+                if(i==$scope.validations[0].technology_type.steps.length){
+                  resultHandler.process(result, "Steps set ");
+                  $scope.save();
+                  window.location="#validations/"+$stateParams.Id;
+                }
+              });
+            }
+          }
+        }
+      });
+    }
+
     $scope.delete = function(id){
       //first we need to get the list of steps for the validation
       //then for each step get the issues and delete them
       //then we delete the step and finally delete the validation
       Steps.query({validationid:id}, function(stepresult){
-        if(stepresult[0] && stepresult[0].redirect){
-          window.location = stepresult[0].redirect;
-        }
-        else if(stepresult.errCode){
-          notifications.showError({message: stepresult.errText})
-        }
-        else{
+        if(resultHandler.process(stepresult)){
           if(stepresult.length>0){
             for (var i=0;i<stepresult.length;i++){
               var stepId = stepresult[i]._id;       //this variable is used to avoid probelms where i is changed before callbacks are executed
               var isLast = i==stepresult.length-1;  //this variable is used to avoid probelms where i is changed before callbacks are executed
               Issues.delete({stepId: stepId}, function(issueresult){
-                if(issueresult.errCode){
-                  notifications.showError({message: issueresult.errText})
-                }
-                else{
+                if(resultHandler.process(issueresult)){
                   Steps.delete({stepId:stepId}, function(result){
-                    if(result.errCode){
-                      notifications.showError({message: result.errText})
-                    }
-                    else if(isLast){
+                    if(resultHandler.process(result)){
                       Validations.delete({validationId: id}, function(result){
-                        if(result.errCode){
-                          notifications.showError({message: result.errText})
-                        }
-                        else{
+                        if(resultHandler.process(result, "Delete")){
                           for(var j=0;j<$scope.validations.length;j++){
                             if($scope.validations[j]._id == id){
                               $scope.validations.splice(j,1);
                             }
                           }
-                          notifications.showSuccess({message: "Successfully Deleted"});
                           window.location = "#validations";
                         }
                       });
@@ -258,16 +294,12 @@
           }
           else{
             Validations.delete({validationId: id}, function(result){
-              if(result.errCode){
-                notifications.showError({message: result.errText})
-              }
-              else{
+              if(resultHandler.process(result, "Delete")){
                 for(var j=0;j<$scope.validations.length;j++){
                   if($scope.validations[j]._id == id){
                     $scope.validations.splice(j,1);
                   }
                 }
-                notifications.showSuccess({message: "Successfully Deleted"});
                 window.location = "#validations";
               }
             });
@@ -279,20 +311,10 @@
     $scope.save = function(){
       var id = $stateParams.Id=="new"?"":$stateParams.Id;
       Validations.save({validationId:id}, $scope.validations[0], function(result){
-        if(result.redirect){
-          window.location = result.redirect;
-        }
-        else if($state.current.name =="validations.new"){
-          console.log('saved new');
-          window.location = "/#validations/"+result._id;
-          notifications.showSuccess({message: "Successfully Saved"});
-          //notify the user that the validation was successfully saved
-        }
-        else if (result.errCode) {
-          notifications.showError({message: result.errText});
-        }
-        else{
-          notifications.showSuccess({message: "Successfully Saved"});
+        if(resultHandler.process(result, "Save")){
+          if($state.current.name =="validations.new"){
+            window.location = "/#validations/"+result._id;
+          }
         }
       });  //currently we"re only allowing a save from the detail page, in which case we should only have 1 validation in the array
     };
@@ -324,7 +346,7 @@
 
   }]);
 
-  app.controller("stepController", ["$scope", "$resource", "$state", "$stateParams", "userPermissions", "notifications", function($scope, $resource, $state, $stateParams, userPermissions, notifications){
+  app.controller("stepController", ["$scope", "$resource", "$state", "$stateParams", "userPermissions", "notifications", "resultHandler", function($scope, $resource, $state, $stateParams, userPermissions, notifications, resultHandler){
     var Step = $resource("api/steps/:stepId", {stepId: "@stepId"});
     var StepTypes = $resource("api/steptypes/:typeId", {typeId: "@typeId"});
     var StepStatus = $resource("api/stepstatus/:statusId", {statusId: "@statusId"});
@@ -342,10 +364,7 @@
 
     if($stateParams.Id && $stateParams.Id!="new"){  //We have a validation to work with
       Step.query({stepId:$stateParams.stepId||"", validationid:$stateParams.Id||""}, function(result){
-        if(result[0] && result[0].redirect){
-          window.location = result[0].redirect;
-        }
-        else{
+        if(resultHandler.process(result)){
           $scope.steps = result;
         }
       });
@@ -355,10 +374,7 @@
     }
     else{ //We should be working with an individual step
       Step.query({stepId: $stateParams.stepId}, function(result){
-        if(result[0] && result[0].redirect){
-          window.location = result[0].redirect;
-        }
-        else{
+        if(resultHandler.process(result)){
           $scope.steps = result;
         }
       })
@@ -373,21 +389,16 @@
     $scope.delete = function(id){
       //First we need to delete all issues related to the step
       Issues.delete({step:id}, function(result){
-        if(result[0] && result[0].redirect){
-          window.location = result[0].redirect;
-        }
-        else if(result.errCode){
-          notifications.showError({message: result.errText})
-        }
-        else{
+        if(resultHandler.process(result)){
           Step.delete({stepId:id}, function(result){
-            for(var i=0;i<$scope.steps.length;i++){
-              if($scope.steps[i]._id == id){
-                $scope.steps.splice(i,1);
-              }
-              notifications.showSuccess({message: "Successfully Deleted"});
-              if($state.current.name.indexOf("detail")!=-1){ //we only redirect if the current view is a detail view
-                window.location = "#validations/"+$stateParams.Id;
+            if(resultHandler.process(result)){
+              for(var i=0;i<$scope.steps.length;i++){
+                if($scope.steps[i]._id == id){
+                  $scope.steps.splice(i,1);
+                }
+                if($state.current.name.indexOf("detail")!=-1){ //we only redirect if the current view is a detail view
+                  window.location = "#validations/"+$stateParams.Id;
+                }
               }
             }
           });
@@ -398,21 +409,7 @@
     $scope.save = function(id){
       console.log("saving");
       Step.save({stepId:id, validationid: $stateParams.Id}, $scope.getStepById(id), function(result){
-        if(result.redirect){
-          window.location = result.redirect;
-        }
-        else if (result.errCode) {
-          notifications.showError({
-            message: result.errText,
-            hideDelay: 3000,
-            hide: true
-          });
-        }
-        else {
-          //notify the user that the validation was successfully saved
-          notifications.showSuccess({message: "Successfully Saved"});
-        }
-        //add notifications & error handling here
+        resultHandler.process(result, "Save");
       });  //currently we"re only allowing a save from the detail page, in which case we should only have 1 validation in the array
     };
 
@@ -424,19 +421,7 @@
       data.status = $scope.newStepStatus;
       data.validationid = $stateParams.Id;
       Step.save(data, function(result){
-        if(result.redirect){
-          window.location = result.redirect;
-        }
-        else if (result.errCode) {
-          notifications.showError({
-            message: result.errText,
-            hideDelay: 3000,
-            hide: true
-          });
-        }
-        else {
-          //notify the user that the validation was successfully saved
-          notifications.showSuccess({message: "Successfully Saved"});
+        if(resultHandler.process(result, "Create")){
           if($scope.steps){
             $scope.steps.push(result);
           }
@@ -460,7 +445,7 @@
     }
   }]);
 
-  app.controller("issueController", ["$scope", "$resource", "$state", "$stateParams", "userPermissions", function($scope, $resource, $state, $stateParams, userPermissions){
+  app.controller("issueController", ["$scope", "$resource", "$state", "$stateParams", "userPermissions", "resultHandler", function($scope, $resource, $state, $stateParams, userPermissions, resultHandler){
     var Issue = $resource("api/issues/:issueId", {issueId: "@issueId"});
     var IssueStatus = $resource("api/issuestatus/:statusId", {statusId: "@statusId"});
     var Step = $resource("api/steps/:stepId", {stepId: "@stepId"});
@@ -469,10 +454,7 @@
     $scope.permissions = userPermissions;
 
     IssueStatus.query({}, function(result){
-      if(result[0] && result[0].redirect){
-        window.location = result[0].redirect;
-      }
-      else{
+      if(resultHandler.process(result)){
         $scope.issueStatus = result;
       }
     });  //this creates a GET query to api/issues/statuses
@@ -480,20 +462,14 @@
     if($state.current.name!="issues.new"){
       if($stateParams.stepId){  //We have a validation to work with
         Issue.query({issueId:$stateParams.issueId||"", step:$stateParams.stepId||""}, function(result){
-          if(result[0] && result[0].redirect){
-            window.location = result[0].redirect;
-          }
-          else{
+          if(resultHandler.process(result)){
             $scope.issues = result;
           }
         });
       }
       else{ //We should be working with an individual issue
         Issue.query({issueId: $stateParams.issueId}, function(result){
-          if(result[0] && result[0].redirect){
-            window.location = result[0].redirect;
-          }
-          else{
+          if(resultHandler.process(result)){
             $scope.issues = result;
             //first get the step, then the validation
             Step.query({stepId: $scope.issues[0].step}, function(step){
@@ -521,9 +497,11 @@
 
     $scope.delete = function(id){
       Issue.delete({issueId:id}, function(result){
-        for(var i=0;i<$scope.issues.length;i++){
-          if($scope.issues[i]._id == id){
-            $scope.issues.splice(i,1);
+        if(resultHandler.process(result, "Delete")){
+          for(var i=0;i<$scope.issues.length;i++){
+            if($scope.issues[i]._id == id){
+              $scope.issues.splice(i,1);
+            }
           }
         }
       });
@@ -532,12 +510,7 @@
     $scope.save = function(id){
       console.log("saving");
       Issue.save({issueId:id, step: $stateParams.stepId}, $scope.getIssueById(id), function(result){
-        if(result.redirect){
-          window.location = result.redirect;
-        }
-        else {
-          //notify the user that the validation was successfully saved
-        }
+        resultHandler.process(result, "Save");
         //add notifications & error handling here
       });  //currently we"re only allowing a save from the detail page, in which case we should only have 1 validation in the array
     };
@@ -549,17 +522,18 @@
       data.status = $scope.newIssueStatus;
       data.step = $stateParams.stepId;
       Issue.save(data, function(result){
-        //need to add error handling
-        if($scope.issues){
-          $scope.issues.push(result);
+        if(resultHandler.process(result, "Create")){
+          if($scope.issues){
+            $scope.issues.push(result);
+          }
+          else{
+            $scope.issues = [result];
+          }
+          $scope.newIssueName = null;
+          $scope.newIssueContent = null;
+          $scope.newIssueType = null;
+          $scope.newIssueStatus = null;
         }
-        else{
-          $scope.issues = [result];
-        }
-        $scope.newIssueName = null;
-        $scope.newIssueContent = null;
-        $scope.newIssueType = null;
-        $scope.newIssueStatus = null;
       });
     }
 
@@ -594,9 +568,11 @@
 
     $scope.delete = function(id){
       User.delete({userId:id}, function(result){
-        for(var i=0;i<$scope.users.length;i++){
-          if($scope.users[i]._id == id){
-            $scope.users.splice(i,1);
+        if(resultHandler.process(result, "Delete")){
+          for(var i=0;i<$scope.users.length;i++){
+            if($scope.users[i]._id == id){
+              $scope.users.splice(i,1);
+            }
           }
         }
       });
@@ -605,18 +581,7 @@
     $scope.save = function(user){
       console.log("saving");
       User.save({userId:user._id}, user, function(result){
-        if(result.redirect){
-          window.location = result.redirect;
-        }
-        else if(result.errCode){
-          //notify the user of the error
-          notifications.showError({message: result.errText});
-        }
-        else{
-          //notify the user that the validation was successfully saved
-          notifications.showSuccess({message: "Successfully Saved"});
-        }
-        //add notifications & error handling here
+        resultHandler.process(result, "Save");      
       });  //currently we"re only allowing a save from the detail page, in which case we should only have 1 validation in the array
     };
   }]);
@@ -684,10 +649,11 @@
 
   }]);
 
-  app.controller("adminController", ["$scope", "$resource", "$state", "$stateParams", "userPermissions", function($scope, $resource, $state, $stateParams, userPermissions){
+  app.controller("adminController", ["$scope", "$resource", "$state", "$stateParams", "userPermissions", "resultHandler", function($scope, $resource, $state, $stateParams, userPermissions, resultHandler){
     var UserRoles = $resource("api/userroles/:roleId", {roleId: "@roleId"});
+    var TechnologyTypes = $resource("api/technologytypes/:techtypeId", {techtypeId: "@techtypeId"});
     var System = $resource("system/:path", {path: "@path"});
-    
+
     $scope.permissions = userPermissions;
     $scope.collections = [
       "validations",
@@ -697,7 +663,8 @@
       "userroles",
       "steptypes",
       "stepstatus",
-      "issuestatus"
+      "issuestatus",
+      "technologytypes"
     ];
 
     UserRoles.query({}, function(result){
@@ -706,28 +673,111 @@
       }
       else{
         $scope.roles = result;
+        $scope.setRole(0);
       }
     });
 
+    TechnologyTypes.query({}, function(result){
+      if(result[0] && result[0].redirect){
+        window.location = result[0].redirect;
+      }
+      else{
+        $scope.technologytypes = result;
+      }
+    });
+
+    $scope.newTechType = null;
+
     $scope.activeRole = 0;
+
+    $scope.activeTechType = 0;
 
     $scope.activeTab = 0;
 
     $scope.setTab = function(index){
       $scope.activeTab = index;
-    }
+    };
 
     $scope.setRole = function(index){
       $scope.activeRole = index;
-    }
+      $scope.copyRoleName = $scope.roles[$scope.activeRole].name;
+    };
+
+    $scope.setTechType = function(index){
+      $scope.activeTechType = index;
+    };
 
     $scope.saveRole = function(){
       console.log($scope.roles[$scope.activeRole]);
       UserRoles.save({roleId:$scope.roles[$scope.activeRole]._id}, $scope.roles[$scope.activeRole], function(result){
-        console.log('Success');
-        $scope.permissions.refresh();
+        resultHandler.process(result, "Save");
       });
-    }
+    };
+
+    $scope.newRole = function(newrolename){
+      var that = this;
+      UserRoles.save({}, {name: newrolename}, function(result){
+        if(resultHandler.process(result, "Create")){
+          $scope.roles.push(result);
+          that.newrolename = "";
+          $scope.setRole($scope.roles.length -1);
+        }
+      });
+    };
+
+    $scope.copyRole = function(copyrolename){
+      var roleToCopy = $scope.roles[$scope.activeRole];
+      if(copyrolename==roleToCopy.name){
+        copyrolename += " - copy";
+      }
+      UserRoles.save({}, {name: copyrolename, permissions: roleToCopy.permissions}, function(result){
+        if(resultHandler.process(result, "Copy")){
+          $scope.roles.push(result);
+          $scope.setRole($scope.roles.length -1);
+        }
+      });
+    };
+
+    $scope.newTechType = function(newtechtype){
+      var that = this;
+      TechnologyTypes.save({},{name: newtechtype}, function(result){
+        if(resultHandler.process(result, "Update")){
+          $scope.technologytypes.push(result);
+          that.newtechtype = "";
+          $scope.setTechType($scope.technologytypes.length);
+        }
+      });
+    };
+
+    $scope.newStep = function(stepContent){
+      var that = this;
+      $scope.technologytypes[$scope.activeTechType].steps.push({
+          name: stepContent,
+          index: $scope.technologytypes[$scope.activeTechType].steps.length
+      });
+      TechnologyTypes.save({techtypeId: $scope.technologytypes[$scope.activeTechType]._id }, $scope.technologytypes[$scope.activeTechType], function(result){
+         if(resultHandler.process(result, "Update")){
+           that.newstepcontent = "";
+         }
+      });
+    };
+
+    $scope.delete = function(index){
+      var roleToDelete = $scope.roles[$scope.activeRole];
+      UserRoles.delete({roleId: roleToDelete._id}, function(result){
+        if(resultHandler.process(result, "Delete")){
+          for(var j=0;j<$scope.roles.length;j++){
+            if($scope.roles[j]._id == roleToDelete._id){
+              $scope.roles.splice(j,1);
+              if($scope.activeRole > 0){
+                $scope.activeRole--;
+                $scope.setRole($scope.activeRole);
+              }
+            }
+          }
+        }
+      });
+    };
   }]);
 
 

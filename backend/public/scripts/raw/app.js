@@ -109,6 +109,7 @@
 
   //Services
   include "./services/permissions.js"
+  include "./services/result-handler.js"
 
   //Controllers
   include "./controllers/main.js"

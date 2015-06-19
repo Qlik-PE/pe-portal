@@ -10,6 +10,10 @@ var StepStatusSchema = new Schema({
     type: String,
     required: true,
     trim: true
+  },
+  createuser: {
+    type: Schema.ObjectId,
+    ref: 'User'
   }
 });
 

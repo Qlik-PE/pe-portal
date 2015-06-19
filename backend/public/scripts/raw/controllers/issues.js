@@ -1,4 +1,4 @@
-app.controller("issueController", ["$scope", "$resource", "$state", "$stateParams", "userPermissions", function($scope, $resource, $state, $stateParams, userPermissions){
+app.controller("issueController", ["$scope", "$resource", "$state", "$stateParams", "userPermissions", "resultHandler", function($scope, $resource, $state, $stateParams, userPermissions, resultHandler){
   var Issue = $resource("api/issues/:issueId", {issueId: "@issueId"});
   var IssueStatus = $resource("api/issuestatus/:statusId", {statusId: "@statusId"});
   var Step = $resource("api/steps/:stepId", {stepId: "@stepId"});
@@ -7,10 +7,7 @@ app.controller("issueController", ["$scope", "$resource", "$state", "$stateParam
   $scope.permissions = userPermissions;
 
   IssueStatus.query({}, function(result){
-    if(result[0] && result[0].redirect){
-      window.location = result[0].redirect;
-    }
-    else{
+    if(resultHandler.process(result)){
       $scope.issueStatus = result;
     }
   });  //this creates a GET query to api/issues/statuses
@@ -18,20 +15,14 @@ app.controller("issueController", ["$scope", "$resource", "$state", "$stateParam
   if($state.current.name!="issues.new"){
     if($stateParams.stepId){  //We have a validation to work with
       Issue.query({issueId:$stateParams.issueId||"", step:$stateParams.stepId||""}, function(result){
-        if(result[0] && result[0].redirect){
-          window.location = result[0].redirect;
-        }
-        else{
+        if(resultHandler.process(result)){
           $scope.issues = result;
         }
       });
     }
     else{ //We should be working with an individual issue
       Issue.query({issueId: $stateParams.issueId}, function(result){
-        if(result[0] && result[0].redirect){
-          window.location = result[0].redirect;
-        }
-        else{
+        if(resultHandler.process(result)){
           $scope.issues = result;
           //first get the step, then the validation
           Step.query({stepId: $scope.issues[0].step}, function(step){
@@ -59,9 +50,11 @@ app.controller("issueController", ["$scope", "$resource", "$state", "$stateParam
 
   $scope.delete = function(id){
     Issue.delete({issueId:id}, function(result){
-      for(var i=0;i<$scope.issues.length;i++){
-        if($scope.issues[i]._id == id){
-          $scope.issues.splice(i,1);
+      if(resultHandler.process(result, "Delete")){
+        for(var i=0;i<$scope.issues.length;i++){
+          if($scope.issues[i]._id == id){
+            $scope.issues.splice(i,1);
+          }
         }
       }
     });
@@ -70,12 +63,7 @@ app.controller("issueController", ["$scope", "$resource", "$state", "$stateParam
   $scope.save = function(id){
     console.log("saving");
     Issue.save({issueId:id, step: $stateParams.stepId}, $scope.getIssueById(id), function(result){
-      if(result.redirect){
-        window.location = result.redirect;
-      }
-      else {
-        //notify the user that the validation was successfully saved
-      }
+      resultHandler.process(result, "Save");
       //add notifications & error handling here
     });  //currently we"re only allowing a save from the detail page, in which case we should only have 1 validation in the array
   };
@@ -87,17 +75,18 @@ app.controller("issueController", ["$scope", "$resource", "$state", "$stateParam
     data.status = $scope.newIssueStatus;
     data.step = $stateParams.stepId;
     Issue.save(data, function(result){
-      //need to add error handling
-      if($scope.issues){
-        $scope.issues.push(result);
+      if(resultHandler.process(result, "Create")){
+        if($scope.issues){
+          $scope.issues.push(result);
+        }
+        else{
+          $scope.issues = [result];
+        }
+        $scope.newIssueName = null;
+        $scope.newIssueContent = null;
+        $scope.newIssueType = null;
+        $scope.newIssueStatus = null;
       }
-      else{
-        $scope.issues = [result];
-      }
-      $scope.newIssueName = null;
-      $scope.newIssueContent = null;
-      $scope.newIssueType = null;
-      $scope.newIssueStatus = null;
     });
   }
 

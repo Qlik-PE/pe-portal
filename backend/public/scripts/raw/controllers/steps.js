@@ -1,4 +1,4 @@
-app.controller("stepController", ["$scope", "$resource", "$state", "$stateParams", "userPermissions", "notifications", function($scope, $resource, $state, $stateParams, userPermissions, notifications){
+app.controller("stepController", ["$scope", "$resource", "$state", "$stateParams", "userPermissions", "notifications", "resultHandler", function($scope, $resource, $state, $stateParams, userPermissions, notifications, resultHandler){
   var Step = $resource("api/steps/:stepId", {stepId: "@stepId"});
   var StepTypes = $resource("api/steptypes/:typeId", {typeId: "@typeId"});
   var StepStatus = $resource("api/stepstatus/:statusId", {statusId: "@statusId"});
@@ -16,10 +16,7 @@ app.controller("stepController", ["$scope", "$resource", "$state", "$stateParams
 
   if($stateParams.Id && $stateParams.Id!="new"){  //We have a validation to work with
     Step.query({stepId:$stateParams.stepId||"", validationid:$stateParams.Id||""}, function(result){
-      if(result[0] && result[0].redirect){
-        window.location = result[0].redirect;
-      }
-      else{
+      if(resultHandler.process(result)){
         $scope.steps = result;
       }
     });
@@ -29,10 +26,7 @@ app.controller("stepController", ["$scope", "$resource", "$state", "$stateParams
   }
   else{ //We should be working with an individual step
     Step.query({stepId: $stateParams.stepId}, function(result){
-      if(result[0] && result[0].redirect){
-        window.location = result[0].redirect;
-      }
-      else{
+      if(resultHandler.process(result)){
         $scope.steps = result;
       }
     })
@@ -47,21 +41,16 @@ app.controller("stepController", ["$scope", "$resource", "$state", "$stateParams
   $scope.delete = function(id){
     //First we need to delete all issues related to the step
     Issues.delete({step:id}, function(result){
-      if(result[0] && result[0].redirect){
-        window.location = result[0].redirect;
-      }
-      else if(result.errCode){
-        notifications.showError({message: result.errText})
-      }
-      else{
+      if(resultHandler.process(result)){
         Step.delete({stepId:id}, function(result){
-          for(var i=0;i<$scope.steps.length;i++){
-            if($scope.steps[i]._id == id){
-              $scope.steps.splice(i,1);
-            }
-            notifications.showSuccess({message: "Successfully Deleted"});
-            if($state.current.name.indexOf("detail")!=-1){ //we only redirect if the current view is a detail view
-              window.location = "#validations/"+$stateParams.Id;
+          if(resultHandler.process(result)){
+            for(var i=0;i<$scope.steps.length;i++){
+              if($scope.steps[i]._id == id){
+                $scope.steps.splice(i,1);
+              }
+              if($state.current.name.indexOf("detail")!=-1){ //we only redirect if the current view is a detail view
+                window.location = "#validations/"+$stateParams.Id;
+              }
             }
           }
         });
@@ -72,21 +61,7 @@ app.controller("stepController", ["$scope", "$resource", "$state", "$stateParams
   $scope.save = function(id){
     console.log("saving");
     Step.save({stepId:id, validationid: $stateParams.Id}, $scope.getStepById(id), function(result){
-      if(result.redirect){
-        window.location = result.redirect;
-      }
-      else if (result.errCode) {
-        notifications.showError({
-          message: result.errText,
-          hideDelay: 3000,
-          hide: true
-        });
-      }
-      else {
-        //notify the user that the validation was successfully saved
-        notifications.showSuccess({message: "Successfully Saved"});
-      }
-      //add notifications & error handling here
+      resultHandler.process(result, "Save");
     });  //currently we"re only allowing a save from the detail page, in which case we should only have 1 validation in the array
   };
 
@@ -98,19 +73,7 @@ app.controller("stepController", ["$scope", "$resource", "$state", "$stateParams
     data.status = $scope.newStepStatus;
     data.validationid = $stateParams.Id;
     Step.save(data, function(result){
-      if(result.redirect){
-        window.location = result.redirect;
-      }
-      else if (result.errCode) {
-        notifications.showError({
-          message: result.errText,
-          hideDelay: 3000,
-          hide: true
-        });
-      }
-      else {
-        //notify the user that the validation was successfully saved
-        notifications.showSuccess({message: "Successfully Saved"});
+      if(resultHandler.process(result, "Create")){
         if($scope.steps){
           $scope.steps.push(result);
         }

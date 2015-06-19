@@ -16,6 +16,10 @@ var UserRoleSchema = new Schema({
     //   update: true,
     //   delete: false
     // }
+  },
+  createuser: {
+    type: Schema.ObjectId,
+    ref: 'User'
   }
 });
 
