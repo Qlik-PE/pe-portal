@@ -1,5 +1,5 @@
 var LocalStrategy    = require('passport-local').Strategy;
-var Partner = require('../partners');
+var Partner = require('../../models/partners');
 
 module.exports = function(passport, User){
 	passport.use('signup', new LocalStrategy({

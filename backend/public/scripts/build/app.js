@@ -245,18 +245,9 @@
             resultHandler.process({errCode:true, errText: "Validation already has steps."});
           }
           else{
-            for(var i=0;i<$scope.validations[0].technology_type.steps.length;i++){
-              var s = $scope.validations[0].technology_type.steps[i];
-              s.validationid = $stateParams.Id;
-              s.status = "5559a3937730da518d2dc00f";
-              Steps.save({}, s, function(result){
-                if(i==$scope.validations[0].technology_type.steps.length){
-                  resultHandler.process(result, "Steps set ");
-                  $scope.save();
-                  window.location="#validations/"+$stateParams.Id;
-                }
-              });
-            }
+            $scope.$broadcast('techTypeChanged',$scope.validations[0].technology_type._id );
+            $scope.save();
+            $scope.setTab(1);
           }
         }
       });
@@ -355,11 +346,15 @@
     $scope.permissions = userPermissions;
 
     StepTypes.query({}, function(result){
-      $scope.stepTypes = result;
+      if(resultHandler.process(result)){
+        $scope.stepTypes = result;
+      }
     });  //this creates a GET query to api/steps/types
 
     StepStatus.query({}, function(result){
-      $scope.stepStatus = result;
+      if(resultHandler.process(result)){
+        $scope.stepStatus = result;
+      }
     });  //this creates a GET query to api/steps/statuses
 
     if($stateParams.Id && $stateParams.Id!="new"){  //We have a validation to work with
@@ -380,6 +375,26 @@
       })
     }
 
+    $scope.$on('techTypeChanged', function(event, techTypeId){
+      Step.query({techtypeId: techTypeId}, function(result){
+        if(resultHandler.process(result)){
+          for(var i=0;i<result.length;i++){
+            var s = result[i];
+            s._id = null;
+            s.techtypeId = null;
+            s.validationid = $stateParams.Id;
+            s.status = "5559a3937730da518d2dc00f";
+            Step.save({}, s, function(stepresult){
+              if(i==result.length){
+                resultHandler.process(stepresult, "Setting steps ");
+                $scope.steps = result;
+              }
+            });
+          }
+        }
+      });
+    });
+
     $scope.activeTab = $state.current.name == "step.issues" ? 1 : 0;
 
     $scope.setTab = function(index){
@@ -391,7 +406,7 @@
       Issues.delete({step:id}, function(result){
         if(resultHandler.process(result)){
           Step.delete({stepId:id}, function(result){
-            if(resultHandler.process(result)){
+            if(resultHandler.process(result, "Delete")){
               for(var i=0;i<$scope.steps.length;i++){
                 if($scope.steps[i]._id == id){
                   $scope.steps.splice(i,1);
@@ -546,7 +561,7 @@
     }
   }]);
 
-  app.controller("userController", ["$scope", "$resource", "$state", "$stateParams", "userPermissions", "notifications", function($scope, $resource, $state, $stateParams, userPermissions, notifications){
+  app.controller("userController", ["$scope", "$resource", "$state", "$stateParams", "userPermissions", "notifications", "resultHandler", function($scope, $resource, $state, $stateParams, userPermissions, notifications, resultHandler){
     var User = $resource("api/users/:userId", {userId: "@userId"});
     var UserRoles = $resource("api/userroles/:roleId", {roleId: "@roleId"});
 
@@ -581,7 +596,7 @@
     $scope.save = function(user){
       console.log("saving");
       User.save({userId:user._id}, user, function(result){
-        resultHandler.process(result, "Save");      
+        resultHandler.process(result, "Save");
       });  //currently we"re only allowing a save from the detail page, in which case we should only have 1 validation in the array
     };
   }]);
@@ -652,7 +667,10 @@
   app.controller("adminController", ["$scope", "$resource", "$state", "$stateParams", "userPermissions", "resultHandler", function($scope, $resource, $state, $stateParams, userPermissions, resultHandler){
     var UserRoles = $resource("api/userroles/:roleId", {roleId: "@roleId"});
     var TechnologyTypes = $resource("api/technologytypes/:techtypeId", {techtypeId: "@techtypeId"});
+    var Step = $resource("api/steps/:stepId", {stepId: "@stepId"});
     var System = $resource("system/:path", {path: "@path"});
+    var StepTypes = $resource("api/steptypes/:typeId", {typeId: "@typeId"});
+    var StepStatus = $resource("api/stepstatus/:statusId", {statusId: "@statusId"});
 
     $scope.permissions = userPermissions;
     $scope.collections = [
@@ -678,11 +696,21 @@
     });
 
     TechnologyTypes.query({}, function(result){
-      if(result[0] && result[0].redirect){
-        window.location = result[0].redirect;
-      }
-      else{
+      if(resultHandler.process(result)){
         $scope.technologytypes = result;
+        $scope.setTechType(0);
+      }
+    });
+
+    StepTypes.query({}, function(result){
+      if(resultHandler.process(result)){
+        $scope.stepTypes = result;
+      }
+    });  //this creates a GET query to api/steps/types
+
+    StepStatus.query({}, function(result){
+      if(resultHandler.process(result)){
+        $scope.stepStatus = result;
       }
     });
 
@@ -705,6 +733,19 @@
 
     $scope.setTechType = function(index){
       $scope.activeTechType = index;
+      Step.query({techtypeId: $scope.technologytypes[$scope.activeTechType]._id}, function(result){
+        if(resultHandler.process(result)){
+          $scope.steps = result.sort(function(a,b){
+            if(a.num > b.num){
+              return 1;
+            }
+            if(a.num < b.num){
+              return -1;
+            }
+            return 0;
+          });
+        }
+      });
     };
 
     $scope.saveRole = function(){
@@ -749,16 +790,77 @@
       });
     };
 
-    $scope.newStep = function(stepContent){
-      var that = this;
-      $scope.technologytypes[$scope.activeTechType].steps.push({
-          name: stepContent,
-          index: $scope.technologytypes[$scope.activeTechType].steps.length
+    $scope.saveTechType = function(){
+      TechnologyTypes.save({techtypeId: $scope.technologytypes[$scope.activeTechType]._id}, $scope.technologytypes[$scope.activeTechType], function(result){
+        resultHandler.process(result, "Update");
       });
-      TechnologyTypes.save({techtypeId: $scope.technologytypes[$scope.activeTechType]._id }, $scope.technologytypes[$scope.activeTechType], function(result){
-         if(resultHandler.process(result, "Update")){
-           that.newstepcontent = "";
+    };
+
+    $scope.newStep = function(newStepName, newStepContent, newStepType, newStepStatus){
+      var that = this;
+      var newStep = {
+          name: newStepName,
+          content: newStepContent,
+          type: newStepType,
+          status: "5559a3937730da518d2dc00f",
+          num: $scope.steps.length,
+          techtypeId: $scope.technologytypes[$scope.activeTechType]._id
+      };
+      Step.save({}, newStep, function(result){
+         if(resultHandler.process(result, "Create")){
+           if($scope.steps){
+             $scope.steps.push(result);
+           }
+           else{
+             $scope.steps = [result];
+           }
+           that.newStepName = "";
+           that.newStepContent = "";
+           that.newStepType = null;
+           that.newStepStatus = null;
          }
+      });
+    };
+
+    $scope.saveStep = function(id){
+      Step.save({stepId:id, techtypeId: $scope.technologytypes[$scope.activeTechType]._id}, $scope.getStepById(id), function(result){
+        resultHandler.process(result, "Save");
+      });
+    };
+
+    $scope.deleteStep = function(id){
+      //First we need to delete all issues related to the step
+        Step.delete({stepId:id}, function(result){
+          if(resultHandler.process(result, "Delete")){
+            for(var i=0;i<$scope.steps.length;i++){
+              if($scope.steps[i]._id == id){
+                $scope.steps.splice(i,1);
+              }
+            }
+          }
+        });
+    };
+
+    $scope.moveStep = function(id, direction){
+      if($(event.target).attr("disabled")=="disabled"){
+        return false;
+      }
+      var stepA = $scope.getStepById(id);
+      var stepB = $scope.getStepByNum(stepA.num + direction);
+      originalA = stepA.num;
+      originalB = stepA.num;
+      stepA.num += direction;
+      stepB.num -= direction;
+      Step.save({stepId: stepA._id}, stepA, function(result){
+        if(resultHandler.process(result)){
+          Step.save({stepId: stepB._id}, stepB, function(result){
+            if(resultHandler.process(result), "Update"){
+              console.log($("[data-num="+result.num+"]"));
+              $scope.steps.splice(originalA, 1);
+              $scope.steps.splice(originalA+=direction, 0, stepA);
+            }
+          });
+        }
       });
     };
 
@@ -778,6 +880,30 @@
         }
       });
     };
+
+    $scope.showMoveUp = function(index){
+      return index>0&&$scope.steps.length>1;
+    };
+
+    $scope.showMoveDown = function(index){
+      return index < $scope.steps.length -1 && $scope.steps.length > 1;
+    };
+
+    $scope.getStepById = function(id){
+      for(var i=0;i<$scope.steps.length;i++){
+        if($scope.steps[i]._id == id){
+          return $scope.steps[i];
+        }
+      };
+    }
+
+    $scope.getStepByNum = function(num){
+      for(var i=0;i<$scope.steps.length;i++){
+        if($scope.steps[i].num == num){
+          return $scope.steps[i];
+        }
+      };
+    }
   }]);
 
 

@@ -17,7 +17,7 @@ var ValidationSchema = new Schema({
   },
   technology_type: {
     type: Schema.ObjectId,
-    ref: 'technologytypes'
+    ref: 'technologytype'
   },
   content: {
     type: String,

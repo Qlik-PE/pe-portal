@@ -7,11 +7,15 @@ app.controller("stepController", ["$scope", "$resource", "$state", "$stateParams
   $scope.permissions = userPermissions;
 
   StepTypes.query({}, function(result){
-    $scope.stepTypes = result;
+    if(resultHandler.process(result)){
+      $scope.stepTypes = result;
+    }
   });  //this creates a GET query to api/steps/types
 
   StepStatus.query({}, function(result){
-    $scope.stepStatus = result;
+    if(resultHandler.process(result)){
+      $scope.stepStatus = result;
+    }
   });  //this creates a GET query to api/steps/statuses
 
   if($stateParams.Id && $stateParams.Id!="new"){  //We have a validation to work with
@@ -32,6 +36,26 @@ app.controller("stepController", ["$scope", "$resource", "$state", "$stateParams
     })
   }
 
+  $scope.$on('techTypeChanged', function(event, techTypeId){
+    Step.query({techtypeId: techTypeId}, function(result){
+      if(resultHandler.process(result)){
+        for(var i=0;i<result.length;i++){
+          var s = result[i];
+          s._id = null;
+          s.techtypeId = null;
+          s.validationid = $stateParams.Id;
+          s.status = "5559a3937730da518d2dc00f";
+          Step.save({}, s, function(stepresult){
+            if(i==result.length){
+              resultHandler.process(stepresult, "Setting steps ");
+              $scope.steps = result;
+            }
+          });
+        }
+      }
+    });
+  });
+
   $scope.activeTab = $state.current.name == "step.issues" ? 1 : 0;
 
   $scope.setTab = function(index){
@@ -43,7 +67,7 @@ app.controller("stepController", ["$scope", "$resource", "$state", "$stateParams
     Issues.delete({step:id}, function(result){
       if(resultHandler.process(result)){
         Step.delete({stepId:id}, function(result){
-          if(resultHandler.process(result)){
+          if(resultHandler.process(result, "Delete")){
             for(var i=0;i<$scope.steps.length;i++){
               if($scope.steps[i]._id == id){
                 $scope.steps.splice(i,1);

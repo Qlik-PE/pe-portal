@@ -1,7 +1,11 @@
 var express = require('express'),
     router = express.Router(),
     Error = require('../../controllers/error'),
-    Partners = require('../../controllers/partners');
+    Partners = {
+      model: require('../../models/partners'),
+      populates: ""
+    },
+    MasterController = require('../../controllers/master');
 
 router.get('/userpermissions', function(req, res){
   if(req.user&&req.user.role){
@@ -18,7 +22,7 @@ router.get("/partners", function(req, res){ //used to check for existing partner
   var params = req.params;
   console.log(params);
   console.log(query);
-  Partners.get(query, function(results){
+  MasterController.get(query, Partners, function(results){
     res.json(results);
   });
 });

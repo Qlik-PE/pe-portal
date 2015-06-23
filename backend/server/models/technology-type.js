@@ -11,11 +11,19 @@ var TechnologyTypeSchema = new Schema({
     required: true,
     trim: true
   },
-  steps:[{
-    name: String,
-    num: Number,
-    _id: Schema.ObjectId
-  }],
+  // steps:[{
+  //   name: String,
+  //   content: String,
+  //   type: {
+  //     type: Schema.ObjectId,
+  //     ref: "steptypes"
+  //   },
+  //   status: {
+  //     type: Schema.ObjectId,
+  //     ref: "stepstatus"
+  //   },
+  //   num: Number
+  // }],
   createuser: {
     type: Schema.ObjectId,
     ref: 'User'

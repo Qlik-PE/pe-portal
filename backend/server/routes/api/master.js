@@ -9,7 +9,7 @@ var express = require('express'),
 var entities = {
     validations   : {
       model: require("../../models/validations"),
-      populates: 'partner',
+      populates: 'partner technology_type',
       exemptFromOwnership: false
     },
     steps         : {

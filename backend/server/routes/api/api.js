@@ -1,19 +1,7 @@
 var express = require('express'),
     router = express.Router();
 
-var validationRoutes = require('./validations');
-var stepRoutes = require('./steps');
-var issueRoutes = require('./issues');
-var imageRoutes = require('./images');
-var userRoutes = require('./users');
-
 var masterRoutes = require('./master');
-
-// router.use('/validations', validationRoutes);
-// router.use('/steps', stepRoutes);
-// router.use('/issues', issueRoutes);
-// router.use('/images', imageRoutes);
-// router.use('/users', userRoutes);
 
 router.use('/', masterRoutes);
 

@@ -1,4 +1,4 @@
-app.controller("userController", ["$scope", "$resource", "$state", "$stateParams", "userPermissions", "notifications", function($scope, $resource, $state, $stateParams, userPermissions, notifications){
+app.controller("userController", ["$scope", "$resource", "$state", "$stateParams", "userPermissions", "notifications", "resultHandler", function($scope, $resource, $state, $stateParams, userPermissions, notifications, resultHandler){
   var User = $resource("api/users/:userId", {userId: "@userId"});
   var UserRoles = $resource("api/userroles/:roleId", {roleId: "@roleId"});
 
@@ -33,7 +33,7 @@ app.controller("userController", ["$scope", "$resource", "$state", "$stateParams
   $scope.save = function(user){
     console.log("saving");
     User.save({userId:user._id}, user, function(result){
-      resultHandler.process(result, "Save");      
+      resultHandler.process(result, "Save");
     });  //currently we"re only allowing a save from the detail page, in which case we should only have 1 validation in the array
   };
 }]);

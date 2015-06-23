@@ -23,7 +23,12 @@ var ValidationstepSchema = new Schema({
   validationid: {
     type: Schema.ObjectId,
     ref: 'validation',
-    required: true
+    required: false
+  },
+  techtypeId:{
+    type: Schema.ObjectId,
+    ref: 'technologytype',
+    required: false
   },
   status: {
     type: Schema.ObjectId,
@@ -34,6 +39,10 @@ var ValidationstepSchema = new Schema({
     type: String,
     required: false,
     trim: true
+  },
+  isTemplate: {
+    type: Boolean,
+    default: false
   },
   num: {
     type: Number,

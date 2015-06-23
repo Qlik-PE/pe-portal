@@ -39,18 +39,9 @@ app.controller("validationController", ["$scope", "$resource", "$state", "$state
           resultHandler.process({errCode:true, errText: "Validation already has steps."});
         }
         else{
-          for(var i=0;i<$scope.validations[0].technology_type.steps.length;i++){
-            var s = $scope.validations[0].technology_type.steps[i];
-            s.validationid = $stateParams.Id;
-            s.status = "5559a3937730da518d2dc00f";
-            Steps.save({}, s, function(result){
-              if(i==$scope.validations[0].technology_type.steps.length){
-                resultHandler.process(result, "Steps set ");
-                $scope.save();
-                window.location="#validations/"+$stateParams.Id;
-              }
-            });
-          }
+          $scope.$broadcast('techTypeChanged',$scope.validations[0].technology_type._id );
+          $scope.save();
+          $scope.setTab(1);
         }
       }
     });

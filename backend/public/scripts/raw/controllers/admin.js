@@ -1,7 +1,10 @@
 app.controller("adminController", ["$scope", "$resource", "$state", "$stateParams", "userPermissions", "resultHandler", function($scope, $resource, $state, $stateParams, userPermissions, resultHandler){
   var UserRoles = $resource("api/userroles/:roleId", {roleId: "@roleId"});
   var TechnologyTypes = $resource("api/technologytypes/:techtypeId", {techtypeId: "@techtypeId"});
+  var Step = $resource("api/steps/:stepId", {stepId: "@stepId"});
   var System = $resource("system/:path", {path: "@path"});
+  var StepTypes = $resource("api/steptypes/:typeId", {typeId: "@typeId"});
+  var StepStatus = $resource("api/stepstatus/:statusId", {statusId: "@statusId"});
 
   $scope.permissions = userPermissions;
   $scope.collections = [
@@ -27,11 +30,21 @@ app.controller("adminController", ["$scope", "$resource", "$state", "$stateParam
   });
 
   TechnologyTypes.query({}, function(result){
-    if(result[0] && result[0].redirect){
-      window.location = result[0].redirect;
-    }
-    else{
+    if(resultHandler.process(result)){
       $scope.technologytypes = result;
+      $scope.setTechType(0);
+    }
+  });
+
+  StepTypes.query({}, function(result){
+    if(resultHandler.process(result)){
+      $scope.stepTypes = result;
+    }
+  });  //this creates a GET query to api/steps/types
+
+  StepStatus.query({}, function(result){
+    if(resultHandler.process(result)){
+      $scope.stepStatus = result;
     }
   });
 
@@ -54,6 +67,19 @@ app.controller("adminController", ["$scope", "$resource", "$state", "$stateParam
 
   $scope.setTechType = function(index){
     $scope.activeTechType = index;
+    Step.query({techtypeId: $scope.technologytypes[$scope.activeTechType]._id}, function(result){
+      if(resultHandler.process(result)){
+        $scope.steps = result.sort(function(a,b){
+          if(a.num > b.num){
+            return 1;
+          }
+          if(a.num < b.num){
+            return -1;
+          }
+          return 0;
+        });
+      }
+    });
   };
 
   $scope.saveRole = function(){
@@ -98,16 +124,77 @@ app.controller("adminController", ["$scope", "$resource", "$state", "$stateParam
     });
   };
 
-  $scope.newStep = function(stepContent){
-    var that = this;
-    $scope.technologytypes[$scope.activeTechType].steps.push({
-        name: stepContent,
-        index: $scope.technologytypes[$scope.activeTechType].steps.length
+  $scope.saveTechType = function(){
+    TechnologyTypes.save({techtypeId: $scope.technologytypes[$scope.activeTechType]._id}, $scope.technologytypes[$scope.activeTechType], function(result){
+      resultHandler.process(result, "Update");
     });
-    TechnologyTypes.save({techtypeId: $scope.technologytypes[$scope.activeTechType]._id }, $scope.technologytypes[$scope.activeTechType], function(result){
-       if(resultHandler.process(result, "Update")){
-         that.newstepcontent = "";
+  };
+
+  $scope.newStep = function(newStepName, newStepContent, newStepType, newStepStatus){
+    var that = this;
+    var newStep = {
+        name: newStepName,
+        content: newStepContent,
+        type: newStepType,
+        status: "5559a3937730da518d2dc00f",
+        num: $scope.steps.length,
+        techtypeId: $scope.technologytypes[$scope.activeTechType]._id
+    };
+    Step.save({}, newStep, function(result){
+       if(resultHandler.process(result, "Create")){
+         if($scope.steps){
+           $scope.steps.push(result);
+         }
+         else{
+           $scope.steps = [result];
+         }
+         that.newStepName = "";
+         that.newStepContent = "";
+         that.newStepType = null;
+         that.newStepStatus = null;
        }
+    });
+  };
+
+  $scope.saveStep = function(id){
+    Step.save({stepId:id, techtypeId: $scope.technologytypes[$scope.activeTechType]._id}, $scope.getStepById(id), function(result){
+      resultHandler.process(result, "Save");
+    });
+  };
+
+  $scope.deleteStep = function(id){
+    //First we need to delete all issues related to the step
+      Step.delete({stepId:id}, function(result){
+        if(resultHandler.process(result, "Delete")){
+          for(var i=0;i<$scope.steps.length;i++){
+            if($scope.steps[i]._id == id){
+              $scope.steps.splice(i,1);
+            }
+          }
+        }
+      });
+  };
+
+  $scope.moveStep = function(id, direction){
+    if($(event.target).attr("disabled")=="disabled"){
+      return false;
+    }
+    var stepA = $scope.getStepById(id);
+    var stepB = $scope.getStepByNum(stepA.num + direction);
+    originalA = stepA.num;
+    originalB = stepA.num;
+    stepA.num += direction;
+    stepB.num -= direction;
+    Step.save({stepId: stepA._id}, stepA, function(result){
+      if(resultHandler.process(result)){
+        Step.save({stepId: stepB._id}, stepB, function(result){
+          if(resultHandler.process(result), "Update"){
+            console.log($("[data-num="+result.num+"]"));
+            $scope.steps.splice(originalA, 1);
+            $scope.steps.splice(originalA+=direction, 0, stepA);
+          }
+        });
+      }
     });
   };
 
@@ -127,4 +214,28 @@ app.controller("adminController", ["$scope", "$resource", "$state", "$stateParam
       }
     });
   };
+
+  $scope.showMoveUp = function(index){
+    return index>0&&$scope.steps.length>1;
+  };
+
+  $scope.showMoveDown = function(index){
+    return index < $scope.steps.length -1 && $scope.steps.length > 1;
+  };
+
+  $scope.getStepById = function(id){
+    for(var i=0;i<$scope.steps.length;i++){
+      if($scope.steps[i]._id == id){
+        return $scope.steps[i];
+      }
+    };
+  }
+
+  $scope.getStepByNum = function(num){
+    for(var i=0;i<$scope.steps.length;i++){
+      if($scope.steps[i].num == num){
+        return $scope.steps[i];
+      }
+    };
+  }
 }]);

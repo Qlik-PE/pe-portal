@@ -14,7 +14,7 @@
   <div class="permission-summary">
     <label>Name:</label><input class="form-control" ng-change="saveRole()" ng-model="copyRoleName"/>
     <div class="copy" ng-show="permissions.canCreate('userroles')" ng-click="copyRole(copyRoleName)">Copy</div>
-    <button ng-click="delete(activeRole)" ng-show="permissions.canDelete('userroles')" class="btn btn-default btn-delete">Delete</button>
+    <button ng-click="delete(activeRole)" ng-show="permissions.canDelete('userroles') && copyRoleName!='admin'" class="btn btn-default btn-delete">Delete</button>
   </div>
   <ul class="permissions-list">
     <li class="table-header">

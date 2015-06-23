@@ -1,4 +1,4 @@
-.validation-list,.validation-step-list, .step-issue-list, .user-list, .permissions-list {
+.validation-list,.validation-step-list, .step-issue-list, .user-list, .permissions-list, .step-template-list {
   padding: 10px 5px;
   li{
     white-space: nowrap;
@@ -38,7 +38,7 @@
   }
 }
 
-.validation-step-list, .step-issue-list, .user-list, .permissions-list{
+.validation-step-list, .step-issue-list, .user-list, .permissions-list, .step-template-list{
   li{
     height: 45px;
     line-height: 45px;
@@ -61,6 +61,7 @@
       height: 34px !important;
       line-height: 34px !important;
     }
+
   }
 }
 
@@ -70,6 +71,37 @@
       &:last-of-type{
         width: 5% !important;
       }
+    }
+  }
+}
+
+.step-template-list{
+  .font{
+    &.up, &.down{
+      cursor: pointer;
+      float: right;
+      font-size: 18px;
+      display: inline-block;
+      height: 34px;
+      width: 34px;
+      position: relative;
+      &::before{
+        height: 100%;
+        width: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+      }
+
+      &[disabled="disabled"]{
+        opacity: 0.3;
+      }
+    }
+    &.up::before{
+      content: "\E806";
+    }
+    &.down::before{
+      content: "\E805";
     }
   }
 }
