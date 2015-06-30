@@ -1068,11 +1068,8 @@
       },
       link: function($scope, element, attr){
         $scope.$parent.addTable(attr.id, attr.title);
-        $scope.getHyperlink = function(colIndex, rowIndex){
-          console.log(colIndex, rowIndex);
-          if($scope.info.labels[colIndex].qFallbackTitle==attr.hyperlink){
-            return attr.hyperlinkurl +"/"+ rowIndex;
-          }
+        $scope.getHyperlink = function(value){        
+          return attr.hyperlinkurl +"/"+ value;
         }
       },
       templateUrl: "/views/public/table.html",

@@ -20,10 +20,10 @@ html(ng-app="peportal")
       div.container        
         div.logo
           a(href="#/") Home
-        ul.nav.navbar-nav.navbar-right
-          li
-            a(ui-sref="publicvalidations") Validations     
+        ul.nav.navbar-nav.navbar-right           
             if isAuthenticated
+              li
+                a(ui-sref="publicvalidations") Validations    
               li.dropdown
                 a.dropdown-toggle(
                     href="#" 

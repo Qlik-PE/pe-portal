@@ -1,11 +1,10 @@
 <ul class="public-validation-list">
   <li class="table-header">
-      <div ng-repeat="label in info.labels">{{label.qFallbackTitle}}</div>
+      <div ng-if="$index>0" ng-repeat="label in info.labels">{{label.qFallbackTitle}}</div>
   </li>
   <li ng-repeat="item in info.items">
-    <div ng-repeat="col in item">
-      <a ng-if="$index==0" href="{{getHyperlink($index, $parent.$parent.$index)}}">{{col.qText || "No Data"}}</a>
-      <p ng-if="$index>0">{{col.qText || "No Data"}}</p>
+    <div ng-if="$index>0" ng-repeat="col in item">
+      <a href="{{getHyperlink(item[0].qText)}}">{{col.qText || "No Data"}}</a>
     </div>
   </li>
 </ul>
