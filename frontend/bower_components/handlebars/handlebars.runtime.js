@@ -26,9 +26,9 @@ THE SOFTWARE.
 */
 /* exported Handlebars */
 (function (root, factory) {
-  if (typeof define === 'function' && define.amd) {
+  if (typeof define === "function" && define.amd) {
     define([], factory);
-  } else if (typeof exports === 'object') {
+  } else if (typeof exports === "object") {
     module.exports = factory();
   } else {
     root.Handlebars = factory();
@@ -43,13 +43,13 @@ var __module2__ = (function() {
     "&": "&amp;",
     "<": "&lt;",
     ">": "&gt;",
-    '"': "&quot;",
-    "'": "&#x27;",
+    """: "&quot;",
+    """: "&#x27;",
     "`": "&#x60;"
   };
 
-  var badChars = /[&<>"'`]/g;
-  var possible = /[&<>"'`]/;
+  var badChars = /[&<>""`]/g;
+  var possible = /[&<>""`]/;
 
   function escapeChar(chr) {
     return escape[chr];
@@ -72,20 +72,20 @@ var __module2__ = (function() {
   // Sourced from lodash
   // https://github.com/bestiejs/lodash/blob/master/LICENSE.txt
   var isFunction = function(value) {
-    return typeof value === 'function';
+    return typeof value === "function";
   };
   // fallback for older versions of Chrome and Safari
   /* istanbul ignore next */
   if (isFunction(/x/)) {
     isFunction = function(value) {
-      return typeof value === 'function' && toString.call(value) === '[object Function]';
+      return typeof value === "function" && toString.call(value) === "[object Function]";
     };
   }
   var isFunction;
   __exports__.isFunction = isFunction;
   /* istanbul ignore next */
   var isArray = Array.isArray || function(value) {
-    return (value && typeof value === 'object') ? toString.call(value) === '[object Array]' : false;
+    return (value && typeof value === "object") ? toString.call(value) === "[object Array]" : false;
   };
   __exports__.isArray = isArray;
   // Older IE versions do not directly support indexOf so we must implement our own, sadly.
@@ -100,18 +100,18 @@ var __module2__ = (function() {
 
   __exports__.indexOf = indexOf;
   function escapeExpression(string) {
-    // don't escape SafeStrings, since they're already safe
+    // don"t escape SafeStrings, since they"re already safe
     if (string && string.toHTML) {
       return string.toHTML();
     } else if (string == null) {
       return "";
     } else if (!string) {
-      return string + '';
+      return string + "";
     }
 
     // Force a string conversion as this will be done by the append regardless and
     // the regex test will do this transparently behind the scenes, causing issues if
-    // an object's to string has escaped characters in it.
+    // an object"s to string has escaped characters in it.
     string = "" + string;
 
     if(!possible.test(string)) { return string; }
@@ -134,7 +134,7 @@ var __module2__ = (function() {
   }
 
   __exports__.blockParams = blockParams;function appendContextPath(contextPath, id) {
-    return (contextPath ? contextPath + '.' : '') + id;
+    return (contextPath ? contextPath + "." : "") + id;
   }
 
   __exports__.appendContextPath = appendContextPath;
@@ -146,7 +146,7 @@ var __module3__ = (function() {
   "use strict";
   var __exports__;
 
-  var errorProps = ['description', 'fileName', 'lineNumber', 'message', 'name', 'number', 'stack'];
+  var errorProps = ["description", "fileName", "lineNumber", "message", "name", "number", "stack"];
 
   function Exception(message, node) {
     var loc = node && node.loc,
@@ -156,12 +156,12 @@ var __module3__ = (function() {
       line = loc.start.line;
       column = loc.start.column;
 
-      message += ' - ' + line + ':' + column;
+      message += " - " + line + ":" + column;
     }
 
     var tmp = Error.prototype.constructor.call(this, message);
 
-    // Unfortunately errors are not enumerable in Chrome (at least), so `for prop in tmp` doesn't work.
+    // Unfortunately errors are not enumerable in Chrome (at least), so `for prop in tmp` doesn"t work.
     for (var idx = 0; idx < errorProps.length; idx++) {
       this[errorProps[idx]] = tmp[errorProps[idx]];
     }
@@ -189,18 +189,18 @@ var __module1__ = (function(__dependency1__, __dependency2__) {
   __exports__.VERSION = VERSION;var COMPILER_REVISION = 6;
   __exports__.COMPILER_REVISION = COMPILER_REVISION;
   var REVISION_CHANGES = {
-    1: '<= 1.0.rc.2', // 1.0.rc.2 is actually rev2 but doesn't report it
-    2: '== 1.0.0-rc.3',
-    3: '== 1.0.0-rc.4',
-    4: '== 1.x.x',
-    5: '== 2.0.0-alpha.x',
-    6: '>= 2.0.0-beta.1'
+    1: "<= 1.0.rc.2", // 1.0.rc.2 is actually rev2 but doesn"t report it
+    2: "== 1.0.0-rc.3",
+    3: "== 1.0.0-rc.4",
+    4: "== 1.x.x",
+    5: "== 2.0.0-alpha.x",
+    6: ">= 2.0.0-beta.1"
   };
   __exports__.REVISION_CHANGES = REVISION_CHANGES;
   var isArray = Utils.isArray,
       isFunction = Utils.isFunction,
       toString = Utils.toString,
-      objectType = '[object Object]';
+      objectType = "[object Object]";
 
   function HandlebarsEnvironment(helpers, partials) {
     this.helpers = helpers || {};
@@ -217,7 +217,7 @@ var __module1__ = (function(__dependency1__, __dependency2__) {
 
     registerHelper: function(name, fn) {
       if (toString.call(name) === objectType) {
-        if (fn) { throw new Exception('Arg not supported with multiple helpers'); }
+        if (fn) { throw new Exception("Arg not supported with multiple helpers"); }
         Utils.extend(this.helpers, name);
       } else {
         this.helpers[name] = fn;
@@ -231,8 +231,8 @@ var __module1__ = (function(__dependency1__, __dependency2__) {
       if (toString.call(name) === objectType) {
         Utils.extend(this.partials,  name);
       } else {
-        if (typeof partial === 'undefined') {
-          throw new Exception('Attempting to register a partial as undefined');
+        if (typeof partial === "undefined") {
+          throw new Exception("Attempting to register a partial as undefined");
         }
         this.partials[name] = partial;
       }
@@ -243,17 +243,17 @@ var __module1__ = (function(__dependency1__, __dependency2__) {
   };
 
   function registerDefaultHelpers(instance) {
-    instance.registerHelper('helperMissing', function(/* [args, ]options */) {
+    instance.registerHelper("helperMissing", function(/* [args, ]options */) {
       if(arguments.length === 1) {
         // A missing field in a {{foo}} constuct.
         return undefined;
       } else {
         // Someone is actually trying to call something, blow up.
-        throw new Exception("Missing helper: '" + arguments[arguments.length-1].name + "'");
+        throw new Exception("Missing helper: "" + arguments[arguments.length-1].name + """);
       }
     });
 
-    instance.registerHelper('blockHelperMissing', function(context, options) {
+    instance.registerHelper("blockHelperMissing", function(context, options) {
       var inverse = options.inverse,
           fn = options.fn;
 
@@ -282,9 +282,9 @@ var __module1__ = (function(__dependency1__, __dependency2__) {
       }
     });
 
-    instance.registerHelper('each', function(context, options) {
+    instance.registerHelper("each", function(context, options) {
       if (!options) {
-        throw new Exception('Must pass iterator to #each');
+        throw new Exception("Must pass iterator to #each");
       }
 
       var fn = options.fn, inverse = options.inverse;
@@ -292,7 +292,7 @@ var __module1__ = (function(__dependency1__, __dependency2__) {
 
       var contextPath;
       if (options.data && options.ids) {
-        contextPath = Utils.appendContextPath(options.data.contextPath, options.ids[0]) + '.';
+        contextPath = Utils.appendContextPath(options.data.contextPath, options.ids[0]) + ".";
       }
 
       if (isFunction(context)) { context = context.call(this); }
@@ -319,7 +319,7 @@ var __module1__ = (function(__dependency1__, __dependency2__) {
         });
       }
 
-      if(context && typeof context === 'object') {
+      if(context && typeof context === "object") {
         if (isArray(context)) {
           for(var j = context.length; i<j; i++) {
             execIteration(i, i, i === context.length-1);
@@ -329,7 +329,7 @@ var __module1__ = (function(__dependency1__, __dependency2__) {
 
           for(var key in context) {
             if(context.hasOwnProperty(key)) {
-              // We're running the iterations one step out of sync so we can detect
+              // We"re running the iterations one step out of sync so we can detect
               // the last iteration without have to scan the object twice and create
               // an itermediate keys array. 
               if (priorKey) {
@@ -352,7 +352,7 @@ var __module1__ = (function(__dependency1__, __dependency2__) {
       return ret;
     });
 
-    instance.registerHelper('if', function(conditional, options) {
+    instance.registerHelper("if", function(conditional, options) {
       if (isFunction(conditional)) { conditional = conditional.call(this); }
 
       // Default behavior is to render the positive path if the value is truthy and not empty.
@@ -365,11 +365,11 @@ var __module1__ = (function(__dependency1__, __dependency2__) {
       }
     });
 
-    instance.registerHelper('unless', function(conditional, options) {
-      return instance.helpers['if'].call(this, conditional, {fn: options.inverse, inverse: options.fn, hash: options.hash});
+    instance.registerHelper("unless", function(conditional, options) {
+      return instance.helpers["if"].call(this, conditional, {fn: options.inverse, inverse: options.fn, hash: options.hash});
     });
 
-    instance.registerHelper('with', function(context, options) {
+    instance.registerHelper("with", function(context, options) {
       if (isFunction(context)) { context = context.call(this); }
 
       var fn = options.fn;
@@ -387,18 +387,18 @@ var __module1__ = (function(__dependency1__, __dependency2__) {
       }
     });
 
-    instance.registerHelper('log', function(message, options) {
+    instance.registerHelper("log", function(message, options) {
       var level = options.data && options.data.level != null ? parseInt(options.data.level, 10) : 1;
       instance.log(level, message);
     });
 
-    instance.registerHelper('lookup', function(obj, field) {
+    instance.registerHelper("lookup", function(obj, field) {
       return obj && obj[field];
     });
   }
 
   var logger = {
-    methodMap: { 0: 'debug', 1: 'info', 2: 'warn', 3: 'error' },
+    methodMap: { 0: "debug", 1: "info", 2: "warn", 3: "error" },
 
     // State enum
     DEBUG: 0,
@@ -409,7 +409,7 @@ var __module1__ = (function(__dependency1__, __dependency2__) {
 
     // Can be overridden in the host environment
     log: function(level, message) {
-      if (typeof console !== 'undefined' && logger.level <= level) {
+      if (typeof console !== "undefined" && logger.level <= level) {
         var method = logger.methodMap[level];
         (console[method] || console.log).call(console, message);
       }
@@ -465,7 +465,7 @@ var __module5__ = (function(__dependency1__, __dependency2__, __dependency3__) {
         throw new Exception("Template was precompiled with an older version of Handlebars than the current runtime. "+
               "Please update your precompiler to a newer version ("+runtimeVersions+") or downgrade your runtime to an older version ("+compilerVersions+").");
       } else {
-        // Use the embedded version info since the runtime doesn't know about this revision yet
+        // Use the embedded version info since the runtime doesn"t know about this revision yet
         throw new Exception("Template was precompiled with a newer version of Handlebars than the current runtime. "+
               "Please update your runtime to a newer version ("+compilerInfo[1]+").");
       }
@@ -480,7 +480,7 @@ var __module5__ = (function(__dependency1__, __dependency2__, __dependency3__) {
       throw new Exception("No environment passed to template");
     }
     if (!templateSpec || !templateSpec.main) {
-      throw new Exception('Unknown template object: ' + typeof templateSpec);
+      throw new Exception("Unknown template object: " + typeof templateSpec);
     }
 
     // Note: Using env.VM references rather than local var references throughout this section to allow
@@ -501,7 +501,7 @@ var __module5__ = (function(__dependency1__, __dependency2__, __dependency3__) {
       }
       if (result != null) {
         if (options.indent) {
-          var lines = result.split('\n');
+          var lines = result.split("\n");
           for (var i = 0, l = lines.length; i < l; i++) {
             if (!lines[i] && i + 1 === l) {
               break;
@@ -509,7 +509,7 @@ var __module5__ = (function(__dependency1__, __dependency2__, __dependency3__) {
 
             lines[i] = options.indent + lines[i];
           }
-          result = lines.join('\n');
+          result = lines.join("\n");
         }
         return result;
       } else {
@@ -521,7 +521,7 @@ var __module5__ = (function(__dependency1__, __dependency2__, __dependency3__) {
     var container = {
       strict: function(obj, name) {
         if (!(name in obj)) {
-          throw new Exception('"' + name + '" not defined in ' + obj);
+          throw new Exception(""" + name + "" not defined in " + obj);
         }
         return obj[name];
       },
@@ -534,7 +534,7 @@ var __module5__ = (function(__dependency1__, __dependency2__, __dependency3__) {
         }
       },
       lambda: function(current, context) {
-        return typeof current === 'function' ? current.call(context) : current;
+        return typeof current === "function" ? current.call(context) : current;
       },
 
       escapeExpression: Utils.escapeExpression,
@@ -609,10 +609,10 @@ var __module5__ = (function(__dependency1__, __dependency2__, __dependency3__) {
 
     ret._child = function(i, data, blockParams, depths) {
       if (templateSpec.useBlockParams && !blockParams) {
-        throw new Exception('must pass block params');
+        throw new Exception("must pass block params");
       }
       if (templateSpec.useDepths && !depths) {
-        throw new Exception('must pass parent depths');
+        throw new Exception("must pass parent depths");
       }
 
       return program(container, i, templateSpec[i], data, 0, blockParams, depths);
@@ -661,7 +661,7 @@ var __module5__ = (function(__dependency1__, __dependency2__, __dependency3__) {
   __exports__.invokePartial = invokePartial;function noop() { return ""; }
 
   __exports__.noop = noop;function initData(context, data) {
-    if (!data || !('root' in data)) {
+    if (!data || !("root" in data)) {
       data = data ? createFrame(data) : {};
       data.root = context;
     }
@@ -707,7 +707,7 @@ var __module0__ = (function(__dependency1__, __dependency2__, __dependency3__, _
 
   /*jshint -W040 */
   /* istanbul ignore next */
-  var root = typeof global !== 'undefined' ? global : window,
+  var root = typeof global !== "undefined" ? global : window,
       $Handlebars = root.Handlebars;
   /* istanbul ignore next */
   Handlebars.noConflict = function() {
@@ -716,7 +716,7 @@ var __module0__ = (function(__dependency1__, __dependency2__, __dependency3__, _
     }
   };
 
-  Handlebars['default'] = Handlebars;
+  Handlebars["default"] = Handlebars;
 
   __exports__ = Handlebars;
   return __exports__;

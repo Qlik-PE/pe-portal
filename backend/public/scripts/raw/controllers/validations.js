@@ -9,20 +9,17 @@ app.controller("validationController", ["$scope", "$resource", "$state", "$state
   console.log($state.current.name);
 
   if($state.current.name !="validations.new"){
-    Validations.query({validationId:$stateParams.Id||""}, function(result){
+    Validations.get({validationId:$stateParams.Id||""}, function(result){
       if(resultHandler.process(result)){
-        $scope.validations = result;
+        $scope.validations = result.data;
         $scope.imageUploadPath = "/api/validations/"+$stateParams.Id+"/image";
       }
     });
   }
 
-  TechnologyTypes.query({}, function(result){
-    if(result[0] && result[0].redirect){
-      window.location = result[0].redirect;
-    }
-    else{
-      $scope.technologytypes = result;
+  TechnologyTypes.get({}, function(result){
+    if(resultHandler.process(result)){
+      $scope.technologytypes = result.data;
     }
   });
 
@@ -33,13 +30,13 @@ app.controller("validationController", ["$scope", "$resource", "$state", "$state
   }
 
   $scope.setSteps = function(){
-    Steps.query({validationid:$stateParams.Id}, function(stepresult){
+    Steps.get({validationid:$stateParams.Id}, function(stepresult){
       if(resultHandler.process(stepresult)){
-        if(stepresult.length > 0){
+        if(stepresult.data.length > 0){
           resultHandler.process({errCode:true, errText: "Validation already has steps."});
         }
         else{
-          $scope.$broadcast('techTypeChanged',$scope.validations[0].technology_type._id );
+          $scope.$broadcast("techTypeChanged",$scope.validations[0].technology_type._id );
           $scope.save();
           $scope.setTab(1);
         }
@@ -95,6 +92,30 @@ app.controller("validationController", ["$scope", "$resource", "$state", "$state
 
   $scope.save = function(){
     var id = $stateParams.Id=="new"?"":$stateParams.Id;
+    Validations.save({validationId:id}, $scope.validations[0], function(result){
+      if(resultHandler.process(result, "Save")){
+        if($state.current.name =="validations.new"){
+          window.location = "/#validations/"+result._id;
+        }
+      }
+    });  //currently we"re only allowing a save from the detail page, in which case we should only have 1 validation in the array
+  };
+
+  $scope.validate = function(){
+    var id = $stateParams.Id=="new"?"":$stateParams.Id;
+    $scope.validations[0].status = "Validated";
+    Validations.save({validationId:id}, $scope.validations[0], function(result){
+      if(resultHandler.process(result, "Save")){
+        if($state.current.name =="validations.new"){
+          window.location = "/#validations/"+result._id;
+        }
+      }
+    });  //currently we"re only allowing a save from the detail page, in which case we should only have 1 validation in the array
+  };
+
+  $scope.unvalidate = function(){
+    var id = $stateParams.Id=="new"?"":$stateParams.Id;
+    $scope.validations[0].status = "Pending";
     Validations.save({validationId:id}, $scope.validations[0], function(result){
       if(resultHandler.process(result, "Save")){
         if($state.current.name =="validations.new"){

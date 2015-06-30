@@ -1,31 +1,49 @@
-var Error = require('./error');
+var Error = require("./error");
 
 module.exports = {
-  get: function(query, entity, callbackFn){
-    entity.model.find(query).populate(entity.populates).exec(function(err, results){
+  get: function(query, parsedQuery, entity, callbackFn){
+    entity.model.find(parsedQuery).populate(entity.populates).sort(entity.sort).skip(entity.skip).limit(entity.limit).exec(function(err, results){
       if(err){
         console.log(err);
         callbackFn.call(null, Error.errorGetting(err.message));
       }
       else{
-        callbackFn.call(null, results);
+        //establish how many rows are in the collection for the given query
+        entity.model.count(parsedQuery, function(err, count){
+          if(err){
+            console.log(err);
+            callbackFn.call(null, Error.errorGetting(err.message));
+          }
+          else{
+            var responseObj = {};
+            responseObj.total = count;
+            responseObj.pages = Math.round(count / query.limit);
+            responseObj.query = query;
+            responseObj.skip = entity.skip + entity.limit;
+            responseObj.limit = entity.limit;
+            responseObj.data = results
+            callbackFn.call(null, responseObj);
+          }
+        })
       }
     });
   },
-  count: function(query, entity, callbackFn){
+  count: function(query, parsedQuery, entity, callbackFn){
     console.log(entity);
-    entity.model.count(query, function(err, result){
+    entity.model.count(parsedQuery, function(err, result){
       if(err){
         console.log(err);
         callbackFn.call(null, Error.errorGetting(err.message));
       }
       else{
-        callbackFn.call(null, result);
+        callbackFn.call(null, {data: result});
       }
     });
   },
   save: function(query, data, entity, callbackFn){
     if(query){ //update
+      console.log('post data');
+      console.log(data);
       entity.model.findOneAndUpdate(query, data, function(err, result){
         if(err){
           console.log(err);

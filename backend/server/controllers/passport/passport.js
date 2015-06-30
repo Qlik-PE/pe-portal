@@ -1,4 +1,4 @@
-var User = require('../../models/users');
+var User = require("../../models/users");
 
 module.exports = function(passport){
   passport.serializeUser(function(user, done) {
@@ -6,14 +6,14 @@ module.exports = function(passport){
   });
 
   passport.deserializeUser(function(id, done) {
-    User.findById(id).populate('role').exec(function(err, user) {      
+    User.findById(id).populate("role").exec(function(err, user) {      
       done(err, user);
     });
   });
 
   //Configure login strategy
-  require('./local.js')(passport, User);
+  require("./local.js")(passport, User);
 
   //configure signup strategy
-  require('./signup.js')(passport, User);
+  require("./signup.js")(passport, User);
 }

@@ -44,7 +44,7 @@
       // route to public validations page
       .state("publicvalidations", {
         url: "/public/validations",
-        templateUrl: "/views/public/validations/list.html",
+        templateUrl: "/views/public/validations/index.html",
         controller: "senseController"
       })
       // route for viewing validations
@@ -108,7 +108,7 @@
   }]);
 
   //Services
-  app.service('userPermissions', ['$resource', function($resource){
+  app.service("userPermissions", ["$resource", "resultHandler", function($resource, resultHandler){
     var System = $resource("system/:path", {path: "@path"});
     this.permissions = {};
     var that = this;
@@ -129,29 +129,32 @@
       return this.permissions[entity] && this.permissions[entity].allOwners && this.permissions[entity].allOwners==true
     }
     this.refresh = function(){
-      System.get({path:'userpermissions'}, function(result){
-        that.permissions = result;
+      System.get({path:"userpermissions"}, function(result){
+        if(resultHandler.process(result)){
+          that.permissions = result.permissions;
+          that.role = result.name;
+        }
       });
     }
     this.refresh();
   }]);
 
-  app.service('resultHandler', ["notifications", function(notifications){
+  app.service("resultHandler", ["notifications", function(notifications){
     this.process = function(result, action){   //deals with the result in a generic way. Return true if the result is a success otherwise returns false
-      if(result.redirect || (result[0] && result[0].redirect)){
-        window.location = result.redirect || result[0].redirect;
+      if(result.redirect){
+        window.location = result.redirect;
         return false;
       }
-      else if (result.errCode || (result[0] && result[0].errCode)) {
+      else if (result.errCode) {
         notifications.showError({
-          message: result.errText || result[0].errText,
+          message: result.errText,
           hideDelay: 3000,
           hide: true
         });
         return false;
       }
       else {
-        //if an action has been passed notify the user of it's success
+        //if an action has been passed notify the user of it"s success
         if(action){
           notifications.showSuccess({message: action + " Successful"});
         }
@@ -162,11 +165,11 @@
 
 
   //Controllers
-  app.controller('mainController', ['$scope', function($scope){
+  app.controller("mainController", ["$scope", function($scope){
     
   }]);
 
-  app.controller('authController', ["$scope", "$resource", "$state", "$stateParams", "userPermissions", function($scope, $resource, $state, $stateParams, userPermissions){
+  app.controller("authController", ["$scope", "$resource", "$state", "$stateParams", "userPermissions", function($scope, $resource, $state, $stateParams, userPermissions){
 
     $scope.partnername = "";
     $scope.partner;
@@ -175,9 +178,9 @@
 
     $scope.checkPartner = function(){
         if($scope.partnername.length>1){
-          //in this controller we're using a jQuery GET instead of an angular $resource
+          //in this controller we"re using a jQuery GET instead of an angular $resource
           //this is because I could not get the regex to parse properly with $resource
-          $.get('system/partners', {name: {$regex:$scope.partnername, $options:"gi"}})
+          $.get("system/partners", {name: {$regex:$scope.partnername, $options:"gi"}})
           .success(function(data){
             if(data.length>0){
               $scope.$apply(function(){
@@ -215,20 +218,17 @@
     console.log($state.current.name);
 
     if($state.current.name !="validations.new"){
-      Validations.query({validationId:$stateParams.Id||""}, function(result){
+      Validations.get({validationId:$stateParams.Id||""}, function(result){
         if(resultHandler.process(result)){
-          $scope.validations = result;
+          $scope.validations = result.data;
           $scope.imageUploadPath = "/api/validations/"+$stateParams.Id+"/image";
         }
       });
     }
 
-    TechnologyTypes.query({}, function(result){
-      if(result[0] && result[0].redirect){
-        window.location = result[0].redirect;
-      }
-      else{
-        $scope.technologytypes = result;
+    TechnologyTypes.get({}, function(result){
+      if(resultHandler.process(result)){
+        $scope.technologytypes = result.data;
       }
     });
 
@@ -239,13 +239,13 @@
     }
 
     $scope.setSteps = function(){
-      Steps.query({validationid:$stateParams.Id}, function(stepresult){
+      Steps.get({validationid:$stateParams.Id}, function(stepresult){
         if(resultHandler.process(stepresult)){
-          if(stepresult.length > 0){
+          if(stepresult.data.length > 0){
             resultHandler.process({errCode:true, errText: "Validation already has steps."});
           }
           else{
-            $scope.$broadcast('techTypeChanged',$scope.validations[0].technology_type._id );
+            $scope.$broadcast("techTypeChanged",$scope.validations[0].technology_type._id );
             $scope.save();
             $scope.setTab(1);
           }
@@ -310,6 +310,30 @@
       });  //currently we"re only allowing a save from the detail page, in which case we should only have 1 validation in the array
     };
 
+    $scope.validate = function(){
+      var id = $stateParams.Id=="new"?"":$stateParams.Id;
+      $scope.validations[0].status = "Validated";
+      Validations.save({validationId:id}, $scope.validations[0], function(result){
+        if(resultHandler.process(result, "Save")){
+          if($state.current.name =="validations.new"){
+            window.location = "/#validations/"+result._id;
+          }
+        }
+      });  //currently we"re only allowing a save from the detail page, in which case we should only have 1 validation in the array
+    };
+
+    $scope.unvalidate = function(){
+      var id = $stateParams.Id=="new"?"":$stateParams.Id;
+      $scope.validations[0].status = "Pending";
+      Validations.save({validationId:id}, $scope.validations[0], function(result){
+        if(resultHandler.process(result, "Save")){
+          if($state.current.name =="validations.new"){
+            window.location = "/#validations/"+result._id;
+          }
+        }
+      });  //currently we"re only allowing a save from the detail page, in which case we should only have 1 validation in the array
+    };
+
     $scope.uploadScreenshot = function(){
       // var file = $("#screenshotUpload")[0].files[0];
       // r = new FileReader();
@@ -345,22 +369,22 @@
 
     $scope.permissions = userPermissions;
 
-    StepTypes.query({}, function(result){
+    StepTypes.get({}, function(result){
       if(resultHandler.process(result)){
-        $scope.stepTypes = result;
+        $scope.stepTypes = result.data;
       }
     });  //this creates a GET query to api/steps/types
 
-    StepStatus.query({}, function(result){
+    StepStatus.get({}, function(result){
       if(resultHandler.process(result)){
-        $scope.stepStatus = result;
+        $scope.stepStatus = result.data;
       }
     });  //this creates a GET query to api/steps/statuses
 
     if($stateParams.Id && $stateParams.Id!="new"){  //We have a validation to work with
-      Step.query({stepId:$stateParams.stepId||"", validationid:$stateParams.Id||""}, function(result){
+      Step.get({stepId:$stateParams.stepId||"", validationid:$stateParams.Id||""}, function(result){
         if(resultHandler.process(result)){
-          $scope.steps = result;
+          $scope.steps = result.data;
         }
       });
     }
@@ -368,26 +392,26 @@
       //do nothing as we have no steps yet
     }
     else{ //We should be working with an individual step
-      Step.query({stepId: $stateParams.stepId}, function(result){
+      Step.get({stepId: $stateParams.stepId}, function(result){
         if(resultHandler.process(result)){
-          $scope.steps = result;
+          $scope.steps = result.data;
         }
       })
     }
 
-    $scope.$on('techTypeChanged', function(event, techTypeId){
-      Step.query({techtypeId: techTypeId}, function(result){
+    $scope.$on("techTypeChanged", function(event, techTypeId){
+      Step.get({techtypeId: techTypeId}, function(result){
         if(resultHandler.process(result)){
-          for(var i=0;i<result.length;i++){
+          for(var i=0;i<result.data.length;i++){
             var s = result[i];
             s._id = null;
             s.techtypeId = null;
             s.validationid = $stateParams.Id;
             s.status = "5559a3937730da518d2dc00f";
             Step.save({}, s, function(stepresult){
-              if(i==result.length){
+              if(i==result.data.length){
                 resultHandler.process(stepresult, "Setting steps ");
-                $scope.steps = result;
+                $scope.steps = result.data;
               }
             });
           }
@@ -468,28 +492,28 @@
 
     $scope.permissions = userPermissions;
 
-    IssueStatus.query({}, function(result){
+    IssueStatus.get({}, function(result){
       if(resultHandler.process(result)){
-        $scope.issueStatus = result;
+        $scope.issueStatus = result.data;
       }
     });  //this creates a GET query to api/issues/statuses
 
     if($state.current.name!="issues.new"){
       if($stateParams.stepId){  //We have a validation to work with
-        Issue.query({issueId:$stateParams.issueId||"", step:$stateParams.stepId||""}, function(result){
+        Issue.get({issueId:$stateParams.issueId||"", step:$stateParams.stepId||""}, function(result){
           if(resultHandler.process(result)){
-            $scope.issues = result;
+            $scope.issues = result.data;
           }
         });
       }
       else{ //We should be working with an individual issue
-        Issue.query({issueId: $stateParams.issueId}, function(result){
+        Issue.get({issueId: $stateParams.issueId}, function(result){
           if(resultHandler.process(result)){
-            $scope.issues = result;
+            $scope.issues = result.data;
             //first get the step, then the validation
-            Step.query({stepId: $scope.issues[0].step}, function(step){
-              $scope.step = step[0].name;
-              Validation.query({validationId: step[0].validationid}, function(validation){
+            Step.get({stepId: $scope.issues[0].step}, function(step){
+              $scope.step = step.data[0].name;
+              Validation.query({validationId: step[0].data.validationid}, function(validation){
                 $scope.validation = validation[0].title;
               });
             })
@@ -567,17 +591,15 @@
 
     $scope.permissions = userPermissions;
 
-    UserRoles.query({}, function(result){
-      $scope.userRoles = result;
-    });  //this creates a GET query to api/users/roles
-
-
-    User.query({userId: $stateParams.userId}, function(result){
-      if(result[0] && result[0].redirect){
-        window.location = result[0].redirect;
+    UserRoles.get({}, function(result){
+      if(resultHandler.process(result)){
+        $scope.userRoles = result.data;
       }
-      else{
-        $scope.users = result;
+    });
+
+    User.get({userId: $stateParams.userId}, function(result){
+      if(resultHandler.process(result)){
+        $scope.users = result.data;
       }
     })
 
@@ -601,7 +623,7 @@
     };
   }]);
 
-  app.controller("dashboardController", ["$scope", "$resource", "$state", "$stateParams","userPermissions", "notifications",  function($scope, $resource, $state, $stateParams, userPermissions, notifications){
+  app.controller("dashboardController", ["$scope", "$resource", "$state", "$stateParams","userPermissions", "notifications", "resultHandler",  function($scope, $resource, $state, $stateParams, userPermissions, notifications, resultHandler){
     var Validation = $resource("api/validations/:Id", {validationId: "@Id"});
     var Issue = $resource("api/issues/:issueId", {issueId: "@issueId"});
     var IssueStatus = $resource("api/issuestatus/:statusId", {statusId: "@statusId"});
@@ -610,36 +632,27 @@
 
     $scope.permissions = userPermissions;
 
-    Validation.query({Id:"count"}, function(result){
-      if(result[0] && result[0].redirect){
-        window.location = result[0].redirect;
-      }
-      else{
-        $scope.validationCount = result[0];
+    Validation.get({Id:"count"}, function(result){
+      if(resultHandler.process(result)){
+        $scope.validationCount = result.data;
       }
     });
 
-    UserRoles.query({}, function(result){
-      $scope.userRoles = result;
-      User.query({userId:"count", role: getUserRoleId("user")}, function(result){   //  /api/users/count
-        if(result[0] && result[0].redirect){
-          window.location = result[0].redirect;
-        }
-        else{
-          $scope.pendingUsers = result[0];
+    UserRoles.get({}, function(result){
+      $scope.userRoles = result.data;
+      User.get({userId:"count", role: getUserRoleId("user")}, function(result){   //  /api/users/count
+      if(resultHandler.process(result)){
+          $scope.pendingUsers = result.data;
         }
       }); //this fetches user that aren"t authorised (or in other words "user" users)
     });
 
 
-    IssueStatus.query({}, function(result){
+    IssueStatus.get({}, function(result){
       $scope.issueStatus = result;
-      Issue.query({issueId:"count", status: getIssueStatusId("Open")}, function(result){   //  /api/users/count
-        if(result[0] && result[0].redirect){
-          window.location = result[0].redirect;
-        }
-        else{
-          $scope.pendingIssues = result[0];
+      Issue.get({issueId:"count", status: getIssueStatusId("Open")}, function(result){   //  /api/users/count
+        if(resultHandler.process(result)){
+          $scope.pendingIssues = result.data;
         }
       }); //this fetches user that aren"t authorised (or in other words "user" users)
 
@@ -685,32 +698,29 @@
       "technologytypes"
     ];
 
-    UserRoles.query({}, function(result){
-      if(result[0] && result[0].redirect){
-        window.location = result[0].redirect;
-      }
-      else{
-        $scope.roles = result;
+    UserRoles.get({}, function(result){
+      if(resultHandler.process(result)){
+        $scope.roles = result.data;
         $scope.setRole(0);
       }
     });
 
-    TechnologyTypes.query({}, function(result){
+    TechnologyTypes.get({}, function(result){
       if(resultHandler.process(result)){
-        $scope.technologytypes = result;
+        $scope.technologytypes = result.data;
         $scope.setTechType(0);
       }
     });
 
-    StepTypes.query({}, function(result){
+    StepTypes.get({}, function(result){
       if(resultHandler.process(result)){
-        $scope.stepTypes = result;
+        $scope.stepTypes = result.data;
       }
     });  //this creates a GET query to api/steps/types
 
-    StepStatus.query({}, function(result){
+    StepStatus.get({}, function(result){
       if(resultHandler.process(result)){
-        $scope.stepStatus = result;
+        $scope.stepStatus = result.data;
       }
     });
 
@@ -733,9 +743,9 @@
 
     $scope.setTechType = function(index){
       $scope.activeTechType = index;
-      Step.query({techtypeId: $scope.technologytypes[$scope.activeTechType]._id}, function(result){
+      Step.get({techtypeId: $scope.technologytypes[$scope.activeTechType]._id}, function(result){
         if(resultHandler.process(result)){
-          $scope.steps = result.sort(function(a,b){
+          $scope.steps = result.data.sort(function(a,b){
             if(a.num > b.num){
               return 1;
             }
@@ -903,6 +913,169 @@
           return $scope.steps[i];
         }
       };
+    }
+  }]);
+
+  app.controller("senseController", ["$scope", "$resource", "$state", "$stateParams", function($scope, $resource, $state, $stateParams){
+    var config = {
+      host: "10.211.55.3",
+      port: "8080",
+      isSecure: false
+    };
+
+    var senseApp;
+
+    qsocks.Connect(config).then(function(global){
+      global.openDoc("c9ece11e-274f-4045-8d1d-402ca46496fc").then(function(app){
+        senseApp = app;
+        $scope.$broadcast("ready", app);
+      }, function(error) {
+          if (error.code == "1002") { //app already opened on server
+              global.getActiveDoc().then(function(app){
+                senseApp = app;
+                $scope.$broadcast("ready", app);
+              });
+          } else {
+              console.log(error)
+          }
+      });
+    });
+
+    $scope.objects = {};
+
+    $scope.test = "testtext";
+
+    $scope.addField = function(name, title){
+      $scope.objects[name] = {
+        title: title,
+        name: name,
+        type: "session-listbox"
+      };
+      $scope.$on("ready", function(event, senseApp){
+        var lbDef = {
+          qInfo:{
+            qType: "ListObject"
+          },
+          qListObjectDef:{
+            qStateName: "$",
+            qDef:{
+              qFieldDefs:[name]
+            }
+          }
+        };
+        senseApp.createSessionObject(lbDef).then(function(response){
+          $scope.$apply(function(){
+            $scope.objects[name].handle= response.handle;
+            $scope.objects[name].object = new qsocks.GenericObject(response.connection, response.handle);
+            $scope.renderObject(name, "session-listbox");
+          });
+        });
+
+      });
+    };
+
+    $scope.addTable = function(id, title){
+      $scope.objects[id] = {
+        title: title,
+        name: id,
+        type: "table"
+      };
+      $scope.$on("ready", function(event, senseApp){
+        senseApp.getObject(id).then(function(response){
+          $scope.objects[id].handle= response.handle;
+          $scope.objects[id].object = new qsocks.GenericObject(response.connection, response.handle);
+          $scope.renderObject(id, "table");
+        });
+      });
+    };
+
+    $scope.renderObject = function(item, objectType){
+      $scope.objects[item].object.getLayout().then(function(layout){
+      switch(objectType){
+        case "listbox":
+        case "session-listbox":
+          $scope.objects[item].object.getListObjectData("/qListObjectDef", [{qTop:0, qLeft:0, qHeight:layout.qListObject.qSize.qcy, qWidth: 1 }]).then(function(data){
+            $scope.$apply(function(){
+              $scope.objects[item].items = data[0].qMatrix;
+            });
+          });
+          break;
+        case "table":
+          $scope.objects[item].object.getHyperCubeData("/qHyperCubeDef", [{qTop:0, qLeft:0, qHeight:layout.qHyperCube.qSize.qcy, qWidth: layout.qHyperCube.qSize.qcx }]).then(function(data){
+            $scope.$apply(function(){
+              $scope.objects[item].labels = layout.qHyperCube.qDimensionInfo.concat(layout.qHyperCube.qMeasureInfo);
+              $scope.objects[item].items = data[0].qMatrix;
+            });
+          });
+          break;
+        case "text":
+          $scope.objects[item].getListObjectData("/qListObjectDef", [{qTop:0, qLeft:0, qHeight:layout.qListObject.qSize.qcy, qWidth: 1 }]).then(function(data){
+            $scope.$apply(function(){
+              $scope.objects[item].text = data[0].qMatrix.toString();
+            });
+          });
+          break;
+      }
+    });
+    };
+
+    $scope.toggleSelect = function(item, elemNum){
+      $scope.objects[item].object.selectListObjectValues("/qListObjectDef", [parseInt(elemNum)], true, false).then(function(response){
+        for(var o in $scope.objects){
+          $scope.renderObject($scope.objects[o].name, $scope.objects[o].type);
+        };
+      });
+    };
+
+    $scope.clearSelections = function(){
+      senseApp.clearAll().then(function(){
+        for(var o in $scope.objects){
+          $scope.renderObject($scope.objects[o].name, $scope.objects[o].type);
+        };
+      });
+    };
+
+    $scope.getObjectByHandle = function(handle){  //NOT NEEDED
+      for(var o in $scope.objects){
+        if($scope.objects[o].handle==handle){
+          return $scope.objects[o];
+        }
+      }
+      return null;
+    };
+
+  }])
+  .directive("senseFilter", [function(){
+    return {
+      restrict: "E",
+      scope: {
+        info: "="
+      },
+      link: function($scope, element, attr){
+        $scope.$parent.addField(attr.field, attr.title);
+        $scope.toggleValue =  function(elemNum){
+          $scope.$parent.toggleSelect(attr.field, elemNum);
+        }
+      },
+      templateUrl: "/views/public/filter.html",
+    }
+  }])
+  .directive("senseTable", [function(){
+    return {
+      restrict: "E",
+      scope: {
+        info: "="
+      },
+      link: function($scope, element, attr){
+        $scope.$parent.addTable(attr.id, attr.title);
+        $scope.getHyperlink = function(colIndex, rowIndex){
+          console.log(colIndex, rowIndex);
+          if($scope.info.labels[colIndex].qFallbackTitle==attr.hyperlink){
+            return attr.hyperlinkurl +"/"+ rowIndex;
+          }
+        }
+      },
+      templateUrl: "/views/public/table.html",
     }
   }]);
 

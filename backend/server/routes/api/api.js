@@ -1,9 +1,9 @@
-var express = require('express'),
+var express = require("express"),
     router = express.Router();
 
-var masterRoutes = require('./master');
+var masterRoutes = require("./master");
 
-router.use('/', masterRoutes);
+router.use("/", masterRoutes);
 
 module.exports = router;
 

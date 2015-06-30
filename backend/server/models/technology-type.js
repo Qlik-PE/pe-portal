@@ -1,4 +1,4 @@
-var mongoose = require('mongoose'),
+var mongoose = require("mongoose"),
   Schema = mongoose.Schema;
 
 
@@ -26,8 +26,8 @@ var TechnologyTypeSchema = new Schema({
   // }],
   createuser: {
     type: Schema.ObjectId,
-    ref: 'User'
+    ref: "User"
   }
 });
 
-module.exports = mongoose.model('technologytype', TechnologyTypeSchema);
+module.exports = mongoose.model("technologytype", TechnologyTypeSchema);

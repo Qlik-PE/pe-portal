@@ -1,20 +1,20 @@
-var express = require('express'),
+var express = require("express"),
     router = express.Router(),
-    passport = require('passport');
+    passport = require("passport");
 
-// router.post('/login', passport.authenticate('local'), function(req, res){
+// router.post("/login", passport.authenticate("local"), function(req, res){
 //   console.log(req.isAuthenticated());
-//   res.redirect('/');
+//   res.redirect("/");
 // });
 
-router.post('/login', passport.authenticate('local',{successRedirect: '/#dashboard', failureRedirect: ''}));
-router.get('/logout', function(req, res){
+router.post("/login", passport.authenticate("local",{successRedirect: "/#dashboard", failureRedirect: ""}));
+router.get("/logout", function(req, res){
   req.logout();
-  res.redirect('/');
+  res.redirect("/");
 });
 
-router.post('/signup', passport.authenticate('signup'), function(req, res){
-  res.redirect('/#dashboard')
+router.post("/signup", passport.authenticate("signup"), function(req, res){
+  res.redirect("/#dashboard")
 });
 
 module.exports = router;

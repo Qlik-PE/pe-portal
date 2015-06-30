@@ -6,22 +6,22 @@ app.controller("stepController", ["$scope", "$resource", "$state", "$stateParams
 
   $scope.permissions = userPermissions;
 
-  StepTypes.query({}, function(result){
+  StepTypes.get({}, function(result){
     if(resultHandler.process(result)){
-      $scope.stepTypes = result;
+      $scope.stepTypes = result.data;
     }
   });  //this creates a GET query to api/steps/types
 
-  StepStatus.query({}, function(result){
+  StepStatus.get({}, function(result){
     if(resultHandler.process(result)){
-      $scope.stepStatus = result;
+      $scope.stepStatus = result.data;
     }
   });  //this creates a GET query to api/steps/statuses
 
   if($stateParams.Id && $stateParams.Id!="new"){  //We have a validation to work with
-    Step.query({stepId:$stateParams.stepId||"", validationid:$stateParams.Id||""}, function(result){
+    Step.get({stepId:$stateParams.stepId||"", validationid:$stateParams.Id||""}, function(result){
       if(resultHandler.process(result)){
-        $scope.steps = result;
+        $scope.steps = result.data;
       }
     });
   }
@@ -29,26 +29,26 @@ app.controller("stepController", ["$scope", "$resource", "$state", "$stateParams
     //do nothing as we have no steps yet
   }
   else{ //We should be working with an individual step
-    Step.query({stepId: $stateParams.stepId}, function(result){
+    Step.get({stepId: $stateParams.stepId}, function(result){
       if(resultHandler.process(result)){
-        $scope.steps = result;
+        $scope.steps = result.data;
       }
     })
   }
 
-  $scope.$on('techTypeChanged', function(event, techTypeId){
-    Step.query({techtypeId: techTypeId}, function(result){
+  $scope.$on("techTypeChanged", function(event, techTypeId){
+    Step.get({techtypeId: techTypeId}, function(result){
       if(resultHandler.process(result)){
-        for(var i=0;i<result.length;i++){
+        for(var i=0;i<result.data.length;i++){
           var s = result[i];
           s._id = null;
           s.techtypeId = null;
           s.validationid = $stateParams.Id;
           s.status = "5559a3937730da518d2dc00f";
           Step.save({}, s, function(stepresult){
-            if(i==result.length){
+            if(i==result.data.length){
               resultHandler.process(stepresult, "Setting steps ");
-              $scope.steps = result;
+              $scope.steps = result.data;
             }
           });
         }

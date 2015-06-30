@@ -19,32 +19,29 @@ app.controller("adminController", ["$scope", "$resource", "$state", "$stateParam
     "technologytypes"
   ];
 
-  UserRoles.query({}, function(result){
-    if(result[0] && result[0].redirect){
-      window.location = result[0].redirect;
-    }
-    else{
-      $scope.roles = result;
+  UserRoles.get({}, function(result){
+    if(resultHandler.process(result)){
+      $scope.roles = result.data;
       $scope.setRole(0);
     }
   });
 
-  TechnologyTypes.query({}, function(result){
+  TechnologyTypes.get({}, function(result){
     if(resultHandler.process(result)){
-      $scope.technologytypes = result;
+      $scope.technologytypes = result.data;
       $scope.setTechType(0);
     }
   });
 
-  StepTypes.query({}, function(result){
+  StepTypes.get({}, function(result){
     if(resultHandler.process(result)){
-      $scope.stepTypes = result;
+      $scope.stepTypes = result.data;
     }
   });  //this creates a GET query to api/steps/types
 
-  StepStatus.query({}, function(result){
+  StepStatus.get({}, function(result){
     if(resultHandler.process(result)){
-      $scope.stepStatus = result;
+      $scope.stepStatus = result.data;
     }
   });
 
@@ -67,9 +64,9 @@ app.controller("adminController", ["$scope", "$resource", "$state", "$stateParam
 
   $scope.setTechType = function(index){
     $scope.activeTechType = index;
-    Step.query({techtypeId: $scope.technologytypes[$scope.activeTechType]._id}, function(result){
+    Step.get({techtypeId: $scope.technologytypes[$scope.activeTechType]._id}, function(result){
       if(resultHandler.process(result)){
-        $scope.steps = result.sort(function(a,b){
+        $scope.steps = result.data.sort(function(a,b){
           if(a.num > b.num){
             return 1;
           }

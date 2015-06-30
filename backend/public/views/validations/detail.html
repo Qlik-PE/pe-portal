@@ -1,5 +1,8 @@
 <div class="content">
   <h1><input class="form-control title"  ng-disabled="!permissions.canUpdate('validations')" ng-blur="save()" placeholder="Title" ng-model="validations[0].title"/></h1>
+  <span class="green" ng-hide="permissions.role=='admin'">{{validations[0].status}}</span>
+  <button ng-click="validate(validations[0]._id)" ng-hide="permissions.role!='admin' || validations[0].status=='Validated'" class="btn btn-default btn-validate">Validate</button>
+  <button ng-click="unvalidate(validations[0]._id)" ng-hide="permissions.role!='admin' || validations[0].status!='Validated'" class="btn btn-default btn-validate">Unvalidate</button>
   <button ng-click="delete(validations[0]._id)" ng-hide="!permissions.canDelete('validations')" class="btn btn-default btn-delete">Delete</button>
   <div class="row content-detail">
     <div class="content col-md-12">

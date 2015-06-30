@@ -1,4 +1,4 @@
-var mongoose = require('mongoose'),
+var mongoose = require("mongoose"),
   Schema = mongoose.Schema;
 
 
@@ -17,16 +17,20 @@ var ValidationSchema = new Schema({
   },
   technology_type: {
     type: Schema.ObjectId,
-    ref: 'technologytype'
+    ref: "technologytype"
   },
   content: {
     type: String,
     //required: true,
     trim: true
   },
+  status:{
+    type: String,
+    default: "pending"
+  },
   partner: {
     type: Schema.ObjectId,
-    ref: 'partner'
+    ref: "partner"
   },
   qliksw: {
     type: String,
@@ -105,15 +109,15 @@ var ValidationSchema = new Schema({
   },
   createuser: {
     type: Schema.ObjectId,
-    ref: 'User'
+    ref: "User"
   },
   assigneduser: {  //User associated with the certstep
     type: Schema.ObjectId,
-    ref: 'user'
+    ref: "user"
   },
   lastedituser: {  //User associated with the certstep
     type: Schema.ObjectId,
-    ref: 'user'
+    ref: "user"
   },
   lasteditdate:{
     type: Date
@@ -121,4 +125,4 @@ var ValidationSchema = new Schema({
   screenshots:[{type:String}]
 });
 
-module.exports = mongoose.model('validation', ValidationSchema);
+module.exports = mongoose.model("validation", ValidationSchema);

@@ -1,4 +1,4 @@
-var mongoose = require('mongoose'),
+var mongoose = require("mongoose"),
   Schema = mongoose.Schema;
 
 
@@ -32,12 +32,12 @@ var PartnerSchema = new Schema({
   },
   user: {  //User associated with the partner
     type: Schema.ObjectId,
-    ref: 'User'
+    ref: "User"
   },
   createuser: {
     type: Schema.ObjectId,
-    ref: 'User'
+    ref: "User"
   }
 });
 
-module.exports = mongoose.model('partner', PartnerSchema);
+module.exports = mongoose.model("partner", PartnerSchema);

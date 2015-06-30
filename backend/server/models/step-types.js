@@ -1,4 +1,4 @@
-var mongoose = require('mongoose'),
+var mongoose = require("mongoose"),
   Schema = mongoose.Schema;
 
 
@@ -13,8 +13,8 @@ var StepTypeSchema = new Schema({
   },
   createuser: {
     type: Schema.ObjectId,
-    ref: 'User'
+    ref: "User"
   }
 });
 
-module.exports = mongoose.model('steptype', StepTypeSchema);
+module.exports = mongoose.model("steptype", StepTypeSchema);

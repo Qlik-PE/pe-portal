@@ -25,7 +25,7 @@ THE SOFTWARE.
 @license
 */
 define(
-  'handlebars/utils',["exports"],
+  "handlebars/utils",["exports"],
   function(__exports__) {
     
     /*jshint -W004 */
@@ -33,13 +33,13 @@ define(
       "&": "&amp;",
       "<": "&lt;",
       ">": "&gt;",
-      '"': "&quot;",
-      "'": "&#x27;",
+      """: "&quot;",
+      """: "&#x27;",
       "`": "&#x60;"
     };
 
-    var badChars = /[&<>"'`]/g;
-    var possible = /[&<>"'`]/;
+    var badChars = /[&<>""`]/g;
+    var possible = /[&<>""`]/;
 
     function escapeChar(chr) {
       return escape[chr];
@@ -62,20 +62,20 @@ define(
     // Sourced from lodash
     // https://github.com/bestiejs/lodash/blob/master/LICENSE.txt
     var isFunction = function(value) {
-      return typeof value === 'function';
+      return typeof value === "function";
     };
     // fallback for older versions of Chrome and Safari
     /* istanbul ignore next */
     if (isFunction(/x/)) {
       isFunction = function(value) {
-        return typeof value === 'function' && toString.call(value) === '[object Function]';
+        return typeof value === "function" && toString.call(value) === "[object Function]";
       };
     }
     var isFunction;
     __exports__.isFunction = isFunction;
     /* istanbul ignore next */
     var isArray = Array.isArray || function(value) {
-      return (value && typeof value === 'object') ? toString.call(value) === '[object Array]' : false;
+      return (value && typeof value === "object") ? toString.call(value) === "[object Array]" : false;
     };
     __exports__.isArray = isArray;
     // Older IE versions do not directly support indexOf so we must implement our own, sadly.
@@ -90,18 +90,18 @@ define(
 
     __exports__.indexOf = indexOf;
     function escapeExpression(string) {
-      // don't escape SafeStrings, since they're already safe
+      // don"t escape SafeStrings, since they"re already safe
       if (string && string.toHTML) {
         return string.toHTML();
       } else if (string == null) {
         return "";
       } else if (!string) {
-        return string + '';
+        return string + "";
       }
 
       // Force a string conversion as this will be done by the append regardless and
       // the regex test will do this transparently behind the scenes, causing issues if
-      // an object's to string has escaped characters in it.
+      // an object"s to string has escaped characters in it.
       string = "" + string;
 
       if(!possible.test(string)) { return string; }
@@ -124,17 +124,17 @@ define(
     }
 
     __exports__.blockParams = blockParams;function appendContextPath(contextPath, id) {
-      return (contextPath ? contextPath + '.' : '') + id;
+      return (contextPath ? contextPath + "." : "") + id;
     }
 
     __exports__.appendContextPath = appendContextPath;
   });
 define(
-  'handlebars/exception',["exports"],
+  "handlebars/exception",["exports"],
   function(__exports__) {
     
 
-    var errorProps = ['description', 'fileName', 'lineNumber', 'message', 'name', 'number', 'stack'];
+    var errorProps = ["description", "fileName", "lineNumber", "message", "name", "number", "stack"];
 
     function Exception(message, node) {
       var loc = node && node.loc,
@@ -144,12 +144,12 @@ define(
         line = loc.start.line;
         column = loc.start.column;
 
-        message += ' - ' + line + ':' + column;
+        message += " - " + line + ":" + column;
       }
 
       var tmp = Error.prototype.constructor.call(this, message);
 
-      // Unfortunately errors are not enumerable in Chrome (at least), so `for prop in tmp` doesn't work.
+      // Unfortunately errors are not enumerable in Chrome (at least), so `for prop in tmp` doesn"t work.
       for (var idx = 0; idx < errorProps.length; idx++) {
         this[errorProps[idx]] = tmp[errorProps[idx]];
       }
@@ -165,7 +165,7 @@ define(
     __exports__["default"] = Exception;
   });
 define(
-  'handlebars/base',["./utils","./exception","exports"],
+  "handlebars/base",["./utils","./exception","exports"],
   function(__dependency1__, __dependency2__, __exports__) {
     
     var Utils = __dependency1__;
@@ -175,18 +175,18 @@ define(
     __exports__.VERSION = VERSION;var COMPILER_REVISION = 6;
     __exports__.COMPILER_REVISION = COMPILER_REVISION;
     var REVISION_CHANGES = {
-      1: '<= 1.0.rc.2', // 1.0.rc.2 is actually rev2 but doesn't report it
-      2: '== 1.0.0-rc.3',
-      3: '== 1.0.0-rc.4',
-      4: '== 1.x.x',
-      5: '== 2.0.0-alpha.x',
-      6: '>= 2.0.0-beta.1'
+      1: "<= 1.0.rc.2", // 1.0.rc.2 is actually rev2 but doesn"t report it
+      2: "== 1.0.0-rc.3",
+      3: "== 1.0.0-rc.4",
+      4: "== 1.x.x",
+      5: "== 2.0.0-alpha.x",
+      6: ">= 2.0.0-beta.1"
     };
     __exports__.REVISION_CHANGES = REVISION_CHANGES;
     var isArray = Utils.isArray,
         isFunction = Utils.isFunction,
         toString = Utils.toString,
-        objectType = '[object Object]';
+        objectType = "[object Object]";
 
     function HandlebarsEnvironment(helpers, partials) {
       this.helpers = helpers || {};
@@ -203,7 +203,7 @@ define(
 
       registerHelper: function(name, fn) {
         if (toString.call(name) === objectType) {
-          if (fn) { throw new Exception('Arg not supported with multiple helpers'); }
+          if (fn) { throw new Exception("Arg not supported with multiple helpers"); }
           Utils.extend(this.helpers, name);
         } else {
           this.helpers[name] = fn;
@@ -217,8 +217,8 @@ define(
         if (toString.call(name) === objectType) {
           Utils.extend(this.partials,  name);
         } else {
-          if (typeof partial === 'undefined') {
-            throw new Exception('Attempting to register a partial as undefined');
+          if (typeof partial === "undefined") {
+            throw new Exception("Attempting to register a partial as undefined");
           }
           this.partials[name] = partial;
         }
@@ -229,17 +229,17 @@ define(
     };
 
     function registerDefaultHelpers(instance) {
-      instance.registerHelper('helperMissing', function(/* [args, ]options */) {
+      instance.registerHelper("helperMissing", function(/* [args, ]options */) {
         if(arguments.length === 1) {
           // A missing field in a {{foo}} constuct.
           return undefined;
         } else {
           // Someone is actually trying to call something, blow up.
-          throw new Exception("Missing helper: '" + arguments[arguments.length-1].name + "'");
+          throw new Exception("Missing helper: "" + arguments[arguments.length-1].name + """);
         }
       });
 
-      instance.registerHelper('blockHelperMissing', function(context, options) {
+      instance.registerHelper("blockHelperMissing", function(context, options) {
         var inverse = options.inverse,
             fn = options.fn;
 
@@ -268,9 +268,9 @@ define(
         }
       });
 
-      instance.registerHelper('each', function(context, options) {
+      instance.registerHelper("each", function(context, options) {
         if (!options) {
-          throw new Exception('Must pass iterator to #each');
+          throw new Exception("Must pass iterator to #each");
         }
 
         var fn = options.fn, inverse = options.inverse;
@@ -278,7 +278,7 @@ define(
 
         var contextPath;
         if (options.data && options.ids) {
-          contextPath = Utils.appendContextPath(options.data.contextPath, options.ids[0]) + '.';
+          contextPath = Utils.appendContextPath(options.data.contextPath, options.ids[0]) + ".";
         }
 
         if (isFunction(context)) { context = context.call(this); }
@@ -305,7 +305,7 @@ define(
           });
         }
 
-        if(context && typeof context === 'object') {
+        if(context && typeof context === "object") {
           if (isArray(context)) {
             for(var j = context.length; i<j; i++) {
               execIteration(i, i, i === context.length-1);
@@ -315,7 +315,7 @@ define(
 
             for(var key in context) {
               if(context.hasOwnProperty(key)) {
-                // We're running the iterations one step out of sync so we can detect
+                // We"re running the iterations one step out of sync so we can detect
                 // the last iteration without have to scan the object twice and create
                 // an itermediate keys array. 
                 if (priorKey) {
@@ -338,7 +338,7 @@ define(
         return ret;
       });
 
-      instance.registerHelper('if', function(conditional, options) {
+      instance.registerHelper("if", function(conditional, options) {
         if (isFunction(conditional)) { conditional = conditional.call(this); }
 
         // Default behavior is to render the positive path if the value is truthy and not empty.
@@ -351,11 +351,11 @@ define(
         }
       });
 
-      instance.registerHelper('unless', function(conditional, options) {
-        return instance.helpers['if'].call(this, conditional, {fn: options.inverse, inverse: options.fn, hash: options.hash});
+      instance.registerHelper("unless", function(conditional, options) {
+        return instance.helpers["if"].call(this, conditional, {fn: options.inverse, inverse: options.fn, hash: options.hash});
       });
 
-      instance.registerHelper('with', function(context, options) {
+      instance.registerHelper("with", function(context, options) {
         if (isFunction(context)) { context = context.call(this); }
 
         var fn = options.fn;
@@ -373,18 +373,18 @@ define(
         }
       });
 
-      instance.registerHelper('log', function(message, options) {
+      instance.registerHelper("log", function(message, options) {
         var level = options.data && options.data.level != null ? parseInt(options.data.level, 10) : 1;
         instance.log(level, message);
       });
 
-      instance.registerHelper('lookup', function(obj, field) {
+      instance.registerHelper("lookup", function(obj, field) {
         return obj && obj[field];
       });
     }
 
     var logger = {
-      methodMap: { 0: 'debug', 1: 'info', 2: 'warn', 3: 'error' },
+      methodMap: { 0: "debug", 1: "info", 2: "warn", 3: "error" },
 
       // State enum
       DEBUG: 0,
@@ -395,7 +395,7 @@ define(
 
       // Can be overridden in the host environment
       log: function(level, message) {
-        if (typeof console !== 'undefined' && logger.level <= level) {
+        if (typeof console !== "undefined" && logger.level <= level) {
           var method = logger.methodMap[level];
           (console[method] || console.log).call(console, message);
         }
@@ -412,7 +412,7 @@ define(
     __exports__.createFrame = createFrame;
   });
 define(
-  'handlebars/safe-string',["exports"],
+  "handlebars/safe-string",["exports"],
   function(__exports__) {
     
     // Build out our basic SafeString type
@@ -427,7 +427,7 @@ define(
     __exports__["default"] = SafeString;
   });
 define(
-  'handlebars/runtime',["./utils","./exception","./base","exports"],
+  "handlebars/runtime",["./utils","./exception","./base","exports"],
   function(__dependency1__, __dependency2__, __dependency3__, __exports__) {
     
     var Utils = __dependency1__;
@@ -447,7 +447,7 @@ define(
           throw new Exception("Template was precompiled with an older version of Handlebars than the current runtime. "+
                 "Please update your precompiler to a newer version ("+runtimeVersions+") or downgrade your runtime to an older version ("+compilerVersions+").");
         } else {
-          // Use the embedded version info since the runtime doesn't know about this revision yet
+          // Use the embedded version info since the runtime doesn"t know about this revision yet
           throw new Exception("Template was precompiled with a newer version of Handlebars than the current runtime. "+
                 "Please update your runtime to a newer version ("+compilerInfo[1]+").");
         }
@@ -462,7 +462,7 @@ define(
         throw new Exception("No environment passed to template");
       }
       if (!templateSpec || !templateSpec.main) {
-        throw new Exception('Unknown template object: ' + typeof templateSpec);
+        throw new Exception("Unknown template object: " + typeof templateSpec);
       }
 
       // Note: Using env.VM references rather than local var references throughout this section to allow
@@ -483,7 +483,7 @@ define(
         }
         if (result != null) {
           if (options.indent) {
-            var lines = result.split('\n');
+            var lines = result.split("\n");
             for (var i = 0, l = lines.length; i < l; i++) {
               if (!lines[i] && i + 1 === l) {
                 break;
@@ -491,7 +491,7 @@ define(
 
               lines[i] = options.indent + lines[i];
             }
-            result = lines.join('\n');
+            result = lines.join("\n");
           }
           return result;
         } else {
@@ -503,7 +503,7 @@ define(
       var container = {
         strict: function(obj, name) {
           if (!(name in obj)) {
-            throw new Exception('"' + name + '" not defined in ' + obj);
+            throw new Exception(""" + name + "" not defined in " + obj);
           }
           return obj[name];
         },
@@ -516,7 +516,7 @@ define(
           }
         },
         lambda: function(current, context) {
-          return typeof current === 'function' ? current.call(context) : current;
+          return typeof current === "function" ? current.call(context) : current;
         },
 
         escapeExpression: Utils.escapeExpression,
@@ -591,10 +591,10 @@ define(
 
       ret._child = function(i, data, blockParams, depths) {
         if (templateSpec.useBlockParams && !blockParams) {
-          throw new Exception('must pass block params');
+          throw new Exception("must pass block params");
         }
         if (templateSpec.useDepths && !depths) {
-          throw new Exception('must pass parent depths');
+          throw new Exception("must pass parent depths");
         }
 
         return program(container, i, templateSpec[i], data, 0, blockParams, depths);
@@ -643,7 +643,7 @@ define(
     __exports__.invokePartial = invokePartial;function noop() { return ""; }
 
     __exports__.noop = noop;function initData(context, data) {
-      if (!data || !('root' in data)) {
+      if (!data || !("root" in data)) {
         data = data ? createFrame(data) : {};
         data.root = context;
       }
@@ -651,7 +651,7 @@ define(
     }
   });
 define(
-  'handlebars.runtime',["./handlebars/base","./handlebars/safe-string","./handlebars/exception","./handlebars/utils","./handlebars/runtime","exports"],
+  "handlebars.runtime",["./handlebars/base","./handlebars/safe-string","./handlebars/exception","./handlebars/utils","./handlebars/runtime","exports"],
   function(__dependency1__, __dependency2__, __dependency3__, __dependency4__, __dependency5__, __exports__) {
     
     /*globals Handlebars: true */
@@ -687,7 +687,7 @@ define(
 
     /*jshint -W040 */
     /* istanbul ignore next */
-    var root = typeof global !== 'undefined' ? global : window,
+    var root = typeof global !== "undefined" ? global : window,
         $Handlebars = root.Handlebars;
     /* istanbul ignore next */
     Handlebars.noConflict = function() {
@@ -696,18 +696,18 @@ define(
       }
     };
 
-    Handlebars['default'] = Handlebars;
+    Handlebars["default"] = Handlebars;
 
     __exports__["default"] = Handlebars;
   });
 define(
-  'handlebars/compiler/ast',["exports"],
+  "handlebars/compiler/ast",["exports"],
   function(__exports__) {
     
     var AST = {
       Program: function(statements, blockParams, strip, locInfo) {
         this.loc = locInfo;
-        this.type = 'Program';
+        this.type = "Program";
         this.body = statements;
 
         this.blockParams = blockParams;
@@ -716,7 +716,7 @@ define(
 
       MustacheStatement: function(path, params, hash, escaped, strip, locInfo) {
         this.loc = locInfo;
-        this.type = 'MustacheStatement';
+        this.type = "MustacheStatement";
 
         this.path = path;
         this.params = params || [];
@@ -728,7 +728,7 @@ define(
 
       BlockStatement: function(path, params, hash, program, inverse, openStrip, inverseStrip, closeStrip, locInfo) {
         this.loc = locInfo;
-        this.type = 'BlockStatement';
+        this.type = "BlockStatement";
 
         this.path = path;
         this.params = params || [];
@@ -743,25 +743,25 @@ define(
 
       PartialStatement: function(name, params, hash, strip, locInfo) {
         this.loc = locInfo;
-        this.type = 'PartialStatement';
+        this.type = "PartialStatement";
 
         this.name = name;
         this.params = params || [];
         this.hash = hash;
 
-        this.indent = '';
+        this.indent = "";
         this.strip = strip;
       },
 
       ContentStatement: function(string, locInfo) {
         this.loc = locInfo;
-        this.type = 'ContentStatement';
+        this.type = "ContentStatement";
         this.original = this.value = string;
       },
 
       CommentStatement: function(comment, strip, locInfo) {
         this.loc = locInfo;
-        this.type = 'CommentStatement';
+        this.type = "CommentStatement";
         this.value = comment;
 
         this.strip = strip;
@@ -770,7 +770,7 @@ define(
       SubExpression: function(path, params, hash, locInfo) {
         this.loc = locInfo;
 
-        this.type = 'SubExpression';
+        this.type = "SubExpression";
         this.path = path;
         this.params = params || [];
         this.hash = hash;
@@ -778,7 +778,7 @@ define(
 
       PathExpression: function(data, depth, parts, original, locInfo) {
         this.loc = locInfo;
-        this.type = 'PathExpression';
+        this.type = "PathExpression";
 
         this.data = data;
         this.original = original;
@@ -788,33 +788,33 @@ define(
 
       StringLiteral: function(string, locInfo) {
         this.loc = locInfo;
-        this.type = 'StringLiteral';
+        this.type = "StringLiteral";
         this.original =
           this.value = string;
       },
 
       NumberLiteral: function(number, locInfo) {
         this.loc = locInfo;
-        this.type = 'NumberLiteral';
+        this.type = "NumberLiteral";
         this.original =
           this.value = Number(number);
       },
 
       BooleanLiteral: function(bool, locInfo) {
         this.loc = locInfo;
-        this.type = 'BooleanLiteral';
+        this.type = "BooleanLiteral";
         this.original =
-          this.value = bool === 'true';
+          this.value = bool === "true";
       },
 
       Hash: function(pairs, locInfo) {
         this.loc = locInfo;
-        this.type = 'Hash';
+        this.type = "Hash";
         this.pairs = pairs;
       },
       HashPair: function(key, value, locInfo) {
         this.loc = locInfo;
-        this.type = 'HashPair';
+        this.type = "HashPair";
         this.key = key;
         this.value = value;
       },
@@ -826,7 +826,7 @@ define(
         // * it has at least one parameter or hash segment
         // TODO: Make these public utility methods
         helperExpression: function(node) {
-          return !!(node.type === 'SubExpression' || node.params.length || node.hash);
+          return !!(node.type === "SubExpression" || node.params.length || node.hash);
         },
 
         scopedId: function(path) {
@@ -847,7 +847,7 @@ define(
     __exports__["default"] = AST;
   });
 define(
-  'handlebars/compiler/parser',["exports"],
+  "handlebars/compiler/parser",["exports"],
   function(__exports__) {
     
     /* jshint ignore:start */
@@ -1043,12 +1043,12 @@ define(
                     expected = [];
                     for (p in table[state])
                         if (this.terminals_[p] && p > 2) {
-                            expected.push("'" + this.terminals_[p] + "'");
+                            expected.push(""" + this.terminals_[p] + """);
                         }
                     if (this.lexer.showPosition) {
-                        errStr = "Parse error on line " + (yylineno + 1) + ":\n" + this.lexer.showPosition() + "\nExpecting " + expected.join(", ") + ", got '" + (this.terminals_[symbol] || symbol) + "'";
+                        errStr = "Parse error on line " + (yylineno + 1) + ":\n" + this.lexer.showPosition() + "\nExpecting " + expected.join(", ") + ", got "" + (this.terminals_[symbol] || symbol) + """;
                     } else {
-                        errStr = "Parse error on line " + (yylineno + 1) + ": Unexpected " + (symbol == 1?"end of input":"'" + (this.terminals_[symbol] || symbol) + "'");
+                        errStr = "Parse error on line " + (yylineno + 1) + ": Unexpected " + (symbol == 1?"end of input":""" + (this.terminals_[symbol] || symbol) + """);
                     }
                     this.parseError(errStr, {text: this.lexer.match, token: this.terminals_[symbol] || symbol, line: this.lexer.yylineno, loc: yyloc, expected: expected});
                 }
@@ -1118,8 +1118,8 @@ define(
             this._input = input;
             this._more = this._less = this.done = false;
             this.yylineno = this.yyleng = 0;
-            this.yytext = this.matched = this.match = '';
-            this.conditionStack = ['INITIAL'];
+            this.yytext = this.matched = this.match = "";
+            this.conditionStack = ["INITIAL"];
             this.yylloc = {first_line:1,first_column:0,last_line:1,last_column:0};
             if (this.options.ranges) this.yylloc.range = [0,0];
             this.offset = 0;
@@ -1181,14 +1181,14 @@ define(
         },
     pastInput:function () {
             var past = this.matched.substr(0, this.matched.length - this.match.length);
-            return (past.length > 20 ? '...':'') + past.substr(-20).replace(/\n/g, "");
+            return (past.length > 20 ? "...":"") + past.substr(-20).replace(/\n/g, "");
         },
     upcomingInput:function () {
             var next = this.match;
             if (next.length < 20) {
                 next += this._input.substr(0, 20-next.length);
             }
-            return (next.substr(0,20)+(next.length > 20 ? '...':'')).replace(/\n/g, "");
+            return (next.substr(0,20)+(next.length > 20 ? "...":"")).replace(/\n/g, "");
         },
     showPosition:function () {
             var pre = this.pastInput();
@@ -1208,8 +1208,8 @@ define(
                 col,
                 lines;
             if (!this._more) {
-                this.yytext = '';
-                this.match = '';
+                this.yytext = "";
+                this.match = "";
             }
             var rules = this._currentRules();
             for (var i=0;i < rules.length; i++) {
@@ -1245,13 +1245,13 @@ define(
             if (this._input === "") {
                 return this.EOF;
             } else {
-                return this.parseError('Lexical error on line '+(this.yylineno+1)+'. Unrecognized text.\n'+this.showPosition(),
+                return this.parseError("Lexical error on line "+(this.yylineno+1)+". Unrecognized text.\n"+this.showPosition(),
                         {text: "", token: null, line: this.yylineno});
             }
         },
     lex:function lex() {
             var r = this.next();
-            if (typeof r !== 'undefined') {
+            if (typeof r !== "undefined") {
                 return r;
             } else {
                 return this.lex();
@@ -1324,7 +1324,7 @@ define(
     break;
     case 9:
                                       this.popState();
-                                      this.begin('raw');
+                                      this.begin("raw");
                                       return 21;
                                      
     break;
@@ -1349,7 +1349,7 @@ define(
     case 19:
       this.unput(yy_.yytext);
       this.popState();
-      this.begin('com');
+      this.begin("com");
 
     break;
     case 20:
@@ -1373,9 +1373,9 @@ define(
     break;
     case 28:this.popState(); return 31;
     break;
-    case 29:yy_.yytext = strip(1,2).replace(/\\"/g,'"'); return 74;
+    case 29:yy_.yytext = strip(1,2).replace(/\\"/g,"""); return 74;
     break;
-    case 30:yy_.yytext = strip(1,2).replace(/\\'/g,"'"); return 74;
+    case 30:yy_.yytext = strip(1,2).replace(/\\"/g,"""); return 74;
     break;
     case 31:return 77;
     break;
@@ -1393,13 +1393,13 @@ define(
     break;
     case 38:yy_.yytext = strip(1,2); return 66;
     break;
-    case 39:return 'INVALID';
+    case 39:return "INVALID";
     break;
     case 40:return 5;
     break;
     }
     };
-    lexer.rules = [/^(?:[^\x00]*?(?=(\{\{)))/,/^(?:[^\x00]+)/,/^(?:[^\x00]{2,}?(?=(\{\{|\\\{\{|\\\\\{\{|$)))/,/^(?:\{\{\{\{\/[^\s!"#%-,\.\/;->@\[-\^`\{-~]+(?=[=}\s\/.])\}\}\}\})/,/^(?:[^\x00]*?(?=(\{\{\{\{\/)))/,/^(?:[\s\S]*?--(~)?\}\})/,/^(?:\()/,/^(?:\))/,/^(?:\{\{\{\{)/,/^(?:\}\}\}\})/,/^(?:\{\{(~)?>)/,/^(?:\{\{(~)?#)/,/^(?:\{\{(~)?\/)/,/^(?:\{\{(~)?\^\s*(~)?\}\})/,/^(?:\{\{(~)?\s*else\s*(~)?\}\})/,/^(?:\{\{(~)?\^)/,/^(?:\{\{(~)?\s*else\b)/,/^(?:\{\{(~)?\{)/,/^(?:\{\{(~)?&)/,/^(?:\{\{(~)?!--)/,/^(?:\{\{(~)?![\s\S]*?\}\})/,/^(?:\{\{(~)?)/,/^(?:=)/,/^(?:\.\.)/,/^(?:\.(?=([=~}\s\/.)|])))/,/^(?:[\/.])/,/^(?:\s+)/,/^(?:\}(~)?\}\})/,/^(?:(~)?\}\})/,/^(?:"(\\["]|[^"])*")/,/^(?:'(\\[']|[^'])*')/,/^(?:@)/,/^(?:true(?=([~}\s)])))/,/^(?:false(?=([~}\s)])))/,/^(?:-?[0-9]+(?:\.[0-9]+)?(?=([~}\s)])))/,/^(?:as\s+\|)/,/^(?:\|)/,/^(?:([^\s!"#%-,\.\/;->@\[-\^`\{-~]+(?=([=~}\s\/.)|]))))/,/^(?:\[[^\]]*\])/,/^(?:.)/,/^(?:$)/];
+    lexer.rules = [/^(?:[^\x00]*?(?=(\{\{)))/,/^(?:[^\x00]+)/,/^(?:[^\x00]{2,}?(?=(\{\{|\\\{\{|\\\\\{\{|$)))/,/^(?:\{\{\{\{\/[^\s!"#%-,\.\/;->@\[-\^`\{-~]+(?=[=}\s\/.])\}\}\}\})/,/^(?:[^\x00]*?(?=(\{\{\{\{\/)))/,/^(?:[\s\S]*?--(~)?\}\})/,/^(?:\()/,/^(?:\))/,/^(?:\{\{\{\{)/,/^(?:\}\}\}\})/,/^(?:\{\{(~)?>)/,/^(?:\{\{(~)?#)/,/^(?:\{\{(~)?\/)/,/^(?:\{\{(~)?\^\s*(~)?\}\})/,/^(?:\{\{(~)?\s*else\s*(~)?\}\})/,/^(?:\{\{(~)?\^)/,/^(?:\{\{(~)?\s*else\b)/,/^(?:\{\{(~)?\{)/,/^(?:\{\{(~)?&)/,/^(?:\{\{(~)?!--)/,/^(?:\{\{(~)?![\s\S]*?\}\})/,/^(?:\{\{(~)?)/,/^(?:=)/,/^(?:\.\.)/,/^(?:\.(?=([=~}\s\/.)|])))/,/^(?:[\/.])/,/^(?:\s+)/,/^(?:\}(~)?\}\})/,/^(?:(~)?\}\})/,/^(?:"(\\["]|[^"])*")/,/^(?:"(\\["]|[^"])*")/,/^(?:@)/,/^(?:true(?=([~}\s)])))/,/^(?:false(?=([~}\s)])))/,/^(?:-?[0-9]+(?:\.[0-9]+)?(?=([~}\s)])))/,/^(?:as\s+\|)/,/^(?:\|)/,/^(?:([^\s!"#%-,\.\/;->@\[-\^`\{-~]+(?=([=~}\s\/.)|]))))/,/^(?:\[[^\]]*\])/,/^(?:.)/,/^(?:$)/];
     lexer.conditions = {"mu":{"rules":[6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40],"inclusive":false},"emu":{"rules":[2],"inclusive":false},"com":{"rules":[5],"inclusive":false},"raw":{"rules":[3,4],"inclusive":false},"INITIAL":{"rules":[0,1,40],"inclusive":true}};
     return lexer;})()
     parser.lexer = lexer;
@@ -1409,7 +1409,7 @@ define(
     /* jshint ignore:end */
   });
 define(
-  'handlebars/compiler/visitor',["../exception","./ast","exports"],
+  "handlebars/compiler/visitor",["../exception","./ast","exports"],
   function(__dependency1__, __dependency2__, __exports__) {
     
     var Exception = __dependency1__["default"];
@@ -1429,7 +1429,7 @@ define(
         if (this.mutating) {
           // Hacky sanity check:
           if (value && (!value.type || !AST[value.type])) {
-            throw new Exception('Unexpected node type "' + value.type + '" found when accepting ' + name + ' on ' + node.type);
+            throw new Exception("Unexpected node type "" + value.type + "" found when accepting " + name + " on " + node.type);
           }
           node[name] = value;
         }
@@ -1441,7 +1441,7 @@ define(
         this.acceptKey(node, name);
 
         if (!node[name]) {
-          throw new Exception(node.type + ' requires ' + name);
+          throw new Exception(node.type + " requires " + name);
         }
       },
 
@@ -1485,38 +1485,38 @@ define(
       },
 
       MustacheStatement: function(mustache) {
-        this.acceptRequired(mustache, 'path');
+        this.acceptRequired(mustache, "path");
         this.acceptArray(mustache.params);
-        this.acceptKey(mustache, 'hash');
+        this.acceptKey(mustache, "hash");
       },
 
       BlockStatement: function(block) {
-        this.acceptRequired(block, 'path');
+        this.acceptRequired(block, "path");
         this.acceptArray(block.params);
-        this.acceptKey(block, 'hash');
+        this.acceptKey(block, "hash");
 
-        this.acceptKey(block, 'program');
-        this.acceptKey(block, 'inverse');
+        this.acceptKey(block, "program");
+        this.acceptKey(block, "inverse");
       },
 
       PartialStatement: function(partial) {
-        this.acceptRequired(partial, 'name');
+        this.acceptRequired(partial, "name");
         this.acceptArray(partial.params);
-        this.acceptKey(partial, 'hash');
+        this.acceptKey(partial, "hash");
       },
 
       ContentStatement: function(/* content */) {},
       CommentStatement: function(/* comment */) {},
 
       SubExpression: function(sexpr) {
-        this.acceptRequired(sexpr, 'path');
+        this.acceptRequired(sexpr, "path");
         this.acceptArray(sexpr.params);
-        this.acceptKey(sexpr, 'hash');
+        this.acceptKey(sexpr, "hash");
       },
       PartialExpression: function(partial) {
-        this.acceptRequired(partial, 'name');
+        this.acceptRequired(partial, "name");
         this.acceptArray(partial.params);
-        this.acceptKey(partial, 'hash');
+        this.acceptKey(partial, "hash");
       },
 
       PathExpression: function(/* path */) {},
@@ -1529,14 +1529,14 @@ define(
         this.acceptArray(hash.pairs);
       },
       HashPair: function(pair) {
-        this.acceptRequired(pair, 'value');
+        this.acceptRequired(pair, "value");
       }
     };
 
     __exports__["default"] = Visitor;
   });
 define(
-  'handlebars/compiler/whitespace-control',["./visitor","exports"],
+  "handlebars/compiler/whitespace-control",["./visitor","exports"],
   function(__dependency1__, __exports__) {
     
     var Visitor = __dependency1__["default"];
@@ -1577,7 +1577,7 @@ define(
 
           if (omitLeft(body, i)) {
             // If we are on a standalone node, save the indent info for partials
-            if (current.type === 'PartialStatement') {
+            if (current.type === "PartialStatement") {
               // Pull out the whitespace from the final line
               current.indent = (/([ \t]+$)/).exec(body[i-1].original)[1];
             }
@@ -1586,7 +1586,7 @@ define(
         if (openStandalone) {
           omitRight((current.program || current.inverse).body);
 
-          // Strip out the previous content node if it's whitespace only
+          // Strip out the previous content node if it"s whitespace only
           omitLeft(body, i);
         }
         if (closeStandalone) {
@@ -1691,7 +1691,7 @@ define(
         return isRoot;
       }
 
-      if (prev.type === 'ContentStatement') {
+      if (prev.type === "ContentStatement") {
         return (sibling || !isRoot ? (/\r?\n\s*?$/) : (/(^|\r?\n)\s*?$/)).test(prev.original);
       }
     }
@@ -1706,13 +1706,13 @@ define(
         return isRoot;
       }
 
-      if (next.type === 'ContentStatement') {
+      if (next.type === "ContentStatement") {
         return (sibling || !isRoot ? (/^\s*?\r?\n/) : (/^\s*?(\r?\n|$)/)).test(next.original);
       }
     }
 
     // Marks the node to the right of the position as omitted.
-    // I.e. {{foo}}' ' will mark the ' ' node as omitted.
+    // I.e. {{foo}}" " will mark the " " node as omitted.
     //
     // If i is undefined, then the first child will be marked as such.
     //
@@ -1720,17 +1720,17 @@ define(
     // content is met.
     function omitRight(body, i, multiple) {
       var current = body[i == null ? 0 : i + 1];
-      if (!current || current.type !== 'ContentStatement' || (!multiple && current.rightStripped)) {
+      if (!current || current.type !== "ContentStatement" || (!multiple && current.rightStripped)) {
         return;
       }
 
       var original = current.value;
-      current.value = current.value.replace(multiple ? (/^\s+/) : (/^[ \t]*\r?\n?/), '');
+      current.value = current.value.replace(multiple ? (/^\s+/) : (/^[ \t]*\r?\n?/), "");
       current.rightStripped = current.value !== original;
     }
 
     // Marks the node to the left of the position as omitted.
-    // I.e. ' '{{foo}} will mark the ' ' node as omitted.
+    // I.e. " "{{foo}} will mark the " " node as omitted.
     //
     // If i is undefined then the last child will be marked as such.
     //
@@ -1738,13 +1738,13 @@ define(
     // content is met.
     function omitLeft(body, i, multiple) {
       var current = body[i == null ? body.length - 1 : i - 1];
-      if (!current || current.type !== 'ContentStatement' || (!multiple && current.leftStripped)) {
+      if (!current || current.type !== "ContentStatement" || (!multiple && current.leftStripped)) {
         return;
       }
 
-      // We omit the last node if it's whitespace only and not preceeded by a non-content node.
+      // We omit the last node if it"s whitespace only and not preceeded by a non-content node.
       var original = current.value;
-      current.value = current.value.replace(multiple ? (/\s+$/) : (/[ \t]+$/), '');
+      current.value = current.value.replace(multiple ? (/\s+$/) : (/[ \t]+$/), "");
       current.leftStripped = current.value !== original;
       return current.leftStripped;
     }
@@ -1752,7 +1752,7 @@ define(
     __exports__["default"] = WhitespaceControl;
   });
 define(
-  'handlebars/compiler/helpers',["../exception","exports"],
+  "handlebars/compiler/helpers",["../exception","exports"],
   function(__dependency1__, __exports__) {
     
     var Exception = __dependency1__["default"];
@@ -1771,35 +1771,35 @@ define(
 
     __exports__.SourceLocation = SourceLocation;function stripFlags(open, close) {
       return {
-        open: open.charAt(2) === '~',
-        close: close.charAt(close.length-3) === '~'
+        open: open.charAt(2) === "~",
+        close: close.charAt(close.length-3) === "~"
       };
     }
 
     __exports__.stripFlags = stripFlags;function stripComment(comment) {
-      return comment.replace(/^\{\{~?\!-?-?/, '')
-                    .replace(/-?-?~?\}\}$/, '');
+      return comment.replace(/^\{\{~?\!-?-?/, "")
+                    .replace(/-?-?~?\}\}$/, "");
     }
 
     __exports__.stripComment = stripComment;function preparePath(data, parts, locInfo) {
       /*jshint -W040 */
       locInfo = this.locInfo(locInfo);
 
-      var original = data ? '@' : '',
+      var original = data ? "@" : "",
           dig = [],
           depth = 0,
-          depthString = '';
+          depthString = "";
 
       for(var i=0,l=parts.length; i<l; i++) {
         var part = parts[i].part;
-        original += (parts[i].separator || '') + part;
+        original += (parts[i].separator || "") + part;
 
-        if (part === '..' || part === '.' || part === 'this') {
+        if (part === ".." || part === "." || part === "this") {
           if (dig.length > 0) {
-            throw new Exception('Invalid path: ' + original, {loc: locInfo});
-          } else if (part === '..') {
+            throw new Exception("Invalid path: " + original, {loc: locInfo});
+          } else if (part === "..") {
             depth++;
-            depthString += '../';
+            depthString += "../";
           }
         } else {
           dig.push(part);
@@ -1813,7 +1813,7 @@ define(
       /*jshint -W040 */
       // Must use charAt to support IE pre-10
       var escapeFlag = open.charAt(3) || open.charAt(2),
-          escaped = escapeFlag !== '{' && escapeFlag !== '&';
+          escaped = escapeFlag !== "{" && escapeFlag !== "&";
 
       return new this.MustacheStatement(path, params, hash, escaped, strip, this.locInfo(locInfo));
     }
@@ -1823,7 +1823,7 @@ define(
       if (openRawBlock.path.original !== close) {
         var errorNode = {loc: openRawBlock.path.loc};
 
-        throw new Exception(openRawBlock.path.original + " doesn't match " + close, errorNode);
+        throw new Exception(openRawBlock.path.original + " doesn"t match " + close, errorNode);
       }
 
       locInfo = this.locInfo(locInfo);
@@ -1842,7 +1842,7 @@ define(
       if (close && close.path && openBlock.path.original !== close.path.original) {
         var errorNode = {loc: openBlock.path.loc};
 
-        throw new Exception(openBlock.path.original + ' doesn\'t match ' + close.path.original, errorNode);
+        throw new Exception(openBlock.path.original + " doesn\"t match " + close.path.original, errorNode);
       }
 
       program.blockParams = openBlock.blockParams;
@@ -1875,7 +1875,7 @@ define(
     __exports__.prepareBlock = prepareBlock;
   });
 define(
-  'handlebars/compiler/base',["./parser","./ast","./whitespace-control","./helpers","../utils","exports"],
+  "handlebars/compiler/base",["./parser","./ast","./whitespace-control","./helpers","../utils","exports"],
   function(__dependency1__, __dependency2__, __dependency3__, __dependency4__, __dependency5__, __exports__) {
     
     var parser = __dependency1__["default"];
@@ -1891,7 +1891,7 @@ define(
 
     function parse(input, options) {
       // Just return if an already-compiled AST was passed in.
-      if (input.type === 'Program') { return input; }
+      if (input.type === "Program") { return input; }
 
       parser.yy = yy;
 
@@ -1907,7 +1907,7 @@ define(
     __exports__.parse = parse;
   });
 define(
-  'handlebars/compiler/compiler',["../exception","../utils","./ast","exports"],
+  "handlebars/compiler/compiler",["../exception","../utils","./ast","exports"],
   function(__dependency1__, __dependency2__, __dependency3__, __exports__) {
     
     var Exception = __dependency1__["default"];
@@ -1969,14 +1969,14 @@ define(
         // These changes will propagate to the other compiler components
         var knownHelpers = options.knownHelpers;
         options.knownHelpers = {
-          'helperMissing': true,
-          'blockHelperMissing': true,
-          'each': true,
-          'if': true,
-          'unless': true,
-          'with': true,
-          'log': true,
-          'lookup': true
+          "helperMissing": true,
+          "blockHelperMissing": true,
+          "each": true,
+          "if": true,
+          "unless": true,
+          "with": true,
+          "log": true,
+          "lookup": true
         };
         if (knownHelpers) {
           for (var name in knownHelpers) {
@@ -2033,29 +2033,29 @@ define(
 
         var type = this.classifySexpr(block);
 
-        if (type === 'helper') {
+        if (type === "helper") {
           this.helperSexpr(block, program, inverse);
-        } else if (type === 'simple') {
+        } else if (type === "simple") {
           this.simpleSexpr(block);
 
           // now that the simple mustache is resolved, we need to
           // evaluate it by executing `blockHelperMissing`
-          this.opcode('pushProgram', program);
-          this.opcode('pushProgram', inverse);
-          this.opcode('emptyHash');
-          this.opcode('blockValue', block.path.original);
+          this.opcode("pushProgram", program);
+          this.opcode("pushProgram", inverse);
+          this.opcode("emptyHash");
+          this.opcode("blockValue", block.path.original);
         } else {
           this.ambiguousSexpr(block, program, inverse);
 
           // now that the simple mustache is resolved, we need to
           // evaluate it by executing `blockHelperMissing`
-          this.opcode('pushProgram', program);
-          this.opcode('pushProgram', inverse);
-          this.opcode('emptyHash');
-          this.opcode('ambiguousBlockValue');
+          this.opcode("pushProgram", program);
+          this.opcode("pushProgram", inverse);
+          this.opcode("emptyHash");
+          this.opcode("ambiguousBlockValue");
         }
 
-        this.opcode('append');
+        this.opcode("append");
       },
 
       PartialStatement: function(partial) {
@@ -2063,42 +2063,42 @@ define(
 
         var params = partial.params;
         if (params.length > 1) {
-          throw new Exception('Unsupported number of partial arguments: ' + params.length, partial);
+          throw new Exception("Unsupported number of partial arguments: " + params.length, partial);
         } else if (!params.length) {
-          params.push({type: 'PathExpression', parts: [], depth: 0});
+          params.push({type: "PathExpression", parts: [], depth: 0});
         }
 
         var partialName = partial.name.original,
-            isDynamic = partial.name.type === 'SubExpression';
+            isDynamic = partial.name.type === "SubExpression";
         if (isDynamic) {
           this.accept(partial.name);
         }
 
         this.setupFullMustacheParams(partial, undefined, undefined, true);
 
-        var indent = partial.indent || '';
+        var indent = partial.indent || "";
         if (this.options.preventIndent && indent) {
-          this.opcode('appendContent', indent);
-          indent = '';
+          this.opcode("appendContent", indent);
+          indent = "";
         }
 
-        this.opcode('invokePartial', isDynamic, partialName, indent);
-        this.opcode('append');
+        this.opcode("invokePartial", isDynamic, partialName, indent);
+        this.opcode("append");
       },
 
       MustacheStatement: function(mustache) {
         this.SubExpression(mustache);
 
         if(mustache.escaped && !this.options.noEscape) {
-          this.opcode('appendEscaped');
+          this.opcode("appendEscaped");
         } else {
-          this.opcode('append');
+          this.opcode("append");
         }
       },
 
       ContentStatement: function(content) {
         if (content.value) {
-          this.opcode('appendContent', content.value);
+          this.opcode("appendContent", content.value);
         }
       },
 
@@ -2108,9 +2108,9 @@ define(
         transformLiteralToPath(sexpr);
         var type = this.classifySexpr(sexpr);
 
-        if (type === 'simple') {
+        if (type === "simple") {
           this.simpleSexpr(sexpr);
-        } else if (type === 'helper') {
+        } else if (type === "helper") {
           this.helperSexpr(sexpr);
         } else {
           this.ambiguousSexpr(sexpr);
@@ -2121,19 +2121,19 @@ define(
             name = path.parts[0],
             isBlock = program != null || inverse != null;
 
-        this.opcode('getContext', path.depth);
+        this.opcode("getContext", path.depth);
 
-        this.opcode('pushProgram', program);
-        this.opcode('pushProgram', inverse);
+        this.opcode("pushProgram", program);
+        this.opcode("pushProgram", inverse);
 
         this.accept(path);
 
-        this.opcode('invokeAmbiguous', name, isBlock);
+        this.opcode("invokeAmbiguous", name, isBlock);
       },
 
       simpleSexpr: function(sexpr) {
         this.accept(sexpr.path);
-        this.opcode('resolvePossibleLambda');
+        this.opcode("resolvePossibleLambda");
       },
 
       helperSexpr: function(sexpr, program, inverse) {
@@ -2142,62 +2142,62 @@ define(
             name = path.parts[0];
 
         if (this.options.knownHelpers[name]) {
-          this.opcode('invokeKnownHelper', params.length, name);
+          this.opcode("invokeKnownHelper", params.length, name);
         } else if (this.options.knownHelpersOnly) {
           throw new Exception("You specified knownHelpersOnly, but used the unknown helper " + name, sexpr);
         } else {
           path.falsy = true;
 
           this.accept(path);
-          this.opcode('invokeHelper', params.length, path.original, AST.helpers.simpleId(path));
+          this.opcode("invokeHelper", params.length, path.original, AST.helpers.simpleId(path));
         }
       },
 
       PathExpression: function(path) {
         this.addDepth(path.depth);
-        this.opcode('getContext', path.depth);
+        this.opcode("getContext", path.depth);
 
         var name = path.parts[0],
             scoped = AST.helpers.scopedId(path),
             blockParamId = !path.depth && !scoped && this.blockParamIndex(name);
 
         if (blockParamId) {
-          this.opcode('lookupBlockParam', blockParamId, path.parts);
+          this.opcode("lookupBlockParam", blockParamId, path.parts);
         } else  if (!name) {
           // Context reference, i.e. `{{foo .}}` or `{{foo ..}}`
-          this.opcode('pushContext');
+          this.opcode("pushContext");
         } else if (path.data) {
           this.options.data = true;
-          this.opcode('lookupData', path.depth, path.parts);
+          this.opcode("lookupData", path.depth, path.parts);
         } else {
-          this.opcode('lookupOnContext', path.parts, path.falsy, scoped);
+          this.opcode("lookupOnContext", path.parts, path.falsy, scoped);
         }
       },
 
       StringLiteral: function(string) {
-        this.opcode('pushString', string.value);
+        this.opcode("pushString", string.value);
       },
 
       NumberLiteral: function(number) {
-        this.opcode('pushLiteral', number.value);
+        this.opcode("pushLiteral", number.value);
       },
 
       BooleanLiteral: function(bool) {
-        this.opcode('pushLiteral', bool.value);
+        this.opcode("pushLiteral", bool.value);
       },
 
       Hash: function(hash) {
         var pairs = hash.pairs, i, l;
 
-        this.opcode('pushHash');
+        this.opcode("pushHash");
 
         for (i=0, l=pairs.length; i<l; i++) {
           this.pushParam(pairs[i].value);
         }
         while (i--) {
-          this.opcode('assignToHash', pairs[i].key);
+          this.opcode("assignToHash", pairs[i].key);
         }
-        this.opcode('popHash');
+        this.opcode("popHash");
       },
 
       // HELPERS
@@ -2241,9 +2241,9 @@ define(
           }
         }
 
-        if (isHelper) { return 'helper'; }
-        else if (isEligible) { return 'ambiguous'; }
-        else { return 'simple'; }
+        if (isHelper) { return "helper"; }
+        else if (isEligible) { return "ambiguous"; }
+        else { return "simple"; }
       },
 
       pushParams: function(params) {
@@ -2253,22 +2253,22 @@ define(
       },
 
       pushParam: function(val) {
-        var value = val.value != null ? val.value : val.original || '';
+        var value = val.value != null ? val.value : val.original || "";
 
         if (this.stringParams) {
           if (value.replace) {
             value = value
-                .replace(/^(\.?\.\/)*/g, '')
-                .replace(/\//g, '.');
+                .replace(/^(\.?\.\/)*/g, "")
+                .replace(/\//g, ".");
           }
 
           if(val.depth) {
             this.addDepth(val.depth);
           }
-          this.opcode('getContext', val.depth || 0);
-          this.opcode('pushStringParam', value, val.type);
+          this.opcode("getContext", val.depth || 0);
+          this.opcode("pushStringParam", value, val.type);
 
-          if (val.type === 'SubExpression') {
+          if (val.type === "SubExpression") {
             // SubExpressions get evaluated and passed in
             // in string params mode.
             this.accept(val);
@@ -2280,17 +2280,17 @@ define(
                blockParamIndex = this.blockParamIndex(val.parts[0]);
             }
             if (blockParamIndex) {
-              var blockParamChild = val.parts.slice(1).join('.');
-              this.opcode('pushId', 'BlockParam', blockParamIndex, blockParamChild);
+              var blockParamChild = val.parts.slice(1).join(".");
+              this.opcode("pushId", "BlockParam", blockParamIndex, blockParamChild);
             } else {
               value = val.original || value;
               if (value.replace) {
                 value = value
-                    .replace(/^\.\//g, '')
-                    .replace(/^\.$/g, '');
+                    .replace(/^\.\//g, "")
+                    .replace(/^\.$/g, "");
               }
 
-              this.opcode('pushId', val.type, value);
+              this.opcode("pushId", val.type, value);
             }
           }
           this.accept(val);
@@ -2301,13 +2301,13 @@ define(
         var params = sexpr.params;
         this.pushParams(params);
 
-        this.opcode('pushProgram', program);
-        this.opcode('pushProgram', inverse);
+        this.opcode("pushProgram", program);
+        this.opcode("pushProgram", inverse);
 
         if (sexpr.hash) {
           this.accept(sexpr.hash);
         } else {
-          this.opcode('emptyHash', omitEmpty);
+          this.opcode("emptyHash", omitEmpty);
         }
 
         return params;
@@ -2325,12 +2325,12 @@ define(
     };
 
     function precompile(input, options, env) {
-      if (input == null || (typeof input !== 'string' && input.type !== 'Program')) {
+      if (input == null || (typeof input !== "string" && input.type !== "Program")) {
         throw new Exception("You must pass a string or Handlebars AST to Handlebars.precompile. You passed " + input);
       }
 
       options = options || {};
-      if (!('data' in options)) {
+      if (!("data" in options)) {
         options.data = true;
       }
       if (options.compat) {
@@ -2343,13 +2343,13 @@ define(
     }
 
     __exports__.precompile = precompile;function compile(input, options, env) {
-      if (input == null || (typeof input !== 'string' && input.type !== 'Program')) {
+      if (input == null || (typeof input !== "string" && input.type !== "Program")) {
         throw new Exception("You must pass a string or Handlebars AST to Handlebars.compile. You passed " + input);
       }
 
       options = options || {};
 
-      if (!('data' in options)) {
+      if (!("data" in options)) {
         options.data = true;
       }
       if (options.compat) {
@@ -2407,23 +2407,23 @@ define(
         var literal = sexpr.path;
         // Casting to string here to make false and 0 literal values play nicely with the rest
         // of the system.
-        sexpr.path = new AST.PathExpression(false, 0, [literal.original+''], literal.original+'', literal.log);
+        sexpr.path = new AST.PathExpression(false, 0, [literal.original+""], literal.original+"", literal.log);
       }
     }
   });
 define(
-  'handlebars/compiler/code-gen',["../utils","exports"],
+  "handlebars/compiler/code-gen",["../utils","exports"],
   function(__dependency1__, __exports__) {
     
     var isArray = __dependency1__.isArray;
 
     try {
-      var SourceMap = require('source-map'),
+      var SourceMap = require("source-map"),
             SourceNode = SourceMap.SourceNode;
     } catch (err) {
       /* istanbul ignore next: tested but not covered in istanbul due to dist build  */
       SourceNode = function(line, column, srcFile, chunks) {
-        this.src = '';
+        this.src = "";
         if (chunks) {
           this.add(chunks);
         }
@@ -2432,13 +2432,13 @@ define(
       SourceNode.prototype = {
         add: function(chunks) {
           if (isArray(chunks)) {
-            chunks = chunks.join('');
+            chunks = chunks.join("");
           }
           this.src += chunks;
         },
         prepend: function(chunks) {
           if (isArray(chunks)) {
-            chunks = chunks.join('');
+            chunks = chunks.join("");
           }
           this.src = chunks + this.src;
         },
@@ -2460,9 +2460,9 @@ define(
           ret.push(codeGen.wrap(chunk[i], loc));
         }
         return ret;
-      } else if (typeof chunk === 'boolean' || typeof chunk === 'number') {
+      } else if (typeof chunk === "boolean" || typeof chunk === "number") {
         // Handle primitives that the SourceNode will throw up on
-        return chunk+'';
+        return chunk+"";
       }
       return chunk;
     }
@@ -2484,7 +2484,7 @@ define(
       merge: function() {
         var source = this.empty();
         this.each(function(line) {
-          source.add(['  ', line, '\n']);
+          source.add(["  ", line, "\n"]);
         });
         return source;
       },
@@ -2512,17 +2512,17 @@ define(
 
       functionCall: function(fn, type, params) {
         params = this.generateList(params);
-        return this.wrap([fn, type ? '.' + type + '(' : '(', params, ')']);
+        return this.wrap([fn, type ? "." + type + "(" : "(", params, ")"]);
       },
 
       quotedString: function(str) {
-        return '"' + (str + '')
-          .replace(/\\/g, '\\\\')
-          .replace(/"/g, '\\"')
-          .replace(/\n/g, '\\n')
-          .replace(/\r/g, '\\r')
-          .replace(/\u2028/g, '\\u2028')   // Per Ecma-262 7.3 + 7.8.4
-          .replace(/\u2029/g, '\\u2029') + '"';
+        return """ + (str + "")
+          .replace(/\\/g, "\\\\")
+          .replace(/"/g, "\\"")
+          .replace(/\n/g, "\\n")
+          .replace(/\r/g, "\\r")
+          .replace(/\u2028/g, "\\u2028")   // Per Ecma-262 7.3 + 7.8.4
+          .replace(/\u2029/g, "\\u2029") + """;
       },
 
       objectLiteral: function(obj) {
@@ -2531,15 +2531,15 @@ define(
         for (var key in obj) {
           if (obj.hasOwnProperty(key)) {
             var value = castChunk(obj[key], this);
-            if (value !== 'undefined') {
-              pairs.push([this.quotedString(key), ':', value]);
+            if (value !== "undefined") {
+              pairs.push([this.quotedString(key), ":", value]);
             }
           }
         }
 
         var ret = this.generateList(pairs);
-        ret.prepend('{');
-        ret.add('}');
+        ret.prepend("{");
+        ret.add("}");
         return ret;
       },
 
@@ -2549,7 +2549,7 @@ define(
 
         for (var i = 0, len = entries.length; i < len; i++) {
           if (i) {
-            ret.add(',');
+            ret.add(",");
           }
 
           ret.add(castChunk(entries[i], this, loc));
@@ -2560,8 +2560,8 @@ define(
 
       generateArray: function(entries, loc) {
         var ret = this.generateList(entries, loc);
-        ret.prepend('[');
-        ret.add(']');
+        ret.prepend("[");
+        ret.add("]");
 
         return ret;
       }
@@ -2570,7 +2570,7 @@ define(
     __exports__["default"] = CodeGen;
   });
 define(
-  'handlebars/compiler/javascript-compiler',["../base","../exception","../utils","./code-gen","exports"],
+  "handlebars/compiler/javascript-compiler",["../base","../exception","../utils","./code-gen","exports"],
   function(__dependency1__, __dependency2__, __dependency3__, __dependency4__, __exports__) {
     
     var COMPILER_REVISION = __dependency1__.COMPILER_REVISION;
@@ -2592,11 +2592,11 @@ define(
         if (JavaScriptCompiler.isValidJavaScriptVariableName(name)) {
           return [parent, ".", name];
         } else {
-          return [parent, "['", name, "']"];
+          return [parent, "["", name, ""]"];
         }
       },
       depthedLookup: function(name) {
-        return [this.aliasable('this.lookup'), '(depths, "', name, '")'];
+        return [this.aliasable("this.lookup"), "(depths, "", name, "")"];
       },
 
       compilerInfo: function() {
@@ -2613,12 +2613,12 @@ define(
         source = this.source.wrap(source, location);
 
         if (this.environment.isSimple) {
-          return ['return ', source, ';'];
+          return ["return ", source, ";"];
         } else if (explicit) {
           // This is a case where the buffer operation occurs as a child of another
           // construct, generally braces. We have to explicitly output these buffer
           // operations to ensure that the emitted code goes in the correct location.
-          return ['buffer += ', source, ';'];
+          return ["buffer += ", source, ";"];
         } else {
           source.appendToBuffer = true;
           return source;
@@ -2676,11 +2676,11 @@ define(
 
         // Flush any trailing content that might be pending.
         this.source.currentLocation = firstLoc;
-        this.pushSource('');
+        this.pushSource("");
 
         /* istanbul ignore next */
         if (this.stackSlot || this.inlineStack.length || this.compileStack.length) {
-          throw new Exception('Compile completed with content left on stack');
+          throw new Exception("Compile completed with content left on stack");
         }
 
         var fn = this.createFunctionContext(asObject);
@@ -2742,7 +2742,7 @@ define(
       },
 
       createFunctionContext: function(asObject) {
-        var varDeclarations = '';
+        var varDeclarations = "";
 
         var locals = this.stackVars.concat(this.registers.list);
         if(locals.length > 0) {
@@ -2754,24 +2754,24 @@ define(
         // When using true SourceNodes, this will update all references to the given alias
         // as the source nodes are reused in situ. For the non-source node compilation mode,
         // aliases will not be used, but this case is already being run on the client and
-        // we aren't concern about minimizing the template size.
+        // we aren"t concern about minimizing the template size.
         var aliasCount = 0;
         for (var alias in this.aliases) {
           var node = this.aliases[alias];
 
           if (this.aliases.hasOwnProperty(alias) && node.children && node.referenceCount > 1) {
-            varDeclarations += ', alias' + (++aliasCount) + '=' + alias;
-            node.children[0] = 'alias' + aliasCount;
+            varDeclarations += ", alias" + (++aliasCount) + "=" + alias;
+            node.children[0] = "alias" + aliasCount;
           }
         }
 
         var params = ["depth0", "helpers", "partials", "data"];
 
         if (this.useBlockParams || this.useDepths) {
-          params.push('blockParams');
+          params.push("blockParams");
         }
         if (this.useDepths) {
-          params.push('depths');
+          params.push("depths");
         }
 
         // Perform a second pass over the output to merge content when possible
@@ -2782,7 +2782,7 @@ define(
 
           return Function.apply(this, params);
         } else {
-          return this.source.wrap(['function(', params.join(','), ') {\n  ', source, '}']);
+          return this.source.wrap(["function(", params.join(","), ") {\n  ", source, "}"]);
         }
       },
       mergeSource: function(varDeclarations) {
@@ -2796,7 +2796,7 @@ define(
         this.source.each(function(line) {
           if (line.appendToBuffer) {
             if (bufferStart) {
-              line.prepend('  + ');
+              line.prepend("  + ");
             } else {
               bufferStart = line;
             }
@@ -2806,9 +2806,9 @@ define(
               if (!sourceSeen) {
                 appendFirst = true;
               } else {
-                bufferStart.prepend('buffer += ');
+                bufferStart.prepend("buffer += ");
               }
-              bufferEnd.add(';');
+              bufferEnd.add(";");
               bufferStart = bufferEnd = undefined;
             }
 
@@ -2822,24 +2822,24 @@ define(
 
         if (appendOnly) {
           if (bufferStart) {
-            bufferStart.prepend('return ');
-            bufferEnd.add(';');
+            bufferStart.prepend("return ");
+            bufferEnd.add(";");
           } else if (!sourceSeen) {
-            this.source.push('return "";');
+            this.source.push("return "";");
           }
         } else {
-          varDeclarations += ", buffer = " + (appendFirst ? '' : this.initializeBuffer());
+          varDeclarations += ", buffer = " + (appendFirst ? "" : this.initializeBuffer());
 
           if (bufferStart) {
-            bufferStart.prepend('return buffer + ');
-            bufferEnd.add(';');
+            bufferStart.prepend("return buffer + ");
+            bufferEnd.add(";");
           } else {
-            this.source.push('return buffer;');
+            this.source.push("return buffer;");
           }
         }
 
         if (varDeclarations) {
-          this.source.prepend('var ' + varDeclarations.substring(2) + (appendFirst ? '' : ';\n'));
+          this.source.prepend("var " + varDeclarations.substring(2) + (appendFirst ? "" : ";\n"));
         }
 
         return this.source.merge();
@@ -2855,14 +2855,14 @@ define(
       // replace it on the stack with the result of properly
       // invoking blockHelperMissing.
       blockValue: function(name) {
-        var blockHelperMissing = this.aliasable('helpers.blockHelperMissing'),
+        var blockHelperMissing = this.aliasable("helpers.blockHelperMissing"),
             params = [this.contextName(0)];
         this.setupHelperArgs(name, 0, params);
 
         var blockName = this.popStack();
         params.splice(1, 0, blockName);
 
-        this.push(this.source.functionCall(blockHelperMissing, 'call', params));
+        this.push(this.source.functionCall(blockHelperMissing, "call", params));
       },
 
       // [ambiguousBlockValue]
@@ -2872,10 +2872,10 @@ define(
       // On stack, after, if no lastHelper: same as [blockValue]
       // On stack, after, if lastHelper: value
       ambiguousBlockValue: function() {
-        // We're being a bit cheeky and reusing the options value from the prior exec
-        var blockHelperMissing = this.aliasable('helpers.blockHelperMissing'),
+        // We"re being a bit cheeky and reusing the options value from the prior exec
+        var blockHelperMissing = this.aliasable("helpers.blockHelperMissing"),
             params = [this.contextName(0)];
-        this.setupHelperArgs('', 0, params, true);
+        this.setupHelperArgs("", 0, params, true);
 
         this.flushInline();
 
@@ -2883,9 +2883,9 @@ define(
         params.splice(1, 0, current);
 
         this.pushSource([
-            'if (!', this.lastHelper, ') { ',
-              current, ' = ', this.source.functionCall(blockHelperMissing, 'call', params),
-            '}']);
+            "if (!", this.lastHelper, ") { ",
+              current, " = ", this.source.functionCall(blockHelperMissing, "call", params),
+            "}"]);
       },
 
       // [appendContent]
@@ -2916,15 +2916,15 @@ define(
       append: function() {
         if (this.isInline()) {
           this.replaceStack(function(current) {
-            return [' != null ? ', current, ' : ""'];
+            return [" != null ? ", current, " : """];
           });
 
           this.pushSource(this.appendToBuffer(this.popStack()));
         } else {
           var local = this.popStack();
-          this.pushSource(['if (', local, ' != null) { ', this.appendToBuffer(local, undefined, true), ' }']);
+          this.pushSource(["if (", local, " != null) { ", this.appendToBuffer(local, undefined, true), " }"]);
           if (this.environment.isSimple) {
-            this.pushSource(['else { ', this.appendToBuffer("''", undefined, true), ' }']);
+            this.pushSource(["else { ", this.appendToBuffer("""", undefined, true), " }"]);
           }
         }
       },
@@ -2937,7 +2937,7 @@ define(
       // Escape `value` and append it to the buffer
       appendEscaped: function() {
         this.pushSource(this.appendToBuffer(
-            [this.aliasable('this.escapeExpression'), '(', this.popStack(), ')']));
+            [this.aliasable("this.escapeExpression"), "(", this.popStack(), ")"]));
       },
 
       // [getContext]
@@ -2979,7 +2979,7 @@ define(
           this.pushContext();
         }
 
-        this.resolvePath('context', parts, i, falsy);
+        this.resolvePath("context", parts, i, falsy);
       },
 
       // [lookupBlockParam]
@@ -2992,8 +2992,8 @@ define(
       lookupBlockParam: function(blockParamId, parts) {
         this.useBlockParams = true;
 
-        this.push(['blockParams[', blockParamId[0], '][', blockParamId[1], ']']);
-        this.resolvePath('context', parts, 1);
+        this.push(["blockParams[", blockParamId[0], "][", blockParamId[1], "]"]);
+        this.resolvePath("context", parts, 1);
       },
 
       // [lookupData]
@@ -3005,12 +3005,12 @@ define(
       lookupData: function(depth, parts) {
         /*jshint -W083 */
         if (!depth) {
-          this.pushStackLiteral('data');
+          this.pushStackLiteral("data");
         } else {
-          this.pushStackLiteral('this.data(data, ' + depth + ')');
+          this.pushStackLiteral("this.data(data, " + depth + ")");
         }
 
-        this.resolvePath('data', parts, 0, true);
+        this.resolvePath("data", parts, 0, true);
       },
 
       resolvePath: function(type, parts, i, falsy) {
@@ -3027,10 +3027,10 @@ define(
             // We want to ensure that zero and false are handled properly if the context (falsy flag)
             // needs to have the special handling for these values.
             if (!falsy) {
-              return [' != null ? ', lookup, ' : ', current];
+              return [" != null ? ", lookup, " : ", current];
             } else {
               // Otherwise we can use generic falsy handling
-              return [' && ', lookup];
+              return [" && ", lookup];
             }
           });
         }
@@ -3044,7 +3044,7 @@ define(
       // If the `value` is a lambda, replace it on the stack by
       // the return value of the lambda
       resolvePossibleLambda: function() {
-        this.push([this.aliasable('this.lambda'), '(', this.popStack(), ', ', this.contextName(0), ')']);
+        this.push([this.aliasable("this.lambda"), "(", this.popStack(), ", ", this.contextName(0), ")"]);
       },
 
       // [pushStringParam]
@@ -3059,10 +3059,10 @@ define(
         this.pushContext();
         this.pushString(type);
 
-        // If it's a subexpression, the string result
+        // If it"s a subexpression, the string result
         // will be pushed after this opcode.
-        if (type !== 'SubExpression') {
-          if (typeof string === 'string') {
+        if (type !== "SubExpression") {
+          if (typeof string === "string") {
             this.pushString(string);
           } else {
             this.pushStackLiteral(string);
@@ -3072,13 +3072,13 @@ define(
 
       emptyHash: function(omitEmpty) {
         if (this.trackIds) {
-          this.push('{}'); // hashIds
+          this.push("{}"); // hashIds
         }
         if (this.stringParams) {
-          this.push('{}'); // hashContexts
-          this.push('{}'); // hashTypes
+          this.push("{}"); // hashContexts
+          this.push("{}"); // hashTypes
         }
-        this.pushStackLiteral(omitEmpty ? 'undefined' : '{}');
+        this.pushStackLiteral(omitEmpty ? "undefined" : "{}");
       },
       pushHash: function() {
         if (this.hash) {
@@ -3144,22 +3144,22 @@ define(
       // On stack, before: hash, inverse, program, params..., ...
       // On stack, after: result of helper invocation
       //
-      // Pops off the helper's parameters, invokes the helper,
-      // and pushes the helper's return value onto the stack.
+      // Pops off the helper"s parameters, invokes the helper,
+      // and pushes the helper"s return value onto the stack.
       //
       // If the helper is not found, `helperMissing` is called.
       invokeHelper: function(paramSize, name, isSimple) {
         var nonHelper = this.popStack();
         var helper = this.setupHelper(paramSize, name);
-        var simple = isSimple ? [helper.name, ' || '] : '';
+        var simple = isSimple ? [helper.name, " || "] : "";
 
-        var lookup = ['('].concat(simple, nonHelper);
+        var lookup = ["("].concat(simple, nonHelper);
         if (!this.options.strict) {
-          lookup.push(' || ', this.aliasable('helpers.helperMissing'));
+          lookup.push(" || ", this.aliasable("helpers.helperMissing"));
         }
-        lookup.push(')');
+        lookup.push(")");
 
-        this.push(this.source.functionCall(lookup, 'call', helper.callParams));
+        this.push(this.source.functionCall(lookup, "call", helper.callParams));
       },
 
       // [invokeKnownHelper]
@@ -3171,7 +3171,7 @@ define(
       // so a `helperMissing` fallback is not required.
       invokeKnownHelper: function(paramSize, name) {
         var helper = this.setupHelper(paramSize, name);
-        this.push(this.source.functionCall(helper.name, 'call', helper.callParams));
+        this.push(this.source.functionCall(helper.name, "call", helper.callParams));
       },
 
       // [invokeAmbiguous]
@@ -3180,36 +3180,36 @@ define(
       // On stack, after: result of disambiguation
       //
       // This operation is used when an expression like `{{foo}}`
-      // is provided, but we don't know at compile-time whether it
+      // is provided, but we don"t know at compile-time whether it
       // is a helper or a path.
       //
       // This operation emits more code than the other options,
       // and can be avoided by passing the `knownHelpers` and
       // `knownHelpersOnly` flags at compile-time.
       invokeAmbiguous: function(name, helperCall) {
-        this.useRegister('helper');
+        this.useRegister("helper");
 
         var nonHelper = this.popStack();
 
         this.emptyHash();
         var helper = this.setupHelper(0, name, helperCall);
 
-        var helperName = this.lastHelper = this.nameLookup('helpers', name, 'helper');
+        var helperName = this.lastHelper = this.nameLookup("helpers", name, "helper");
 
-        var lookup = ['(', '(helper = ', helperName, ' || ', nonHelper, ')'];
+        var lookup = ["(", "(helper = ", helperName, " || ", nonHelper, ")"];
         if (!this.options.strict) {
-          lookup[0] = '(helper = ';
+          lookup[0] = "(helper = ";
           lookup.push(
-            ' != null ? helper : ',
-            this.aliasable('helpers.helperMissing')
+            " != null ? helper : ",
+            this.aliasable("helpers.helperMissing")
           );
         }
 
         this.push([
-            '(', lookup,
-            (helper.paramsInit ? ['),(', helper.paramsInit] : []), '),',
-            '(typeof helper === ', this.aliasable('"function"'), ' ? ',
-            this.source.functionCall('helper','call', helper.callParams), ' : helper))'
+            "(", lookup,
+            (helper.paramsInit ? ["),(", helper.paramsInit] : []), "),",
+            "(typeof helper === ", this.aliasable(""function""), " ? ",
+            this.source.functionCall("helper","call", helper.callParams), " : helper))"
         ]);
       },
 
@@ -3232,22 +3232,22 @@ define(
         if (indent) {
           options.indent = JSON.stringify(indent);
         }
-        options.helpers = 'helpers';
-        options.partials = 'partials';
+        options.helpers = "helpers";
+        options.partials = "partials";
 
         if (!isDynamic) {
-          params.unshift(this.nameLookup('partials', name, 'partial'));
+          params.unshift(this.nameLookup("partials", name, "partial"));
         } else {
           params.unshift(name);
         }
 
         if (this.options.compat) {
-          options.depths = 'depths';
+          options.depths = "depths";
         }
         options = this.objectLiteral(options);
         params.push(options);
 
-        this.push(this.source.functionCall('this.invokePartial', '', params));
+        this.push(this.source.functionCall("this.invokePartial", "", params));
       },
 
       // [assignToHash]
@@ -3284,16 +3284,16 @@ define(
       },
 
       pushId: function(type, name, child) {
-        if (type === 'BlockParam') {
+        if (type === "BlockParam") {
           this.pushStackLiteral(
-              'blockParams[' + name[0] + '].path[' + name[1] + ']'
-              + (child ? ' + ' + JSON.stringify('.' + child) : ''));
-        } else if (type === 'PathExpression') {
+              "blockParams[" + name[0] + "].path[" + name[1] + "]"
+              + (child ? " + " + JSON.stringify("." + child) : ""));
+        } else if (type === "PathExpression") {
           this.pushString(name);
-        } else if (type === 'SubExpression') {
-          this.pushStackLiteral('true');
+        } else if (type === "SubExpression") {
+          this.pushStackLiteral("true");
         } else {
-          this.pushStackLiteral('null');
+          this.pushStackLiteral("null");
         }
       },
 
@@ -3311,10 +3311,10 @@ define(
           var index = this.matchExistingProgram(child);
 
           if (index == null) {
-            this.context.programs.push('');     // Placeholder to prevent name conflicts for nested children
+            this.context.programs.push("");     // Placeholder to prevent name conflicts for nested children
             index = this.context.programs.length;
             child.index = index;
-            child.name = 'program' + index;
+            child.name = "program" + index;
             this.context.programs[index] = compiler.compile(child, options, this.context, !this.precompile);
             this.context.environments[index] = child;
 
@@ -3322,7 +3322,7 @@ define(
             this.useBlockParams = this.useBlockParams || compiler.useBlockParams;
           } else {
             child.index = index;
-            child.name = 'program' + index;
+            child.name = "program" + index;
 
             this.useDepths = this.useDepths || child.useDepths;
             this.useBlockParams = this.useBlockParams || child.useBlockParams;
@@ -3340,16 +3340,16 @@ define(
 
       programExpression: function(guid) {
         var child = this.environment.children[guid],
-            programParams = [child.index, 'data', child.blockParams];
+            programParams = [child.index, "data", child.blockParams];
 
         if (this.useBlockParams || this.useDepths) {
-          programParams.push('blockParams');
+          programParams.push("blockParams");
         }
         if (this.useDepths) {
-          programParams.push('depths');
+          programParams.push("depths");
         }
 
-        return 'this.program(' + programParams.join(', ') + ')';
+        return "this.program(" + programParams.join(", ") + ")";
       },
 
       useRegister: function(name) {
@@ -3385,30 +3385,30 @@ define(
       },
 
       replaceStack: function(callback) {
-        var prefix = ['('],
+        var prefix = ["("],
             stack,
             createdStack,
             usedLiteral;
 
         /* istanbul ignore next */
         if (!this.isInline()) {
-          throw new Exception('replaceStack on non-inline');
+          throw new Exception("replaceStack on non-inline");
         }
 
-        // We want to merge the inline statement into the replacement statement via ','
+        // We want to merge the inline statement into the replacement statement via ","
         var top = this.popStack(true);
 
         if (top instanceof Literal) {
           // Literals do not need to be inlined
           stack = [top.value];
-          prefix = ['(', stack];
+          prefix = ["(", stack];
           usedLiteral = true;
         } else {
           // Get or create the current stack name for use by the inline
           createdStack = true;
           var name = this.incrStack();
 
-          prefix = ['((', this.push(name), ' = ', top, ')'];
+          prefix = ["((", this.push(name), " = ", top, ")"];
           stack = this.topStack();
         }
 
@@ -3420,7 +3420,7 @@ define(
         if (createdStack) {
           this.stackSlot--;
         }
-        this.push(prefix.concat(item, ')'));
+        this.push(prefix.concat(item, ")"));
       },
 
       incrStack: function() {
@@ -3441,7 +3441,7 @@ define(
             this.compileStack.push(entry);
           } else {
             var stack = this.incrStack();
-            this.pushSource([stack, ' = ', entry, ';']);
+            this.pushSource([stack, " = ", entry, ";"]);
             this.compileStack.push(stack);
           }
         }
@@ -3460,7 +3460,7 @@ define(
           if (!inline) {
             /* istanbul ignore next */
             if (!this.stackSlot) {
-              throw new Exception('Invalid stack pop');
+              throw new Exception("Invalid stack pop");
             }
             this.stackSlot--;
           }
@@ -3482,9 +3482,9 @@ define(
 
       contextName: function(context) {
         if (this.useDepths && context) {
-          return 'depths[' + context + ']';
+          return "depths[" + context + "]";
         } else {
-          return 'depth' + context;
+          return "depth" + context;
         }
       },
 
@@ -3513,7 +3513,7 @@ define(
       setupHelper: function(paramSize, name, blockHelper) {
         var params = [],
             paramsInit = this.setupHelperArgs(name, paramSize, params, blockHelper);
-        var foundHelper = this.nameLookup('helpers', name, 'helper');
+        var foundHelper = this.nameLookup("helpers", name, "helper");
 
         return {
           params: params,
@@ -3543,8 +3543,8 @@ define(
         // Avoid setting fn and inverse if neither are set. This allows
         // helpers to do a check for `if (options.fn)`
         if (program || inverse) {
-          options.fn = program || 'this.noop';
-          options.inverse = inverse || 'this.noop';
+          options.fn = program || "this.noop";
+          options.inverse = inverse || "this.noop";
         }
 
         // The parameters go on to the stack in order (making sure that they are evaluated in order)
@@ -3572,10 +3572,10 @@ define(
         }
 
         if (this.options.data) {
-          options.data = 'data';
+          options.data = "data";
         }
         if (this.useBlockParams) {
-          options.blockParams = 'blockParams';
+          options.blockParams = "blockParams";
         }
         return options;
       },
@@ -3584,12 +3584,12 @@ define(
         var options = this.setupParams(helper, paramSize, params, true);
         options = this.objectLiteral(options);
         if (useRegister) {
-          this.useRegister('options');
-          params.push('options');
-          return ['options=', options];
+          this.useRegister("options");
+          params.push("options");
+          return ["options=", options];
         } else {
           params.push(options);
-          return '';
+          return "";
         }
       }
     };
@@ -3638,7 +3638,7 @@ define(
       }
 
       if (requireTerminal) {
-        return [compiler.aliasable('this.strict'), '(', stack, ', ', compiler.quotedString(parts[i]), ')'];
+        return [compiler.aliasable("this.strict"), "(", stack, ", ", compiler.quotedString(parts[i]), ")"];
       } else {
         return stack;
       }
@@ -3647,7 +3647,7 @@ define(
     __exports__["default"] = JavaScriptCompiler;
   });
 define(
-  'handlebars',["./handlebars.runtime","./handlebars/compiler/ast","./handlebars/compiler/base","./handlebars/compiler/compiler","./handlebars/compiler/javascript-compiler","exports"],
+  "handlebars",["./handlebars.runtime","./handlebars/compiler/ast","./handlebars/compiler/base","./handlebars/compiler/compiler","./handlebars/compiler/javascript-compiler","exports"],
   function(__dependency1__, __dependency2__, __dependency3__, __dependency4__, __dependency5__, __exports__) {
     
     /*globals Handlebars: true */
@@ -3687,7 +3687,7 @@ define(
 
     /*jshint -W040 */
     /* istanbul ignore next */
-    var root = typeof global !== 'undefined' ? global : window,
+    var root = typeof global !== "undefined" ? global : window,
         $Handlebars = root.Handlebars;
     /* istanbul ignore next */
     Handlebars.noConflict = function() {
@@ -3696,7 +3696,7 @@ define(
       }
     };
 
-    Handlebars['default'] = Handlebars;
+    Handlebars["default"] = Handlebars;
 
     __exports__["default"] = Handlebars;
   });

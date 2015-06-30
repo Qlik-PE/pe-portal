@@ -44,7 +44,7 @@
       // route to public validations page
       .state("publicvalidations", {
         url: "/public/validations",
-        templateUrl: "/views/public/validations/list.html",
+        templateUrl: "/views/public/validations/index.html",
         controller: "senseController"
       })
       // route for viewing validations
@@ -120,5 +120,6 @@
   include "./controllers/users.js"
   include "./controllers/dashboard.js"
   include "./controllers/admin.js"
+  include "./controllers/sense-engine.js"
 
 })();

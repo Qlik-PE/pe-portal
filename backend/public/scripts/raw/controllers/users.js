@@ -4,17 +4,15 @@ app.controller("userController", ["$scope", "$resource", "$state", "$stateParams
 
   $scope.permissions = userPermissions;
 
-  UserRoles.query({}, function(result){
-    $scope.userRoles = result;
-  });  //this creates a GET query to api/users/roles
-
-
-  User.query({userId: $stateParams.userId}, function(result){
-    if(result[0] && result[0].redirect){
-      window.location = result[0].redirect;
+  UserRoles.get({}, function(result){
+    if(resultHandler.process(result)){
+      $scope.userRoles = result.data;
     }
-    else{
-      $scope.users = result;
+  });
+
+  User.get({userId: $stateParams.userId}, function(result){
+    if(resultHandler.process(result)){
+      $scope.users = result.data;
     }
   })
 

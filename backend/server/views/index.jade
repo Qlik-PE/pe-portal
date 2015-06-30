@@ -12,6 +12,7 @@ html(ng-app="peportal")
     script(src="/bower_components/angular-sanitize/angular-sanitize.js")
     script(src="/bower_components/ng-notifications-bar/dist/ngNotificationsBar.min.js")
     script(src="/bower_components/angular-utils-ui-breadcrumbs/uiBreadcrumbs.js")
+    script(src="/qsocks/qsocks.bundle.js")
     script(src="/js/app.js")
   body    
     notifications-bar.notifications.container
@@ -21,7 +22,7 @@ html(ng-app="peportal")
           a(href="#/") Home
         ul.nav.navbar-nav.navbar-right
           li
-            //a(ui-sref="publicvalidations") Validations     
+            a(ui-sref="publicvalidations") Validations     
             if isAuthenticated
               li.dropdown
                 a.dropdown-toggle(
@@ -47,7 +48,7 @@ html(ng-app="peportal")
                     a(href="/auth/logout") Logout
             else     
               li(style="color: rgb(94,168,63);")
-                a(ui-sref="loginsignup") Login
+                a(ui-sref="loginsignup") Login/Signup
     div.container    
       div(ui-view)        
     div.footer

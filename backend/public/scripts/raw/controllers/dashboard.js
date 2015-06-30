@@ -1,4 +1,4 @@
-app.controller("dashboardController", ["$scope", "$resource", "$state", "$stateParams","userPermissions", "notifications",  function($scope, $resource, $state, $stateParams, userPermissions, notifications){
+app.controller("dashboardController", ["$scope", "$resource", "$state", "$stateParams","userPermissions", "notifications", "resultHandler",  function($scope, $resource, $state, $stateParams, userPermissions, notifications, resultHandler){
   var Validation = $resource("api/validations/:Id", {validationId: "@Id"});
   var Issue = $resource("api/issues/:issueId", {issueId: "@issueId"});
   var IssueStatus = $resource("api/issuestatus/:statusId", {statusId: "@statusId"});
@@ -7,36 +7,27 @@ app.controller("dashboardController", ["$scope", "$resource", "$state", "$stateP
 
   $scope.permissions = userPermissions;
 
-  Validation.query({Id:"count"}, function(result){
-    if(result[0] && result[0].redirect){
-      window.location = result[0].redirect;
-    }
-    else{
-      $scope.validationCount = result[0];
+  Validation.get({Id:"count"}, function(result){
+    if(resultHandler.process(result)){
+      $scope.validationCount = result.data;
     }
   });
 
-  UserRoles.query({}, function(result){
-    $scope.userRoles = result;
-    User.query({userId:"count", role: getUserRoleId("user")}, function(result){   //  /api/users/count
-      if(result[0] && result[0].redirect){
-        window.location = result[0].redirect;
-      }
-      else{
-        $scope.pendingUsers = result[0];
+  UserRoles.get({}, function(result){
+    $scope.userRoles = result.data;
+    User.get({userId:"count", role: getUserRoleId("user")}, function(result){   //  /api/users/count
+    if(resultHandler.process(result)){
+        $scope.pendingUsers = result.data;
       }
     }); //this fetches user that aren"t authorised (or in other words "user" users)
   });
 
 
-  IssueStatus.query({}, function(result){
+  IssueStatus.get({}, function(result){
     $scope.issueStatus = result;
-    Issue.query({issueId:"count", status: getIssueStatusId("Open")}, function(result){   //  /api/users/count
-      if(result[0] && result[0].redirect){
-        window.location = result[0].redirect;
-      }
-      else{
-        $scope.pendingIssues = result[0];
+    Issue.get({issueId:"count", status: getIssueStatusId("Open")}, function(result){   //  /api/users/count
+      if(resultHandler.process(result)){
+        $scope.pendingIssues = result.data;
       }
     }); //this fetches user that aren"t authorised (or in other words "user" users)
 

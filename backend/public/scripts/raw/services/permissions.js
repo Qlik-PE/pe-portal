@@ -1,4 +1,4 @@
-app.service('userPermissions', ['$resource', function($resource){
+app.service("userPermissions", ["$resource", "resultHandler", function($resource, resultHandler){
   var System = $resource("system/:path", {path: "@path"});
   this.permissions = {};
   var that = this;
@@ -19,8 +19,11 @@ app.service('userPermissions', ['$resource', function($resource){
     return this.permissions[entity] && this.permissions[entity].allOwners && this.permissions[entity].allOwners==true
   }
   this.refresh = function(){
-    System.get({path:'userpermissions'}, function(result){
-      that.permissions = result;
+    System.get({path:"userpermissions"}, function(result){
+      if(resultHandler.process(result)){
+        that.permissions = result.permissions;
+        that.role = result.name;
+      }
     });
   }
   this.refresh();

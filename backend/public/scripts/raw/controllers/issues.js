@@ -6,28 +6,28 @@ app.controller("issueController", ["$scope", "$resource", "$state", "$stateParam
 
   $scope.permissions = userPermissions;
 
-  IssueStatus.query({}, function(result){
+  IssueStatus.get({}, function(result){
     if(resultHandler.process(result)){
-      $scope.issueStatus = result;
+      $scope.issueStatus = result.data;
     }
   });  //this creates a GET query to api/issues/statuses
 
   if($state.current.name!="issues.new"){
     if($stateParams.stepId){  //We have a validation to work with
-      Issue.query({issueId:$stateParams.issueId||"", step:$stateParams.stepId||""}, function(result){
+      Issue.get({issueId:$stateParams.issueId||"", step:$stateParams.stepId||""}, function(result){
         if(resultHandler.process(result)){
-          $scope.issues = result;
+          $scope.issues = result.data;
         }
       });
     }
     else{ //We should be working with an individual issue
-      Issue.query({issueId: $stateParams.issueId}, function(result){
+      Issue.get({issueId: $stateParams.issueId}, function(result){
         if(resultHandler.process(result)){
-          $scope.issues = result;
+          $scope.issues = result.data;
           //first get the step, then the validation
-          Step.query({stepId: $scope.issues[0].step}, function(step){
-            $scope.step = step[0].name;
-            Validation.query({validationId: step[0].validationid}, function(validation){
+          Step.get({stepId: $scope.issues[0].step}, function(step){
+            $scope.step = step.data[0].name;
+            Validation.query({validationId: step[0].data.validationid}, function(validation){
               $scope.validation = validation[0].title;
             });
           })

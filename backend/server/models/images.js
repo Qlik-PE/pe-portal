@@ -1,4 +1,4 @@
-var mongoose = require('mongoose'),
+var mongoose = require("mongoose"),
   Schema = mongoose.Schema;
 
 
@@ -12,8 +12,8 @@ var ImageSchema = new Schema({
   content: Buffer,
   createuser: {
     type: Schema.ObjectId,
-    ref: 'User'
+    ref: "User"
   }
 });
 
-module.exports = mongoose.model('image', ImageSchema);
+module.exports = mongoose.model("image", ImageSchema);

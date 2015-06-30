@@ -12,8 +12,8 @@
     /**
      * Config
      */
-    var moduleName = 'angularUtils.directives.uiBreadcrumbs';
-    var templateUrl = '/bower_components/angular-utils-ui-breadcrumbs/uiBreadcrumbs.tpl.html';
+    var moduleName = "angularUtils.directives.uiBreadcrumbs";
+    var templateUrl = "/bower_components/angular-utils-ui-breadcrumbs/uiBreadcrumbs.tpl.html";
 
     /**
      * Module
@@ -23,25 +23,25 @@
         module = angular.module(moduleName);
     } catch(err) {
         // named module does not exist, so create one
-        module = angular.module(moduleName, ['ui.router']);
+        module = angular.module(moduleName, ["ui.router"]);
     }
 
-    module.directive('uiBreadcrumbs', ['$interpolate', '$state', function($interpolate, $state) {
+    module.directive("uiBreadcrumbs", ["$interpolate", "$state", function($interpolate, $state) {
             return {
-                restrict: 'E',
+                restrict: "E",
                 templateUrl: function(elem, attrs) {
                     return attrs.templateUrl || templateUrl;
                 },
                 scope: {
-                    displaynameProperty: '@',
-                    abstractProxyProperty: '@?'
+                    displaynameProperty: "@",
+                    abstractProxyProperty: "@?"
                 },
                 link: function(scope) {
                     scope.breadcrumbs = [];
-                    if ($state.$current.name !== '') {
+                    if ($state.$current.name !== "") {
                         updateBreadcrumbsArray();
                     }
-                    scope.$on('$stateChangeSuccess', function() {
+                    scope.$on("$stateChangeSuccess", function() {
                         updateBreadcrumbsArray();
                     });
 
@@ -55,7 +55,7 @@
                         var breadcrumbs = [];
                         var currentState = $state.$current;
 
-                        while(currentState && currentState.name !== '') {
+                        while(currentState && currentState.name !== "") {
                             workingState = getWorkingState(currentState);
                             if (workingState) {
                                 displayName = getDisplayName(workingState);
@@ -84,7 +84,7 @@
                         var proxyStateName;
                         var workingState = currentState;
                         if (currentState.abstract === true) {
-                            if (typeof scope.abstractProxyProperty !== 'undefined') {
+                            if (typeof scope.abstractProxyProperty !== "undefined") {
                                 proxyStateName = getObjectValue(scope.abstractProxyProperty, currentState);
                                 if (proxyStateName) {
                                     workingState = $state.get(proxyStateName);
@@ -100,7 +100,7 @@
 
                     /**
                      * Resolve the displayName of the specified state. Take the property specified by the `displayname-property`
-                     * attribute and look up the corresponding property on the state's config object. The specified string can be interpolated against any resolved
+                     * attribute and look up the corresponding property on the state"s config object. The specified string can be interpolated against any resolved
                      * properties on the state config object, by using the usual {{ }} syntax.
                      * @param currentState
                      * @returns {*}
@@ -111,25 +111,25 @@
                         var displayName;
 
                         if (!scope.displaynameProperty) {
-                            // if the displayname-property attribute was not specified, default to the state's name
+                            // if the displayname-property attribute was not specified, default to the state"s name
                             return currentState.name;
                         }
                         propertyReference = getObjectValue(scope.displaynameProperty, currentState);
 
                         if (propertyReference === false) {
                             return false;
-                        } else if (typeof propertyReference === 'undefined') {
+                        } else if (typeof propertyReference === "undefined") {
                             return currentState.name;
                         } else {
                             // use the $interpolate service to handle any bindings in the propertyReference string.
-                            interpolationContext =  (typeof currentState.locals !== 'undefined') ? currentState.locals.globals : currentState;
+                            interpolationContext =  (typeof currentState.locals !== "undefined") ? currentState.locals.globals : currentState;
                             displayName = $interpolate(propertyReference)(interpolationContext);
                             return displayName;
                         }
                     }
 
                     /**
-                     * Given a string of the type 'object.property.property', traverse the given context (eg the current $state object) and return the
+                     * Given a string of the type "object.property.property", traverse the given context (eg the current $state object) and return the
                      * value found at that path.
                      *
                      * @param objectPath
@@ -138,14 +138,14 @@
                      */
                     function getObjectValue(objectPath, context) {
                         var i;
-                        var propertyArray = objectPath.split('.');
+                        var propertyArray = objectPath.split(".");
                         var propertyReference = context;
 
                         for (i = 0; i < propertyArray.length; i ++) {
                             if (angular.isDefined(propertyReference[propertyArray[i]])) {
                                 propertyReference = propertyReference[propertyArray[i]];
                             } else {
-                                // if the specified property was not found, default to the state's name
+                                // if the specified property was not found, default to the state"s name
                                 return undefined;
                             }
                         }

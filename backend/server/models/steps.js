@@ -1,4 +1,4 @@
-var mongoose = require('mongoose'),
+var mongoose = require("mongoose"),
   Schema = mongoose.Schema;
 
 
@@ -17,22 +17,22 @@ var ValidationstepSchema = new Schema({
   },
   type: {
     type: Schema.ObjectId,
-    ref: 'steptype',
+    ref: "steptype",
     required: false
   },
   validationid: {
     type: Schema.ObjectId,
-    ref: 'validation',
+    ref: "validation",
     required: false
   },
   techtypeId:{
     type: Schema.ObjectId,
-    ref: 'technologytype',
+    ref: "technologytype",
     required: false
   },
   status: {
     type: Schema.ObjectId,
-    ref: 'stepstatus',
+    ref: "stepstatus",
     required: true
   },
   content: {
@@ -51,27 +51,27 @@ var ValidationstepSchema = new Schema({
   },
   createuser: {  //User associated with the certstep
     type: Schema.ObjectId,
-    ref: 'user'
+    ref: "user"
   },
   assigneduser: {  //User associated with the certstep
     type: Schema.ObjectId,
-    ref: 'user'
+    ref: "user"
   },
   lastedituser: {  //User associated with the certstep
     type: Schema.ObjectId,
-    ref: 'user'
+    ref: "user"
   },
   lasteditdata:{
     type: Date
   },
   partner: {  //User associated with the certstep
     type: Schema.ObjectId,
-    ref: 'partner'
+    ref: "partner"
   },
   issues:[{
     type: Schema.ObjectId,
-    ref: 'issue'
+    ref: "issue"
   }]
 });
 
-module.exports = mongoose.model('step', ValidationstepSchema);
+module.exports = mongoose.model("step", ValidationstepSchema);

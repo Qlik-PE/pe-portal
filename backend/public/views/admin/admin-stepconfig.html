@@ -27,7 +27,7 @@
       <div class="move font up" ng-disabled="!showMoveUp($index)" ng-click="moveStep(step._id, -1)"></div>
       <div class="move font down" ng-disabled="!showMoveDown($index)" ng-click="moveStep(step._id, 1)"></div>
     </li>
-    <li>
+    <li ng-show="permissions.canCreate('steps')">
       <input class="form-control description" ng-model="newStepName" />
       <input class="form-control description" ng-model="newStepContent"/>
       <select class="form-control" ng-model="newStepType" ng-options="item.name for item in stepTypes track by item._id">

@@ -1,4 +1,4 @@
-.validation-list,.validation-step-list, .step-issue-list, .user-list, .permissions-list, .step-template-list {
+.validation-list,.validation-step-list, .step-issue-list, .user-list, .permissions-list, .step-template-list, .public-validation-list {
   padding: 10px 5px;
   li{
     white-space: nowrap;
@@ -115,7 +115,7 @@
       width: 10% !important;
       display: inline-block;
       text-indent: 0;
-      &[type='checkbox']{
+      &[type="checkbox"]{
         height: 22px !important;
         line-height: 25px !important;
         margin-top: 0;
@@ -132,6 +132,80 @@
       background-color: transparent;
       display: inline-block;
       box-shadow: none;
+    }
+  }
+}
+
+.filters{
+    display: inline-block;
+    vertical-align: top;
+    margin-right: 20px;
+    width: 200px;
+    .filter{
+      position: relative;
+      h1{
+        padding-left: 10px;
+        margin-bottom: 5px;
+        color: @filter-header;
+        font-size: 14px;
+      }
+      ul{
+        padding-left: 10px;
+        padding-top: 10px;
+        color: @filter-item;
+        border-top: 2px solid;
+        font-size: 14px;
+        li{
+          cursor: pointer;
+          position: relative;
+          height: 20px;
+          line-height: 20px;
+          text-indent: 25px;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          overflow: hidden;
+          &:before{
+            content: "";
+            border: 1px solid;
+            position: absolute;
+            top: 8px;
+            left: 5px;
+            height: 5px;
+            width: 5px;
+          }
+          &[data-state="S"]:before{
+            background-color: @green;
+          }
+          &[data-state="A"]{
+            background-color: @outside;
+          }
+          &[data-state="X"]{
+            background-color: @excluded;
+            color: @excluded-text;
+          }
+        }
+      }
+    }
+}
+
+.public-validation-list{
+  .table-header{
+    font-weight: bold;
+  }
+  li{
+    white-space: normal;
+    height: auto;
+    line-height: 20px;
+  }
+  div{
+    white-space: normal;
+    display: inline-block;
+    width: 75%;
+    text-indent: 0;
+    padding: 5px;
+    &:first-of-type{
+      width: 20%;
+      vertical-align: top;
     }
   }
 }
