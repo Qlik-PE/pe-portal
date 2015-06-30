@@ -20,7 +20,7 @@ router.get("/partners", function(req, res){ //used to check for existing partner
   var query = req.query || {};
   //query={name:/Qli/gi};
   var params = req.params;
-  MasterController.get(query, Partners, function(results){
+  MasterController.get(req.query, query, Partners, function(results){
     res.json(results);
   });
 });

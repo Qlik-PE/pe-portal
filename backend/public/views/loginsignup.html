@@ -15,15 +15,15 @@
           <button class="btn btn-default" ng-click="hideSuggestions()">No</button>
         </div>
       </div>
-      <form action="/auth/signup" method="post">
+      <div>
         <input class="form-control" name="partnername" placeholder="Partner" ng-model="partnername" ng-blur="checkPartner()">
         <input class="form-control" ng-hide="true" name="partner" ng-model="partner">
-        <input class="form-control" name="name" placeholder="Fullname">
-        <input class="form-control" name="email" placeholder="Email">
-        <input class="form-control" name="password" placeholder="Password" type="password">
+        <input class="form-control" name="name" placeholder="Fullname" ng-model="name">
+        <input class="form-control" name="email" placeholder="Email" ng-model="email">
+        <input class="form-control" name="password" placeholder="Password" type="password" ng-model="password">
         <input class="form-control" placeholder="Confirm Password" type="password">
-        <button class="btn btn-submit btn-register" type="submit">Signup</button>
-      </form>
+        <button class="btn btn-submit btn-register" ng-click="signup()">Signup</button>
+      </div>
     </div>
     <div class="col-md-2"></div>
     <div class="col-md-4">

@@ -34,5 +34,11 @@ module.exports = {
       errCode: 5,
       errText: "Could not delete record. " + (customText || "")
     }
+  },
+  custom: function(customText){
+    return {
+      errCode: -1,
+      errText: (customText || "")
+    }
   }
 }

@@ -1,0 +1,31 @@
+﻿<div class="qrest-connect-dialog-container qui-modalbackground">
+    <div class="qrest-connect-dialog qui-delayedModal">
+        <div class="select-config-dialog">
+            <h1>Choose a REST Configuration</h1>
+            <ul class="select-config-source">
+                <li class="active">Local</li>
+                <li>Online</li>
+            </ul>
+            <div class="select-config" ng-show="step=='config-selection'">
+                <ul>
+                    <li ng-repeat="config in localConfigList" qva-activate="loadTemplate('connection-settings', '{{config.name}}')" data-next-step="connection-settings" data-icon="{{config.icon}}">
+                        {{config.name}}
+                    </li>
+                </ul>
+            </div>
+            <div class="connection-settings" ng-show=" step=='connection-settings' ">
+                <label>Connection Name: </label>
+                <input ng-model="name" />
+                <label>Connection Url: </label>
+                <input ng-model="url" data-parameter="url" />      
+                <div ng-include src="subpage"></ng-include>
+            </div>
+        </div>
+        <footer class="dm-footer">
+            <qui-button class="qui-button" qva-activate="$event.preventDefault(); onCancelClicked()" q-translation="Common.Cancel"></qui-button>
+            <qui-button class="qui-button" qva-activate="$event.preventDefault(); onOKClicked()" q-translation="Common.Save">
+                Save
+            </qui-button>
+        </footer>
+    </div>    
+</div>
