@@ -933,15 +933,14 @@
 
   app.controller("senseController", ["$scope", "$resource", "$state", "$stateParams", function($scope, $resource, $state, $stateParams){
     var config = {
-      host: "10.211.55.3",
-      port: "8080",
+      host: "52.11.126.107/peportal",    
       isSecure: false
     };
 
     var senseApp;
 
     qsocks.Connect(config).then(function(global){
-      global.openDoc("c9ece11e-274f-4045-8d1d-402ca46496fc").then(function(app){
+      global.openDoc("0911af14-71f8-4ba7-8bf9-be2f847dc292").then(function(app){
         senseApp = app;
         $scope.$broadcast("ready", app);
       }, function(error) {
@@ -1083,7 +1082,7 @@
       },
       link: function($scope, element, attr){
         $scope.$parent.addTable(attr.id, attr.title);
-        $scope.getHyperlink = function(value){        
+        $scope.getHyperlink = function(value){
           return attr.hyperlinkurl +"/"+ value;
         }
       },
