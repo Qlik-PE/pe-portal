@@ -19,7 +19,7 @@ module.exports = {
             responseObj.total = count;
             responseObj.pages = Math.round(count / query.limit);
             responseObj.query = query;
-            responseObj.skip = entity.skip + entity.limit;
+            responseObj.skip = parseInt(entity.skip) + parsenInt(entity.limit);
             responseObj.limit = entity.limit;
             responseObj.data = results
             callbackFn.call(null, responseObj);
