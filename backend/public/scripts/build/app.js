@@ -232,7 +232,7 @@
 
     console.log($state.current.name);
 
-    if($state.current.name !="validations.new"){
+    if($stateParams.Id !="new"){
       Validations.get({validationId:$stateParams.Id||""}, function(result){
         if(resultHandler.process(result)){
           $scope.validations = result.data;
@@ -272,31 +272,41 @@
       //first we need to get the list of steps for the validation
       //then for each step get the issues and delete them
       //then we delete the step and finally delete the validation
-      Steps.query({validationid:id}, function(stepresult){
+      Steps.get({validationid:id}, function(stepresult){
         if(resultHandler.process(stepresult)){
-          if(stepresult.length>0){
-            for (var i=0;i<stepresult.length;i++){
-              var stepId = stepresult[i]._id;       //this variable is used to avoid probelms where i is changed before callbacks are executed
-              var isLast = i==stepresult.length-1;  //this variable is used to avoid probelms where i is changed before callbacks are executed
+          if(stepresult.data.length>0){
+            function deleteIssuesAndStep(stepIndex){
+              var stepId = stepresult.data[stepIndex]._id;
               Issues.delete({stepId: stepId}, function(issueresult){
                 if(resultHandler.process(issueresult)){
+                  //delete the step
                   Steps.delete({stepId:stepId}, function(result){
                     if(resultHandler.process(result)){
-                      Validations.delete({validationId: id}, function(result){
-                        if(resultHandler.process(result, "Delete")){
-                          for(var j=0;j<$scope.validations.length;j++){
-                            if($scope.validations[j]._id == id){
-                              $scope.validations.splice(j,1);
+                      if(stepIndex==stepresult.data.length-1){
+                        //delete the validation
+                        Validations.delete({validationId: id}, function(result){
+                          if(resultHandler.process(result, "Delete")){
+                            for(var j=0;j<$scope.validations.length;j++){
+                              if($scope.validations[j]._id == id){
+                                $scope.validations.splice(j,1);
+                              }
                             }
+                            window.location = "#validations";
                           }
-                          window.location = "#validations";
-                        }
-                      });
+                        });
+                      }
+                      else{
+                        //delete the next step and issues
+                        stepIndex++;
+                        deleteIssuesAndStep(stepIndex);
+                      }
                     }
                   });
                 }
               });
             }
+
+            deleteIssuesAndStep(0);          
           }
           else{
             Validations.delete({validationId: id}, function(result){
@@ -318,7 +328,7 @@
       var id = $stateParams.Id=="new"?"":$stateParams.Id;
       Validations.save({validationId:id}, $scope.validations[0], function(result){
         if(resultHandler.process(result, "Save")){
-          if($state.current.name =="validations.new"){
+          if($stateParams.Id == "new"){
             window.location = "/#validations/"+result._id;
           }
         }
@@ -378,6 +388,7 @@
 
   app.controller("stepController", ["$scope", "$resource", "$state", "$stateParams", "userPermissions", "notifications", "resultHandler", function($scope, $resource, $state, $stateParams, userPermissions, notifications, resultHandler){
     var Step = $resource("api/steps/:stepId", {stepId: "@stepId"});
+    var StepTemplate = $resource("api/templatesteps/:stepId", {stepId: "@stepId"});
     var StepTypes = $resource("api/steptypes/:typeId", {typeId: "@typeId"});
     var StepStatus = $resource("api/stepstatus/:statusId", {statusId: "@statusId"});
     var Issues = $resource("api/issues/:issueId", {issueId:"@issueId"});
@@ -415,10 +426,10 @@
     }
 
     $scope.$on("techTypeChanged", function(event, techTypeId){
-      Step.get({techtypeId: techTypeId}, function(result){
+      StepTemplate.get({techtypeId: techTypeId}, function(result){
         if(resultHandler.process(result)){
           for(var i=0;i<result.data.length;i++){
-            var s = result[i];
+            var s = result.data[i];
             s._id = null;
             s.techtypeId = null;
             s.validationid = $stateParams.Id;

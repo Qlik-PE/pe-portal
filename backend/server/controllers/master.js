@@ -29,7 +29,6 @@ module.exports = {
     });
   },
   count: function(query, parsedQuery, entity, callbackFn){
-    console.log(entity);
     entity.model.count(parsedQuery, function(err, result){
       if(err){
         console.log(err);
@@ -41,9 +40,7 @@ module.exports = {
     });
   },
   save: function(query, data, entity, callbackFn){
-    if(query){ //update
-      console.log('post data');
-      console.log(data);
+    if(query){ //update      
       entity.model.findOneAndUpdate(query, data, function(err, result){
         if(err){
           console.log(err);

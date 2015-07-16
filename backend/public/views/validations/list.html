@@ -1,6 +1,6 @@
 <div class="content">
   <h2>Validations</h2>
-  <a ui-sref="validations.new" ng-show="permissions.canCreate('validations')" class="btn btn-default btn-save">Create New</a>
+  <a href="#validations/new" ng-show="permissions.canCreate('validations')" class="btn btn-default btn-save">Create New</a>
   <ul class="validation-list" ng-hide="validations.length==0 || !permissions.canRead('validations')">
     <li ng-repeat="validation in validations">
       <a ui-sref=".detail({Id:'{{validation._id}}'})">{{validation.title}}</a>

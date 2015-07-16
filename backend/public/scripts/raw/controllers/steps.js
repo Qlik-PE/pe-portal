@@ -1,5 +1,6 @@
 app.controller("stepController", ["$scope", "$resource", "$state", "$stateParams", "userPermissions", "notifications", "resultHandler", function($scope, $resource, $state, $stateParams, userPermissions, notifications, resultHandler){
   var Step = $resource("api/steps/:stepId", {stepId: "@stepId"});
+  var StepTemplate = $resource("api/templatesteps/:stepId", {stepId: "@stepId"});
   var StepTypes = $resource("api/steptypes/:typeId", {typeId: "@typeId"});
   var StepStatus = $resource("api/stepstatus/:statusId", {statusId: "@statusId"});
   var Issues = $resource("api/issues/:issueId", {issueId:"@issueId"});
@@ -37,10 +38,10 @@ app.controller("stepController", ["$scope", "$resource", "$state", "$stateParams
   }
 
   $scope.$on("techTypeChanged", function(event, techTypeId){
-    Step.get({techtypeId: techTypeId}, function(result){
+    StepTemplate.get({techtypeId: techTypeId}, function(result){
       if(resultHandler.process(result)){
         for(var i=0;i<result.data.length;i++){
-          var s = result[i];
+          var s = result.data[i];
           s._id = null;
           s.techtypeId = null;
           s.validationid = $stateParams.Id;

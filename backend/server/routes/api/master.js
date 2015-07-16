@@ -19,6 +19,12 @@ var entities = {
       populates: "type status issues partner user",
       exemptFromOwnership: false
     },
+    templatesteps         : {
+      collection: "steps",
+      model: require("../../models/steps"),
+      populates: "type status issues partner user",
+      exemptFromOwnership: true
+    },
     steptypes     : {
       collection: "steptypes",
       model: require("../../models/step-types"),
@@ -71,7 +77,7 @@ router.get("/:entity", Auth.isLoggedIn, function(req, res){
   var query = queryObj.query;
   var entity = queryObj.entity;
   var user = req.user;
-  var userPermissions = req.user.role.permissions[req.params.entity];
+  var userPermissions = req.user.role.permissions[entity.collection];
   //check that the user has sufficient permissions for this operation
   if(!userPermissions || userPermissions.read!=true){
     res.json([Error.insufficientPermissions]);
@@ -94,7 +100,7 @@ router.get("/:entity/count", Auth.isLoggedIn, function(req, res){
   var query = queryObj.query;
   var entity = queryObj.entity;
   var user = req.user;
-  var userPermissions = req.user.role.permissions[req.params.entity];
+  var userPermissions = req.user.role.permissions[entity.collection];
   //check that the user has sufficient permissions for this operation
   if(!userPermissions || userPermissions.read!=true){
     res.json([Error.insufficientPermissions]);
@@ -118,7 +124,7 @@ router.get("/:entity/:id", Auth.isLoggedIn, function(req, res){
   var entity = queryObj.entity;
   query["_id"] = req.params.id;
   var user = req.user;
-  var userPermissions = req.user.role.permissions[req.params.entity];
+  var userPermissions = req.user.role.permissions[entity.collection];
   //check that the user has sufficient permissions for this operation
   if(!userPermissions || userPermissions.read==false){
     res.json([Error.insufficientPermissions]);
@@ -136,9 +142,9 @@ router.get("/:entity/:id", Auth.isLoggedIn, function(req, res){
 //This route is for creating a new record on the specified entity and returning the new record
 //Requires "create" permission on the specified entity
 router.post("/:entity/", Auth.isLoggedIn, function(req, res){
-  var entity = req.params.entity;
+  var entity = entities[req.params.entity];
   var user = req.user;
-  var userPermissions = req.user.role.permissions[entity];
+  var userPermissions = req.user.role.permissions[entity.collection];
   var data = req.body;
   if(!userPermissions || userPermissions.create!=true){
     res.json(Error.insufficientPermissions);
@@ -146,7 +152,7 @@ router.post("/:entity/", Auth.isLoggedIn, function(req, res){
   else{
     data.createuser = user._id;
     data.partner = user.partner;  //add the partnerid of the current user to the record
-    MasterController.save(null, data, entities[entity], function(result){
+    MasterController.save(null, data, entity, function(result){
       res.json(result);
     });
   }
@@ -162,7 +168,7 @@ router.post("/:entity/:id", Auth.isLoggedIn, function(req, res){
   var entity = queryObj.entity;
   query["_id"] = req.params.id;
   var user = req.user;
-  var userPermissions = req.user.role.permissions[req.params.entity];
+  var userPermissions = req.user.role.permissions[entity.collection];
   var data = req.body;
   //check that the user has sufficient permissions for this operation
   if(!userPermissions || userPermissions.update!=true){
@@ -193,9 +199,9 @@ router.post("/:entity/:id", Auth.isLoggedIn, function(req, res){
 //Requires "delete" permission on the specified entity
 router.delete("/:entity", Auth.isLoggedIn, function(req, res){
   var query = req.query || {};
-  var entity = req.params.entity;
+  var entity = entities[req.params.entity];
   var user = req.user;
-  var userPermissions = req.user.role.permissions[entity];
+  var userPermissions = req.user.role.permissions[entity.collection];
   if(!userPermissions || userPermissions.delete!=true){
     res.json(Error.insufficientPermissions);
   }
@@ -203,7 +209,7 @@ router.delete("/:entity", Auth.isLoggedIn, function(req, res){
     if(userPermissions.allOwners!=true){
       query["partner"]=user.partner;
     }
-    MasterController.delete(query, entities[entity], function(result){
+    MasterController.delete(query, entity, function(result){
       res.json(result);
     });
   }
@@ -215,9 +221,9 @@ router.delete("/:entity", Auth.isLoggedIn, function(req, res){
 router.delete("/:entity/:id", Auth.isLoggedIn, function(req, res){
   var query = req.query || {};
   query["_id"] = req.params.id;
-  var entity = req.params.entity;
+  var entity = entities[req.params.entity];
   var user = req.user;
-  var userPermissions = req.user.role.permissions[entity];
+  var userPermissions = req.user.role.permissions[entity.collection];
   if(!userPermissions || userPermissions.delete!=true){
     res.json(Error.insufficientPermissions);
   }
@@ -225,7 +231,8 @@ router.delete("/:entity/:id", Auth.isLoggedIn, function(req, res){
     if(userPermissions.allOwners!=true){
       query["partner"]=user.partner;
     }
-    MasterController.delete(query, entities[entity], function(result){
+    console.log(query);
+    MasterController.delete(query, entity, function(result){
       res.json(result);
     });
   }
