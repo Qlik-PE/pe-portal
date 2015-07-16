@@ -115,8 +115,7 @@
     this.canCreate = function(entity){
       return this.permissions[entity] && this.permissions[entity].create && this.permissions[entity].create==true
     }
-    this.canRead = function(entity){
-      console.log(entity);
+    this.canRead = function(entity){    
       return this.permissions[entity] && this.permissions[entity].read && this.permissions[entity].read==true
     }
     this.canUpdate = function(entity){
@@ -211,12 +210,15 @@
     $scope.signup = function(){
       var user = {
         partner: $scope.partner,
+        partnername: $scope.partnername,
         name: $scope.name,
         email: $scope.email,
         password: $scope.password
       };
       SignUp.save({}, user, function(result){
-        resultHandler.process(result);
+        if(resultHandler.process(result, "Registration")){
+          window.location = "#login";
+        }
       });
     };
 
@@ -228,9 +230,7 @@
     var Issues = $resource("api/issues/:issueId", {issueId:"@issueId"});
     var TechnologyTypes = $resource("api/technologytypes/:techtypeId", {techtypeId: "@techtypeId"});
 
-    $scope.permissions = userPermissions;
-
-    console.log($state.current.name);
+    $scope.permissions = userPermissions;  
 
     if($stateParams.Id !="new"){
       Validations.get({validationId:$stateParams.Id||""}, function(result){
@@ -306,7 +306,7 @@
               });
             }
 
-            deleteIssuesAndStep(0);          
+            deleteIssuesAndStep(0);
           }
           else{
             Validations.delete({validationId: id}, function(result){
@@ -358,31 +358,6 @@
         }
       });  //currently we"re only allowing a save from the detail page, in which case we should only have 1 validation in the array
     };
-
-    $scope.uploadScreenshot = function(){
-      // var file = $("#screenshotUpload")[0].files[0];
-      // r = new FileReader();
-      // r.onloadend = function(e){
-      //   var data = new FormData();
-      //   data.append("file", e.target.result);
-      //   //send you binary data via $http or $resource or do anything else with it
-        //ValidationImages.save({validationId:$stateParams.id}, $("#file")[0].files[0], function(result){
-        $("#uploadForm")[0].submit(function(event, result){
-          event.preventDefault();
-          if($scope.validation[0].screenshots){
-            $scope.validation[0].screenshots.push(result._id);
-          }
-          else{
-            $scope.validation[0].screenshots = [result._id];
-          }
-        });
-      //}
-      //r.readAsBinaryString(file);
-    }
-
-    $scope.getPath = function(id){
-      return "/api/images/"+id;
-    }
 
   }]);
 
@@ -539,8 +514,8 @@
             //first get the step, then the validation
             Step.get({stepId: $scope.issues[0].step}, function(step){
               $scope.step = step.data[0].name;
-              Validation.query({validationId: step[0].data.validationid}, function(validation){
-                $scope.validation = validation[0].title;
+              Validation.get({validationId: step[0].data.validationid}, function(validation){
+                $scope.validation = validation.data[0].title;
               });
             })
           }
@@ -654,7 +629,7 @@
     var Issue = $resource("api/issues/:issueId", {issueId: "@issueId"});
     var IssueStatus = $resource("api/issuestatus/:statusId", {statusId: "@statusId"});
     var User = $resource("api/users/:userId", {userId: "@userId"});
-    var UserRoles = $resource("api/userroles/:roleId", {userId: "@roleId"});
+    var UserRoles = $resource("api/userroles/:roleId", {roleId: "@roleId"});
 
     $scope.permissions = userPermissions;
 

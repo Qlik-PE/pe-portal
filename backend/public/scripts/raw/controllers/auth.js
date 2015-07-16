@@ -40,12 +40,15 @@ app.controller("authController", ["$scope", "$resource", "$state", "$stateParams
   $scope.signup = function(){
     var user = {
       partner: $scope.partner,
+      partnername: $scope.partnername,
       name: $scope.name,
       email: $scope.email,
       password: $scope.password
     };
     SignUp.save({}, user, function(result){
-      resultHandler.process(result);
+      if(resultHandler.process(result, "Registration")){
+        window.location = "#login";
+      }
     });
   };
 

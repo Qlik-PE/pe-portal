@@ -3,7 +3,7 @@ app.controller("dashboardController", ["$scope", "$resource", "$state", "$stateP
   var Issue = $resource("api/issues/:issueId", {issueId: "@issueId"});
   var IssueStatus = $resource("api/issuestatus/:statusId", {statusId: "@statusId"});
   var User = $resource("api/users/:userId", {userId: "@userId"});
-  var UserRoles = $resource("api/userroles/:roleId", {userId: "@roleId"});
+  var UserRoles = $resource("api/userroles/:roleId", {roleId: "@roleId"});
 
   $scope.permissions = userPermissions;
 

@@ -27,8 +27,8 @@ app.controller("issueController", ["$scope", "$resource", "$state", "$stateParam
           //first get the step, then the validation
           Step.get({stepId: $scope.issues[0].step}, function(step){
             $scope.step = step.data[0].name;
-            Validation.query({validationId: step[0].data.validationid}, function(validation){
-              $scope.validation = validation[0].title;
+            Validation.get({validationId: step[0].data.validationid}, function(validation){
+              $scope.validation = validation.data[0].title;
             });
           })
         }

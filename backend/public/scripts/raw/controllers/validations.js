@@ -4,9 +4,7 @@ app.controller("validationController", ["$scope", "$resource", "$state", "$state
   var Issues = $resource("api/issues/:issueId", {issueId:"@issueId"});
   var TechnologyTypes = $resource("api/technologytypes/:techtypeId", {techtypeId: "@techtypeId"});
 
-  $scope.permissions = userPermissions;
-
-  console.log($state.current.name);
+  $scope.permissions = userPermissions;  
 
   if($stateParams.Id !="new"){
     Validations.get({validationId:$stateParams.Id||""}, function(result){
@@ -82,7 +80,7 @@ app.controller("validationController", ["$scope", "$resource", "$state", "$state
             });
           }
 
-          deleteIssuesAndStep(0);          
+          deleteIssuesAndStep(0);
         }
         else{
           Validations.delete({validationId: id}, function(result){
@@ -134,30 +132,5 @@ app.controller("validationController", ["$scope", "$resource", "$state", "$state
       }
     });  //currently we"re only allowing a save from the detail page, in which case we should only have 1 validation in the array
   };
-
-  $scope.uploadScreenshot = function(){
-    // var file = $("#screenshotUpload")[0].files[0];
-    // r = new FileReader();
-    // r.onloadend = function(e){
-    //   var data = new FormData();
-    //   data.append("file", e.target.result);
-    //   //send you binary data via $http or $resource or do anything else with it
-      //ValidationImages.save({validationId:$stateParams.id}, $("#file")[0].files[0], function(result){
-      $("#uploadForm")[0].submit(function(event, result){
-        event.preventDefault();
-        if($scope.validation[0].screenshots){
-          $scope.validation[0].screenshots.push(result._id);
-        }
-        else{
-          $scope.validation[0].screenshots = [result._id];
-        }
-      });
-    //}
-    //r.readAsBinaryString(file);
-  }
-
-  $scope.getPath = function(id){
-    return "/api/images/"+id;
-  }
 
 }]);

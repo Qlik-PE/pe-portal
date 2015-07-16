@@ -1,7 +1,8 @@
 var express = require("express"),
     router = express.Router(),
     passport = require("passport"),
-    Error = require("../controllers/error");
+    Error = require("../controllers/error"),
+    Signup = require("../controllers/signup");
 
 // router.post("/login", passport.authenticate("local"), function(req, res){
 //   console.log(req.isAuthenticated());
@@ -14,8 +15,10 @@ router.get("/logout", function(req, res){
   res.redirect("/");
 });
 
-router.post("/signup", passport.authenticate("signup"), function(req, res){
-  res.redirect("/#dashboard")
+router.post("/signup", function(req, res){
+  Signup(req.body, function(result){
+    res.json(result);
+  });
 });
 
 module.exports = router;
