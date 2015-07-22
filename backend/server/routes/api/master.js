@@ -240,14 +240,20 @@ router.delete("/:entity/:id", Auth.isLoggedIn, function(req, res){
 
 //this function parses any sorting or paging parameters and contstructs the mongodb query accordingly.
 //Currently only used for GET requests
-function parseQuery(query, body, method, entity){
+function parseQuery(query, body, method, originalEntity){
+  var entity = cloneObject(originalEntity);
   var mongoQuery = {};
   query = query || {};
   body = body || {};
   if(query.sort){
+    var sortFields = query.sort.toString().split(",");
+    var sortOrders = query.sortOrder.toString().split(",");
     var sort = {};
-    sort[query.sort] = query.sortOrder || 1;
+    for(var i=0; i < sortFields.length; i++){
+      sort[sortFields[i]] = sortOrders[i] || 1;
+    }
     entity.sort = sort;
+    console.log(sort);
     delete query["sort"];
     delete query["sortOrder"];
   }
@@ -264,6 +270,14 @@ function parseQuery(query, body, method, entity){
   mongoQuery.query = query;
 
   return mongoQuery;
+}
+
+function cloneObject(object){
+  var clone = {};
+  for (var key in object){
+    clone[key] = object[key];
+  }
+  return clone;
 }
 
 function concatObjects(objects){
