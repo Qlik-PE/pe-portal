@@ -1,0 +1,208 @@
+.validation-list,.validation-step-list, .step-issue-list, .user-list, .permissions-list, .step-template-list, .public-validation-list {
+  padding: 10px 5px;
+  li{
+    white-space: nowrap;
+    overflow: hidden;
+    height: 30px;
+    line-height: 30px;
+    background-color: white;
+    text-indent: 10px;
+    &:nth-child(odd){
+      background-color: @table-odd-background;
+    }
+    .delete{
+      float: right;
+      color: @red;
+      margin-right: 10px;
+      cursor: pointer;
+    }
+    .new{
+      float: right;
+      color: @green;
+      margin-right: 10px;
+      cursor: pointer;
+    }
+  }
+}
+
+.roles-list{
+  .new{
+    float: right;
+    color: @green;
+    margin-right: 10px;
+    cursor: pointer;
+  }
+  input{
+    display: inline-block;
+    width: 80%;
+  }
+}
+
+.validation-step-list, .step-issue-list, .user-list, .permissions-list, .step-template-list{
+  li{
+    height: 45px;
+    line-height: 45px;
+    a.link{
+      display: inline-block;
+    }
+    label, input, select, a.link{
+      width: 20% !important;
+    }
+    label, input{
+      &.description{
+        width: 25% !important;
+      }
+    }
+
+    select{
+      display: inline-block;
+    }
+    input.form-control, select.form-control{
+      height: 34px !important;
+      line-height: 34px !important;
+    }
+
+  }
+}
+
+.validation-step-list{
+  li{
+    label{
+      &:last-of-type{
+        width: 5% !important;
+      }
+    }
+  }
+}
+
+.step-template-list{
+  .font{
+    &.up, &.down{
+      cursor: pointer;
+      float: right;
+      font-size: 18px;
+      display: inline-block;
+      height: 34px;
+      width: 34px;
+      position: relative;
+      &::before{
+        height: 100%;
+        width: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+      }
+
+      &[disabled="disabled"]{
+        opacity: 0.3;
+      }
+    }
+    &.up::before{
+      content: "\E806";
+    }
+    &.down::before{
+      content: "\E805";
+    }
+  }
+}
+
+.permissions-list{
+  li{
+    height: 34px !important;
+    line-height: 34px !important;
+
+    :not(:first-child){
+      width: 10% !important;
+      display: inline-block;
+      text-indent: 0;
+      &[type="checkbox"]{
+        height: 22px !important;
+        line-height: 25px !important;
+        margin-top: 0;
+        border: none;
+        box-shadow: none;
+      }
+    }
+    :first-child{
+      width: 30% !important;
+    }
+
+    .list-label{
+      border: none;
+      background-color: transparent;
+      display: inline-block;
+      box-shadow: none;
+    }
+  }
+}
+
+.filters{
+    display: inline-block;
+    vertical-align: top;
+    margin-right: 20px;
+    width: 200px;
+    .filter{
+      position: relative;
+      h1{
+        padding-left: 10px;
+        margin-bottom: 5px;
+        color: @filter-header;
+        font-size: 14px;
+      }
+      ul{
+        padding-left: 10px;
+        padding-top: 10px;
+        color: @filter-item;
+        border-top: 2px solid;
+        font-size: 14px;
+        li{
+          cursor: pointer;
+          position: relative;
+          height: 20px;
+          line-height: 20px;
+          text-indent: 25px;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          overflow: hidden;
+          &:before{
+            content: "";
+            border: 1px solid;
+            position: absolute;
+            top: 8px;
+            left: 5px;
+            height: 5px;
+            width: 5px;
+          }
+          &[data-state="S"]:before{
+            background-color: @green;
+          }
+          &[data-state="A"]{
+            background-color: @outside;
+          }
+          &[data-state="X"]{
+            background-color: @excluded;
+            color: @excluded-text;
+          }
+        }
+      }
+    }
+}
+
+.public-validation-list{
+  .table-header{
+    font-weight: bold;
+  }
+  li{
+    white-space: normal;
+    height: auto;
+    line-height: 20px;
+  }
+  div{
+    white-space: normal;
+    display: inline-block;
+    width: 30%;
+    text-indent: 0;
+    padding: 5px;
+    vertical-align: top;    
+  }
+}

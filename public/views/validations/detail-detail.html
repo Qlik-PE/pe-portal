@@ -1,0 +1,51 @@
+<div class="col-md-6">
+  <label ng-show="permissions.canSeeAll('validations')">Technology Partner: </label>
+  <span>{{validations[0].partner.name}}</span>
+  <br>
+  <label>Connectivity Method: </label>
+  <input class="form-control" ng-disabled="!permissions.canUpdate('validations')" ng-blur="save()" ng-model="validations[0].connect_method"/>
+  <br>
+  <label>Host OS: </label>
+  <input class="form-control" ng-disabled="!permissions.canUpdate('validations')" ng-blur="save()" ng-model="validations[0].host_os"/>
+  <br>
+  <label>Host HW: </label>
+  <input class="form-control" ng-disabled="!permissions.canUpdate('validations')" ng-blur="save()" ng-model="validations[0].host_hw"/>
+  <br>
+  <label>Host Physical/VM: </label>
+  <input class="form-control" ng-disabled="!permissions.canUpdate('validations')" ng-blur="save()" ng-model="validations[0].host_physVm"/>
+  <br>
+  <label>Host in Cloud?: </label>
+  <input class="form-control" type="checkbox" ng-disabled="!permissions.canUpdate('validations')" ng-change="save()" ng-model="validations[0].host_cloudFg"/>
+  <br>
+  <label>Partner Software: </label>
+  <input class="form-control" ng-disabled="!permissions.canUpdate('validations')" ng-blur="save()" ng-model="validations[0].partnersw"/>
+  <br>
+  <label>Partner SW Version: </label>
+  <input class="form-control" ng-disabled="!permissions.canUpdate('validations')" ng-blur="save()" ng-model="validations[0].partnerver"/>
+  <br>
+</div>
+<div class="col-md-6">
+  <label>Dataset Used: </label>
+  <input class="form-control" ng-disabled="!permissions.canUpdate('validations')" ng-blur="save()" ng-model="validations[0].dataset_used"/>
+  <br>
+  <label>Datamodel Info: </label>
+  <input class="form-control" ng-disabled="!permissions.canUpdate('validations')" ng-blur="save()" ng-model="validations[0].datamodel_desc"/>
+  <br>
+  <label>Data Density: </label>
+  <input class="form-control" ng-disabled="!permissions.canUpdate('validations')" ng-blur="save()" ng-model="validations[0].data_density"/>
+  <br>
+  <label>Data Size Rows: </label>
+  <input class="form-control" ng-disabled="!permissions.canUpdate('validations')" ng-blur="save()" ng-model="validations[0].datavolume_rows"/>
+  <br>
+  <label>Data Size Columns: </label>
+  <input class="form-control" ng-disabled="!permissions.canUpdate('validations')" ng-blur="save()" ng-model="validations[0].datacolume_cols"/>
+  <br>
+  <label>Qlik Software: </label>
+  <input class="form-control" ng-disabled="!permissions.canUpdate('validations')" ng-blur="save()" ng-model="validations[0].qliksw"/>
+  <br>
+  <label>Qlik Version: </label>
+  <input class="form-control" ng-disabled="!permissions.canUpdate('validations')" ng-blur="save()" ng-model="validations[0].qlikver"/>
+  <br>
+  <label>Benchmarks: </label>
+  <input class="form-control" ng-disabled="!permissions.canUpdate('validations')" ng-blur="save()" ng-model="validations[0].benchmarks"/>
+</div>

@@ -1,0 +1,92 @@
+.content{
+  position: relative;
+  h1{
+    width: 50%;
+  }
+
+  .content-detail{
+    padding-bottom: 10px;
+    label{
+      width: 28%;
+    }
+    input.form-control, select.form-control{
+      height: 25px;
+      line-height: 25px;
+      display: inline-block;
+      width: 70%;
+    }
+
+    .tabs{
+      margin: 10px 0;
+      li{
+        color: @headers;
+        display: inline-block;
+        height: 30px;
+        line-height: 30px;
+        width: 100px;
+        font-size: 22px;
+
+        &.active{
+          font-weight: bold;
+          color: @green;
+        }
+      }
+    }
+  }
+
+  .btn-delete, .btn-save{
+    position: absolute;
+    top: 0;
+    right: 0;
+  }
+
+  .btn-file {
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-file input[type=file] {
+      position: absolute;
+      top: 0;
+      right: 0;
+      min-width: 100%;
+      min-height: 100%;
+      font-size: 100px;
+      text-align: right;
+      filter: alpha(opacity=0);
+      opacity: 0;
+      outline: none;
+      background: white;
+      cursor: inherit;
+      display: block;
+  }
+
+  .issue-count{
+    text-indent: 15px;
+    display: inline-block;
+  }
+
+  .permission-summary{
+    .copy{
+      color: @green;
+      display: inline-block;
+    }
+  }
+}
+
+.partner-suggestions{
+  text-align: center;
+  width: 400px;
+  margin: 0 auto;
+  margin-top: 100px;
+  background-color: white;
+  border: 1px solid @light-grey;
+  border-radius: 5px;
+  padding: 10px;
+  li{
+    height: 30px;
+    line-height: 30px;
+    text-align: left;
+    color: @green;
+    text-indent: 10px;
+  }
+}

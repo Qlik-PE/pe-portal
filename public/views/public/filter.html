@@ -1,0 +1,6 @@
+<div>
+  <h1>{{info.title}}</h1>
+  <ul>
+    <li ng-repeat="item in info.items" ng-click="toggleValue(item[0].qElemNumber)" data-state="{{item[0].qState}}" data-elem="{{item[0].qElemNumber}}">{{item[0].qText}}</li>
+  </ul>
+</div>

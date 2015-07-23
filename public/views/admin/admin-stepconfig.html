@@ -1,0 +1,38 @@
+<div class="col-md-3" style="padding-left:0px;">
+  <h2>Technology Type</h2>
+  <ul class="tabs roles-list">
+    <li ng-class="{active:activeTechType===$index}" ng-repeat="technologytype in technologytypes" ng-click="setTechType($index)">
+      <a>{{technologytype.name}}</a>
+    </li>
+    <li ng-show="permissions.canCreate('technologytypes')" >
+      <input class="form-control" placeholder="New Technology Type" ng-model="newtechtype"/>
+      <div class="new" ng-click="newTechType(newtechtype)">Add</div>
+    </li>
+  </ul>
+</div>
+<div class="col-md-9 content-detail">
+  <h3>Steps</h3>
+  <ul class="step-template-list">
+    <li class="table-header">
+      <label class="description">Name</label>
+      <label class="description">Description</label>
+      <label>Type</label>
+    </li>
+    <li ng-repeat="step in steps" data-num="step.num">
+      <input class="form-control description" ng-disabled="!permissions.canUpdate('steps')" ng-blur="saveStep(step._id)" ng-model="step.name"/>
+      <input class="form-control description" ng-disabled="!permissions.canUpdate('steps')" ng-blur="saveStep(step._id)" ng-model="step.content"/>
+      <select class="form-control" ng-disabled="!permissions.canUpdate('steps')" ng-change="saveStep(step._id)" ng-model="step.type" ng-options="item.name for item in stepTypes track by item._id">
+      <select>
+      <div class="delete" ng-show="permissions.canDelete('steps')" ng-click="deleteStep(step._id)">Delete</div>
+      <div class="move font up" ng-disabled="!showMoveUp($index)" ng-click="moveStep(step._id, -1)"></div>
+      <div class="move font down" ng-disabled="!showMoveDown($index)" ng-click="moveStep(step._id, 1)"></div>
+    </li>
+    <li ng-show="permissions.canCreate('steps')">
+      <input class="form-control description" ng-model="newStepName" />
+      <input class="form-control description" ng-model="newStepContent"/>
+      <select class="form-control" ng-model="newStepType" ng-options="item.name for item in stepTypes track by item._id">
+      <select>
+      <div class="new" ng-click="newStep(newStepName, newStepContent, newStepType, newStepStatus)">Add</div>
+    </li>
+  </ul>
+</div>

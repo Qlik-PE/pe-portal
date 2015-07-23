@@ -1,32 +1,3 @@
-@import 'colors.less';
-@import 'fonts.less';
-
-//header
-@import 'header/header-main.less';
-@import 'header/header-mobile.less';
-
-//footer
-@import 'footer/footer-main.less';
-@import 'footer/footer-mobile.less';
-
-//home
-@import 'home/home-main.less';
-@import 'home/home-mobile.less';
-
-//certifications
-@import 'certifications/list-main.less';
-@import 'certifications/list-mobile.less';
-
-//normalize
-@import 'normalize.less';
-
-//generic components
-//for now we're just accomodating desktops at 1170px
-.container{
-  width: 1170px;
-  margin: 0 auto;
-}
-
 ul{
   margin: 0;
   padding: 0;
@@ -36,7 +7,54 @@ li{
   list-style-type: none;
 }
 
-a, a:visited{
+a{
+  cursor: pointer;
+}
+
+a, a:hover, a:visited{
   color: inherit;
   text-decoration: none;
 }
+
+a:hover{
+  color: @green;
+}
+
+.form-control{
+  margin: 2px 0;
+}
+
+h1{
+  color: @green;
+  font-size: 30px;
+}
+
+h2{
+  color: @dark-grey;
+  font-size: 22px;
+}
+
+/* Sticky footer styles
+-------------------------------------------------- */
+html {
+  position: relative;
+  min-height: 100%;
+}
+body {
+  /* Margin bottom by footer height */
+  margin-bottom: 60px;
+}
+
+@import "./colors.less";
+@import "./fonts.less";
+@import "./buttons.less";
+@import "./lists.less";
+@import "./header/header-main.less";
+@import "./footer/footer-main.less";
+@import "./login/login-main.less";
+@import "./content.less";
+@import "./dashboard.less";
+@import "./adminconsole.less";
+@import "./home.less";
+@import "./notifications.less";
+@import "./smokescreen.less";

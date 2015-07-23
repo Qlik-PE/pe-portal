@@ -1,0 +1,13 @@
+<div class="col-md-12 screenshots">
+  <form id="uploadForm" name="uploader" method="post" action="{{imageUploadPath}}" enctype="multipart/form-data">
+      <span class="btn btn-default btn-file">
+        Choose
+        <input onchange="angular.element(this).scope().uploadScreenshot()" type="file" name="file" id="file"/>
+      </span>
+  </form>
+  <ul ng-hide="validations[0].screenshots.length==0">
+    <li ng-repeat="screenshot in validations[0].screenshots" data-val="test">
+      
+    </li>
+  </ul>
+</div>

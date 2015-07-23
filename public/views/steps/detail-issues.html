@@ -1,0 +1,24 @@
+<div class="issues col-md-12" ng-controller="issueController">
+  <ul class="step-issue-list">
+    <li class="table-header">
+      <label>Name</label>
+      <label class="description">Description</label>
+      <label>Status</label>
+    </li>
+    <li ng-hide="issues.length==0" ng-repeat="issue in issues">
+      <a class="link" href="#issues/{{issue._id}}">{{issue.name}}</a>
+      <input class="form-control description"  ng-blur="save(issue._id)" ng-model="issue.content"/>
+      <select class="form-control" ng-change="save(issue._id)" ng-model="issue.status" ng-options="item.name for item in issueStatus track by item._id">
+      <select>
+      <div class="delete" ng-click="delete(issue._id)">Delete</div>
+    </li>
+    <li>
+      <input class="form-control" ng-model="newIssueName" />
+      <input class="form-control description" ng-model="newIssueContent"/>
+      <select class="form-control" ng-model="newIssueStatus" ng-options="item.name for item in issueStatus track by item._id">
+      <select>
+      <div class="new" ng-click="new()">Add</div>
+    </li>
+  </ul>
+  <ng-include ng-show="{{issues.length==0}}" src=""/views/noresults.html""></ng-include>
+</div>

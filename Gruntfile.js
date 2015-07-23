@@ -1,12 +1,10 @@
 module.exports = function(grunt) {
-
-
   grunt.initConfig({
     includes: {
       files:{
-        src: ['main.js', 'sense-functions.js'],
-        dest: 'public/scripts/build/',
-        cwd: 'public/scripts/raw'
+        src: ["app.js"],
+        dest: "public/scripts/build/",
+        cwd: "public/scripts/raw"
       }
     },
     less: {
@@ -23,16 +21,16 @@ module.exports = function(grunt) {
     },
     watch: {
       styles: {
-        files: ['public/styles/less/**/*.less', 'public/scripts/raw/**/*.js'], // which files to watch
-        tasks: ['less','includes'],
+        files: ["public/styles/less/**/*.less", "public/scripts/raw/**/*.js"], // which files to watch
+        tasks: ["less","includes"],
         options: {
           nospawn: true
         }
       }
     }
   });
-  grunt.loadNpmTasks('grunt-contrib-less');
-  grunt.loadNpmTasks('grunt-includes');
-  grunt.loadNpmTasks('grunt-contrib-watch');
-  grunt.registerTask('default', ['includes','less', 'watch']);
+  grunt.loadNpmTasks("grunt-contrib-less");
+  grunt.loadNpmTasks("grunt-includes");
+  grunt.loadNpmTasks("grunt-contrib-watch");
+  grunt.registerTask("default", ["includes","less", "watch"]);
 };

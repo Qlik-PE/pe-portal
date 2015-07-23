@@ -1,0 +1,24 @@
+<div class="col-md-12 dashboard">
+  <h2>Dashboard</h2>
+  <ul>
+    <li ng-show="permissions.canRead('validations')" >
+      <a ui-sref="validations">
+        {{validationCount}}
+        <h3>Total Validations</h3>
+      </a>
+    </li>
+    <li ng-show="permissions.canRead('issues')" >
+      <a ui-sref="issues">
+        {{pendingIssues}}
+        {{userPermissions.canRead("issues")}}
+        <h3>Oustanding Issues</h3>
+      </a>
+    </li>
+    <li ng-show="permissions.canRead('users')" >
+      <a ui-sref="users">
+        {{pendingUsers}}
+        <h3>Pending User Requests</h3>
+      </a>
+    </li>
+  </ul>
+</div>
