@@ -1,0 +1,10 @@
+<div class="col-md-12 screenshots">
+  <form enctype="multipart/form-data" action="/attachments" method="post" id="newScreenshotForm">
+      <span class="btn btn-default btn-file">
+        Choose
+        <input onchange="angular.element(this).scope().uploadScreenshot()" type="file" name="file" id="file"/>
+      </span>
+  </form>
+  <gallery images="screenshots">
+  </gallery>
+</div>

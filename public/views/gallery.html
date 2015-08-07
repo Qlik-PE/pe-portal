@@ -1,0 +1,17 @@
+<div>
+  <ul class="gallery">
+    <li ng-repeat="image in images">
+      <a ng-click="showModal($index)">
+        <img src="{{image.thumbnail}}"/>
+      </a>
+    </li>
+  </ul>
+  <div class="gallery-modal-container" ng-class="{active: isModal==true}">
+    <div class="modal-image">
+      <img src="{{images[activeImage].image}}" />
+      <a class="button prev" ng-click="prev()">Prev</a>
+      <a class="button next" ng-click="next()">Next</a>
+      <a class="button closeModal" ng-click="close()">X</a>
+    </div>
+  </div>
+</div>

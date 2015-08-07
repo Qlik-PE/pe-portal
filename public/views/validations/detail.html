@@ -1,6 +1,6 @@
 <div class="content">
   <h1><input class="form-control title"  ng-disabled="!permissions.canUpdate('validations')" ng-blur="save()" placeholder="Title" ng-model="validations[0].title"/></h1>
-  <span class="green" ng-hide="permissions.role=='admin'">{{validations[0].status}}</span>
+  <span class="green">{{validations[0].status}}</span>
   <button ng-click="validate(validations[0]._id)" ng-hide="permissions.role!='admin' || validations[0].status=='Validated'" class="btn btn-default btn-validate">Validate</button>
   <button ng-click="unvalidate(validations[0]._id)" ng-hide="permissions.role!='admin' || validations[0].status!='Validated'" class="btn btn-default btn-validate">Unvalidate</button>
   <button ng-click="delete(validations[0]._id)" ng-hide="!permissions.canDelete('validations')" class="btn btn-default btn-delete">Delete</button>
@@ -18,9 +18,9 @@
         <li ng-class="{active:activeTab===1}" ng-show="permissions.canRead('steps')">
           <a ng-click="setTab(1)">Steps</a>
         </li>
-        <li ng-class="{active:activeTab===2}">
+        <!-- <li ng-class="{active:activeTab===2}">
           <a ng-click="setTab(2)">Screenshots</a>
-        </li>
+        </li> -->
       </ul>
     </div>
     <div ng-show="activeTab==0">
@@ -29,8 +29,8 @@
     <div ng-show="activeTab==1">
       <ng-include src="'/views/validations/detail-steps.html'"></ng-include>
     </div>
-    <div ng-show="false">
+    <!-- <div ng-show="activeTab==2">
       <ng-include src="'/views/validations/detail-screenshots.html'"></ng-include>
-    </div>
+    </div> -->
   </div>
 </div>

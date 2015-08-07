@@ -13,13 +13,13 @@
 </div>
 <div class="col-md-6">
   <label>Type: </label>
-  <select class="form-control" ng-change="save(steps[0]._id)" ng-model="steps[0].type" ng-options="item.name for item in stepTypes track by item._id">
+  <select class="form-control" ng-disabled="!permissions.canUpdate('steps')" ng-model="steps[0].type" ng-options="item.name for item in stepTypes track by item._id">
   <select>
   <br>
   <label>Status: </label>
-  <select class="form-control" ng-change="save(steps[0]._id)" ng-model="steps[0].status" ng-options="item.name for item in stepStatus track by item._id">
+  <select class="form-control" ng-disabled="!permissions.canUpdate('steps')" ng-model="steps[0].status" ng-options="item.name for item in stepStatus track by item._id">
   <select>
   <br>
   <label>Num: </label>
-  <input class="form-control" ng-blur="save()" ng-model="steps[0].num"/>
+  <input class="form-control" ng-disabled="true" ng-model="steps[0].num"/>
 </div>

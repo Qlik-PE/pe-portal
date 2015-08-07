@@ -1,6 +1,6 @@
 app.controller("senseController", ["$scope", "$resource", "$state", "$stateParams", function($scope, $resource, $state, $stateParams){
   var config = {
-    host: "52.11.126.107/peportal",    
+    host: "52.11.126.107/peportal",
     isSecure: false
   };
 
@@ -138,7 +138,7 @@ app.controller("senseController", ["$scope", "$resource", "$state", "$stateParam
         $scope.$parent.toggleSelect(attr.field, elemNum);
       }
     },
-    templateUrl: "/views/public/filter.html",
+    templateUrl: "/views/public/filter.html"
   }
 }])
 .directive("senseTable", [function(){
@@ -153,6 +153,6 @@ app.controller("senseController", ["$scope", "$resource", "$state", "$stateParam
         return attr.hyperlinkurl +"/"+ value;
       }
     },
-    templateUrl: "/views/public/table.html",
+    templateUrl: "/views/public/table.html"
   }
 }]);

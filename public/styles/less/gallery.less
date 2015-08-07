@@ -1,0 +1,55 @@
+.gallery-modal-container{
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background-color: @smoke;
+  display: none;
+  &.active{
+    display: block;
+  }
+
+  .modal-image{
+    margin: 100px auto;
+    background-color: white;
+    padding: 10px;
+    border-radius: 3px;
+    position: relative;
+
+    .button{
+      position: absolute;
+      top: ~"calc(50% - 20px)";
+      width: 80px;
+      height: 40px;
+      color: white;
+      line-height: 40px;
+      text-align: center;
+      background-color: rgba(0,0,0,0.3);
+      &:hover{
+        background-color: rgba(0,0,0,0.8);
+      }
+      &.prev{
+        left: 0;
+      }
+      &.next{
+        right: 0;
+      }
+      &.closeModal{
+        top: -5px;
+        right: -5px;
+        font-size: 18px;
+        height: 40px;
+        width: 40px;
+        border-radius: 20px;
+      }
+    }
+  }
+}
+
+.gallery{
+  li{
+    margin: 5px;
+    display: inline-block;
+  }
+}

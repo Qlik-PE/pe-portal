@@ -17,7 +17,8 @@ require(__dirname+"/server/models/validations");
 require(__dirname+"/server/models/steps");
 require(__dirname+"/server/models/step-types");
 require(__dirname+"/server/models/step-status");
-require(__dirname+"/server/models/images");
+require(__dirname+"/server/models/attachments");
+require(__dirname+"/server/models/status-history");
 require(__dirname+"/server/models/issues");
 
 //configure passport strategies
@@ -26,6 +27,7 @@ require(__dirname+"/server/controllers/passport/passport")(passport);
 //route controllers
 var systemRoutes = require(__dirname+"/server/routes/system/system");
 var apiRoutes = require(__dirname+"/server/routes/api/api");
+var attachmentRoutes = require(__dirname+"/server/routes/attachments");
 var authRoutes = require(__dirname+"/server/routes/auth");
 
 app.use("/views", express.static(__dirname + "/public/views"));
@@ -34,10 +36,11 @@ app.use("/css", express.static(__dirname + "/public/styles/css"));
 app.use("/resources", express.static(__dirname + "/public/resources"));
 app.use("/js", express.static(__dirname + "/public/scripts/build"));
 app.use("/bower_components", express.static(__dirname + "/bower_components"));
+app.use("/node_modules", express.static(__dirname + "/node_modules"));
 app.use("/qsocks", express.static(__dirname + "/node_modules/qsocks"));
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded());
+app.use(bodyParser.json({limit: '5mb'}));
+app.use(bodyParser.urlencoded({limit: '2mb'}));
 
 app.use(expressSession({secret: "qlikPEPortal"})); //ATTENTION - need to find out what the secret key is
 app.use(passport.initialize());
@@ -50,6 +53,7 @@ app.get("/", function(req, res){
 //load the routes
 app.use("/system", systemRoutes);
 app.use("/api", apiRoutes);
+app.use("/attachments", attachmentRoutes);
 app.use("/auth", authRoutes);
 
 app.listen(3000);

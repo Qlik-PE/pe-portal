@@ -111,6 +111,9 @@
   include "./services/permissions.js"
   include "./services/result-handler.js"
 
+  //Directives
+  include "./directives/gallery.js"
+
   //Controllers
   include "./controllers/main.js"
   include "./controllers/auth.js"

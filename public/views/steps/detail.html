@@ -1,10 +1,10 @@
 <div class="content">
-  <h1><input class="form-control title"  ng-blur="save(steps[0]._id)" placeholder="Title" ng-model="steps[0].name"/></h1>
+  <h1><input class="form-control title"  placeholder="Title" ng-model="steps[0].name"/></h1>
   <button ng-click="delete()" class="btn btn-default btn-delete">Delete</button>
   <div class="row content-detail">
     <div class="content col-md-12">
       <h2>Description</h2>
-      <textarea class="form-control" ng-blur="save(steps[0]._id)" ng-model="steps[0].content"></textarea>
+      <textarea class="form-control" ng-model="steps[0].content"></textarea>
       <ul class="tabs">
         <li ng-class="{active:activeTab===0}">
           <a ng-click="setTab(0)">Detail</a>
@@ -13,18 +13,24 @@
           <a ng-click="setTab(1)">Issues</a>
         </li>
         <li ng-class="{active:activeTab===2}">
-          <a ng-click="setTab(2)">History</a>
+          <a ng-click="setTab(2)">Screenshots</a>
+        </li>
+        <li ng-class="{active:activeTab===3}">
+          <a ng-click="setTab(3)">History</a>
         </li>
       </ul>
     </div>
     <div ng-show="activeTab==0">
-      <ng-include src=""/views/steps/detail-detail.html""></ng-include>
+      <ng-include src="'/views/steps/detail-detail.html'"></ng-include>
     </div>
     <div ng-show="activeTab==1">
-      <ng-include src=""/views/steps/detail-issues.html""></ng-include>
+      <ng-include src="'/views/steps/detail-issues.html'"></ng-include>
     </div>
     <div ng-show="activeTab==2">
-      <ng-include src=""/views/steps/detail-history.html""></ng-include>
+      <ng-include src="'/views/steps/detail-screenshots.html'"></ng-include>
+    </div>
+    <div ng-show="activeTab==3">
+      <ng-include src="'/views/steps/detail-history.html'"></ng-include>
     </div>
   </div>
 </div>

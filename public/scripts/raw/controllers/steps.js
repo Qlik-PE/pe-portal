@@ -3,21 +3,27 @@ app.controller("stepController", ["$scope", "$resource", "$state", "$stateParams
   var StepTemplate = $resource("api/templatesteps/:stepId", {stepId: "@stepId"});
   var StepTypes = $resource("api/steptypes/:typeId", {typeId: "@typeId"});
   var StepStatus = $resource("api/stepstatus/:statusId", {statusId: "@statusId"});
+  var StatusHistory = $resource("api/statushistory/:historyId", {historyId: "@historyId"});
   var Issues = $resource("api/issues/:issueId", {issueId:"@issueId"});
+  var Screenshots = $resource("api/attachments/:attachmentId", {attachmentId:"@attachmentId"});
+  var SaveScreenshots = $resource("attachments/:attachmentId", {attachmentId:"@attachmentId"});
 
   $scope.permissions = userPermissions;
+  $scope.screenshots = [];
+  $scope.step;
+  $scope.saveTimeout;
 
   StepTypes.get({}, function(result){
     if(resultHandler.process(result)){
       $scope.stepTypes = result.data;
     }
-  });  //this creates a GET query to api/steps/types
+  });
 
   StepStatus.get({}, function(result){
     if(resultHandler.process(result)){
       $scope.stepStatus = result.data;
     }
-  });  //this creates a GET query to api/steps/statuses
+  });
 
   if($stateParams.Id && $stateParams.Id!="new"){  //We have a validation to work with
     Step.get({stepId:$stateParams.stepId||"", validationid:$stateParams.Id||""}, function(result){
@@ -33,6 +39,34 @@ app.controller("stepController", ["$scope", "$resource", "$state", "$stateParams
     Step.get({stepId: $stateParams.stepId}, function(result){
       if(resultHandler.process(result)){
         $scope.steps = result.data;
+        StatusHistory.get({entityId: $scope.steps[0]._id}, function(result){
+          if(resultHandler.process(result)){
+            $scope.stepStatusHistory = result.data;
+          }
+        });
+        $scope.setTab(0);
+        $scope.$watchCollection("steps[0]" ,function(o, n){
+          //because this is fired for any change we'll implement a timeout to prevent saving too many times while a user is typing
+          if($scope.saveTimeout){
+            clearTimeout($scope.saveTimeout);
+          }
+          $scope.saveTimeout = setTimeout(function(){
+            $scope.save($scope.steps[0]._id);
+            if(o.status != n.status){
+              //we need to add a record to the status history table
+              StatusHistory.save({},{
+                entityId: $scope.steps[0]._id,
+                oldStatus: o.status.name,
+                newStatus: n.status.name
+              }, function(result){
+                if(resultHandler.process()){
+
+                }
+              });
+            }
+          }, 600);
+
+        });
       }
     })
   }
@@ -61,6 +95,14 @@ app.controller("stepController", ["$scope", "$resource", "$state", "$stateParams
 
   $scope.setTab = function(index){
     $scope.activeTab = index;
+    if(index==2 && $scope.screenshots.length == 0){
+      //now fetch the screenshots for the current step
+      Screenshots.get({entityId: $scope.steps[0]._id}, function(result){
+        if(resultHandler.process(result)){
+          $scope.screenshots = result.data;
+        }
+      });
+    }
   }
 
   $scope.delete = function(id){
@@ -111,7 +153,7 @@ app.controller("stepController", ["$scope", "$resource", "$state", "$stateParams
         $scope.newStepStatus = null;
       }
     });
-  }
+  };
 
   $scope.getStepById = function(id){
     for(var i=0;i<$scope.steps.length;i++){
@@ -119,5 +161,71 @@ app.controller("stepController", ["$scope", "$resource", "$state", "$stateParams
         return $scope.steps[i];
       }
     };
+  };
+
+  $(document).on('submit', "#newScreenshotForm", function(event){
+    event.preventDefault();
+    $.ajax({
+      url:'/attachments',
+      data: $(this).serialize(),
+      success: function(data){
+        console.log(data);
+      }
+    });
+  });
+
+  $scope.uploadScreenshot = function(a, b, c){
+    var file = $("#file")[0].files[0];
+    var r = new FileReader();
+    r.onloadend = function(event){
+      var canvas = document.createElement('canvas');
+      var context = canvas.getContext('2d');
+      var image = r.result;
+
+      var thumbnail = new Image();
+      thumbnail.onload = function() {
+        var width = thumbnail.width;
+        var height = thumbnail.height;
+        context.drawImage(thumbnail, 0, 0, thumbnail.width * (200/thumbnail.height), 200);
+        var data = {
+          entityId: $scope.steps[0]._id,
+          image: image,
+          thumbnail: canvas.toDataURL(),
+          width: width,
+          height: height
+        };
+        Screenshots.save(data, function(result){
+          if(resultHandler.process(result, "Image Upload")){
+
+          }
+        });
+      };
+      thumbnail.src = r.result;
+    }
+    r.readAsDataURL(file);
+  };
+
+  $scope.getScreenshot = function(content){
+    return "data:image/png;base64,"+btoa(content.data);
+    var buffer = _arrayBufferToBase64(content.data);
+    return buffer;
+  };
+
+  $scope.getScreenshotPath = function(id){
+    return "/attachments/"+id;
+  };
+
+  $scope.openLightboxModal = function (index) {
+    Lightbox.openModal($scope.screenshots, index);
+  };
+
+  function _arrayBufferToBase64( buffer ) {
+    var binary = '';
+    var bytes = new Uint8Array( buffer );
+    var len = bytes.byteLength;
+    for (var i = 0; i < len; i++) {
+        binary += String.fromCharCode( bytes[ i ] );
+    }
+    return binary ;
   }
 }]);

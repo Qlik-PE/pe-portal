@@ -16,8 +16,11 @@ var entities = {
     steps         : {
       collection: "steps",
       model: require("../../models/steps"),
-      populates: "type status issues partner user",
-      exemptFromOwnership: false
+      populates: "type status issues partner createuser",
+      exemptFromOwnership: false,
+      sort:{
+        created: 1
+      }
     },
     templatesteps         : {
       collection: "steps",
@@ -66,6 +69,18 @@ var entities = {
       model: require("../../models/technology-type"),
       populates: "",
       exemptFromOwnership: true
+    },
+    attachments     : {
+      collection: "attachments",
+      model: require("../../models/attachments"),
+      populates: "",
+      exemptFromOwnership: true
+    },
+    statushistory     : {
+      collection: "statushistory",
+      model: require("../../models/status-history"),
+      populates: "createuser",
+      exemptFromOwnership: false
     }
 };
 
@@ -80,12 +95,14 @@ router.get("/:entity", Auth.isLoggedIn, function(req, res){
   var userPermissions = req.user.role.permissions[entity.collection];
   //check that the user has sufficient permissions for this operation
   if(!userPermissions || userPermissions.read!=true){
-    res.json([Error.insufficientPermissions]);
+    res.json(Error.insufficientPermissions("On "+req.params.entity));
   }
   else{
     if(userPermissions.allOwners!=true && entity.exemptFromOwnership!=true){
       query["partner"]=user.partner;
     }
+    console.log(req.params.entity);
+    console.log(query);
     MasterController.get(req.query, query, entity, function(results){
       res.json(results || {});
     });
@@ -103,7 +120,7 @@ router.get("/:entity/count", Auth.isLoggedIn, function(req, res){
   var userPermissions = req.user.role.permissions[entity.collection];
   //check that the user has sufficient permissions for this operation
   if(!userPermissions || userPermissions.read!=true){
-    res.json([Error.insufficientPermissions]);
+    res.json(Error.insufficientPermissions("On "+req.params.entity));
   }
   else{
     if(userPermissions.allOwners!=true){
@@ -127,7 +144,7 @@ router.get("/:entity/:id", Auth.isLoggedIn, function(req, res){
   var userPermissions = req.user.role.permissions[entity.collection];
   //check that the user has sufficient permissions for this operation
   if(!userPermissions || userPermissions.read==false){
-    res.json([Error.insufficientPermissions]);
+    res.json(Error.insufficientPermissions("On "+req.params.entity));
   }
   else{
     if(userPermissions.allOwners!=true){

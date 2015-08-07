@@ -1,0 +1,17 @@
+<div class="status-history-list col-md-12">
+  <ul class="">
+    <li class="table-header">
+      <label>Date</label>
+      <label>User</label>
+      <label>Old Value</label>
+      <label>New Value</label>
+    </li>
+    <li ng-hide="stepStatusHistory.length==0" ng-repeat="item in stepStatusHistory">
+      <span>{{item.createdate | date:"mediumDate"}}</span>
+      <span>{{item.createuser.name}}</span>
+      <span>{{item.oldStatus}}</span>
+      <span>{{item.newStatus}}</span>
+    </li>
+  </ul>
+  <ng-include ng-show="{{stepStatusHistory.length==0}}" src=""/views/noresults.html""></ng-include>
+</div>

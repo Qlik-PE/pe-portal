@@ -109,7 +109,7 @@ var ValidationSchema = new Schema({
   },
   createuser: {
     type: Schema.ObjectId,
-    ref: "User"
+    ref: "user"
   },
   assigneduser: {  //User associated with the certstep
     type: Schema.ObjectId,

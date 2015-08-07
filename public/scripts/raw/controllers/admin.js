@@ -16,7 +16,9 @@ app.controller("adminController", ["$scope", "$resource", "$state", "$stateParam
     "steptypes",
     "stepstatus",
     "issuestatus",
-    "technologytypes"
+    "technologytypes",
+    "attachments",
+    "statushistory"
   ];
 
   UserRoles.get({}, function(result){
