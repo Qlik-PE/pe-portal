@@ -2,7 +2,7 @@ module.exports = function(grunt) {
   grunt.initConfig({
     includes: {
       files:{
-        src: ["app.js"],
+        src: ["app.js", "printer.js"],
         dest: "public/scripts/build/",
         cwd: "public/scripts/raw"
       }

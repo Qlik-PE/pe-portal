@@ -106,7 +106,6 @@
       });
 
   }]);
-
   //Services
   app.service("userPermissions", ["$resource", "resultHandler", function($resource, resultHandler){
     var System = $resource("system/:path", {path: "@path"});
@@ -115,7 +114,7 @@
     this.canCreate = function(entity){
       return this.permissions[entity] && this.permissions[entity].create && this.permissions[entity].create==true
     }
-    this.canRead = function(entity){    
+    this.canRead = function(entity){
       return this.permissions[entity] && this.permissions[entity].read && this.permissions[entity].read==true
     }
     this.canUpdate = function(entity){
@@ -123,6 +122,9 @@
     }
     this.canDelete = function(entity){
       return this.permissions[entity] && this.permissions[entity].delete && this.permissions[entity].delete==true
+    }
+    this.canReport = function(entity){
+      return this.permissions[entity] && this.permissions[entity].report && this.permissions[entity].report==true
     }
     this.canSeeAll = function(entity){
       return this.permissions[entity] && this.permissions[entity].allOwners && this.permissions[entity].allOwners==true
@@ -227,6 +229,56 @@
     }
   });
 
+  app.directive('report', ["$resource", "resultHandler", function($resource, resultHandler){
+    return {
+      restrict: "E",
+      replace: true,
+      scope: {
+
+      },
+      link: function($scope, element, attr){
+        $scope.entity;
+        $scope.report;
+
+        $scope.$on("showReportDialog", function(event, params){
+          $scope.entity = params.entity;
+          $scope.id = params.id;
+          var Reports = $resource("/api/"+params.entity+"/reports");
+          var Entity = $resource("/api/"+params.entity+"/:entityId", {entityId:"@entityId"});
+          Reports.get({}, function(result){
+            if(resultHandler.process(result)){
+              $scope.reports = result.data;
+            }
+          });
+          Entity.get({entityId: params.id}, function(result){
+            if(resultHandler.process(result)){
+              $scope.info = result.data[0];
+            }
+          });
+          $scope.isModal = true;
+        });
+        $scope.info, $scope.reports;
+        $scope.getReportTemplate = function(entity, report){
+          return '/views/reports/'+entity+'/'+report;
+        };
+        $scope.print = function(entity, id) {
+          var html = $(".report-print").html();
+          //$.get('/print/'+$scope.report+'/'+entity+'/'+id)
+          $.post('/print', {data: html})
+          .success(function(data){
+            window.open(data.file);
+          })
+        }
+        $scope.isModal = false;
+        $scope.close = function(){
+          $scope.activeImage=null;
+          $scope.isModal = false;
+        }
+      },
+      templateUrl: "/views/report.html"
+    }
+  }]);
+
 
   //Controllers
   app.controller("mainController", ["$scope", function($scope){
@@ -295,13 +347,17 @@
     var Issues = $resource("api/issues/:issueId", {issueId:"@issueId"});
     var TechnologyTypes = $resource("api/technologytypes/:techtypeId", {techtypeId: "@techtypeId"});
 
-    $scope.permissions = userPermissions;  
+    $scope.permissions = userPermissions;
 
     if($stateParams.Id !="new"){
       Validations.get({validationId:$stateParams.Id||""}, function(result){
         if(resultHandler.process(result)){
           $scope.validations = result.data;
           $scope.imageUploadPath = "/api/validations/"+$stateParams.Id+"/image";
+          $scope.$watchCollection("validations[0]" ,function(o, n){
+            console.log(o);
+            console.log(n);
+          });
         }
       });
     }
@@ -424,6 +480,10 @@
       });  //currently we"re only allowing a save from the detail page, in which case we should only have 1 validation in the array
     };
 
+    $scope.report = function(id, entity){
+      $scope.$root.$broadcast("showReportDialog", {id:id, entity: entity});
+    };
+
   }]);
 
   app.controller("stepController", ["$scope", "$resource", "$state", "$stateParams", "userPermissions", "notifications", "resultHandler", function($scope, $resource, $state, $stateParams, userPermissions, notifications, resultHandler){
@@ -457,6 +517,19 @@
       Step.get({stepId:$stateParams.stepId||"", validationid:$stateParams.Id||""}, function(result){
         if(resultHandler.process(result)){
           $scope.steps = result.data;
+          $scope.$watch("steps" ,function(n, o){
+            for(var i=0;i<o.length;i++){
+              if(o[i].status._id != n[i].status._id){
+                StatusHistory.save({},{
+                  entityId: $scope.steps[0]._id,
+                  oldStatus: o[i].status.name,
+                  newStatus: n[i].status.name
+                }, function(result){
+                  resultHandler.process(result);
+                });
+              }
+            }
+          }, true);
         }
       });
     }
@@ -473,7 +546,7 @@
             }
           });
           $scope.setTab(0);
-          $scope.$watchCollection("steps[0]" ,function(o, n){
+          $scope.$watchCollection("steps[0]" ,function(n, o){
             //because this is fired for any change we'll implement a timeout to prevent saving too many times while a user is typing
             if($scope.saveTimeout){
               clearTimeout($scope.saveTimeout);
@@ -487,8 +560,13 @@
                   oldStatus: o.status.name,
                   newStatus: n.status.name
                 }, function(result){
-                  if(resultHandler.process()){
-
+                  if(resultHandler.process(result)){
+                    if($scope.stepStatusHistory){
+                      $scope.stepStatusHistory.splice(0,0,result);
+                    }
+                    else{
+                      $scope.stepStatusHistory = [result];
+                    }
                   }
                 });
               }
@@ -687,7 +765,7 @@
             //first get the step, then the validation
             Step.get({stepId: $scope.issues[0].step}, function(step){
               $scope.step = step.data[0].name;
-              Validation.get({validationId: step[0].data.validationid}, function(validation){
+              Validation.get({validationId: step.data[0].validationid}, function(validation){
                 $scope.validation = validation.data[0].title;
               });
             })
@@ -1250,6 +1328,5 @@
       templateUrl: "/views/public/table.html"
     }
   }]);
-
 
 })();

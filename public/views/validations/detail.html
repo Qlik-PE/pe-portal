@@ -3,6 +3,7 @@
   <span class="green">{{validations[0].status}}</span>
   <button ng-click="validate(validations[0]._id)" ng-hide="permissions.role!='admin' || validations[0].status=='Validated'" class="btn btn-default btn-validate">Validate</button>
   <button ng-click="unvalidate(validations[0]._id)" ng-hide="permissions.role!='admin' || validations[0].status!='Validated'" class="btn btn-default btn-validate">Unvalidate</button>
+  <button ng-click="report(validations[0]._id, 'validations')" ng-hide="!permissions.canReport('validations')" class="btn btn-default btn-report">Report</button>
   <button ng-click="delete(validations[0]._id)" ng-hide="!permissions.canDelete('validations')" class="btn btn-default btn-delete">Delete</button>
   <div class="row content-detail">
     <div class="content col-md-12">

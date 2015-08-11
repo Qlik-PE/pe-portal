@@ -4,7 +4,11 @@ var express = require("express"),
     expressSession = require("express-session"),
     bodyParser = require("body-parser"),
     mongoose = require("mongoose"),
-    busboy = require("connect-busboy");
+    busboy = require("connect-busboy"),
+    fs = require('fs'),
+    pdf = require('phantomjs-pdf'),
+    request = require('request'),
+    htmltopdf = require('wkhtmltopdf');
 
 app.use(busboy());
 
@@ -37,6 +41,7 @@ app.use("/resources", express.static(__dirname + "/public/resources"));
 app.use("/js", express.static(__dirname + "/public/scripts/build"));
 app.use("/bower_components", express.static(__dirname + "/bower_components"));
 app.use("/node_modules", express.static(__dirname + "/node_modules"));
+app.use("/print", express.static(__dirname + "/public/temp"));
 app.use("/qsocks", express.static(__dirname + "/node_modules/qsocks"));
 
 app.use(bodyParser.json({limit: '5mb'}));
@@ -48,6 +53,40 @@ app.use(passport.session());
 
 app.get("/", function(req, res){
   res.render(__dirname+"/server/views/index.jade", {isAuthenticated: req.isAuthenticated(), user: req.user});
+});
+app.get("/sysprint/:report/:entity/:id", function(req, res){
+  console.log(req.params);
+  res.render(__dirname+"/server/views/print.jade");
+});
+
+app.get("/print/:report/:entity/:id", function(req, res){
+  //request.get({url:'http://localhost:3000/sysprint/'+req.params.report+'/'+req.params.entity+'/'+req.params.id, timeout:5000}, function(err, resp, body){
+    //htmltopdf("<h1>TEST</h1>", { pageSize: 'letter', output: __dirname+'/public/temp/'+req.user._id+'.pdf' });
+    //res.json({file:'/print/'+req.user._id+'.pdf'});
+  //});
+  //htmltopdf('http://localhost:3000/sysprint/'+req.params.report+'/'+req.params.entity+'/'+req.params.id, { pageSize: 'letter', output: __dirname+'/public/temp/'+req.user._id+'.pdf' });
+  //htmltopdf(req.body.data, { pageSize: 'letter', output: __dirname+'/public/temp/'+req.user._id+'.pdf' });
+  var options = {
+    html: 'http://localhost:3000/sysprint/'+req.params.report+'/'+req.params.entity+'/'+req.params.id
+  };
+  pdf.convert(options, function(result){
+    result.toFile(__dirname+'/public/temp/'+req.user._id+'.pdf');
+    res.json({file:'/print/'+req.user._id+'.pdf'});
+  });
+});
+
+app.post("/print", function(req, res){
+  var html = req.body.data;
+  console.log(req.body);
+  request.get({url:'http://localhost:3000/css/main.css'}, function(err, resp, body){
+    if(err){
+      console.log(err);
+    }
+    html = "<style>"+body+"</style>" + html;
+    htmltopdf(html, { pageSize: 'letter', output: __dirname+'/public/temp/'+req.user._id+'.pdf' }, function(){
+      res.json({file:'/print/'+req.user._id+'.pdf'});
+    });
+});
 });
 
 //load the routes

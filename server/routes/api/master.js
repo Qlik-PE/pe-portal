@@ -2,6 +2,8 @@ var express = require("express"),
     router = express.Router(),
     Auth = require("../../controllers/auth"),
     Error = require("../../controllers/error"),
+    fs = require('fs'),
+    appLocation = require('../../../appLocation'),
     MasterController = require("../../controllers/master");
 
 //Include all Controllers for now
@@ -80,7 +82,10 @@ var entities = {
       collection: "statushistory",
       model: require("../../models/status-history"),
       populates: "createuser",
-      exemptFromOwnership: false
+      exemptFromOwnership: false,
+      sort: {
+        createdate : -1
+      }
     }
 };
 
@@ -128,6 +133,33 @@ router.get("/:entity/count", Auth.isLoggedIn, function(req, res){
     }
     MasterController.count(req.query, query, entity, function(results){
       res.json(results||{});
+    });
+  }
+});
+
+//This route lists all of the htm lreport templates stored in the given
+//entity folder in (/views/reports/:entity)
+//Requires "reporting" permissions on the specified entity
+router.get("/:entity/reports", Auth.isLoggedIn, function(req, res){
+  var queryObj = parseQuery(req.query || {}, req.body || {}, "GET", entities[req.params.entity]);
+  var query = queryObj.query;
+  var entity = queryObj.entity;
+  var user = req.user;
+  var userPermissions = req.user.role.permissions[entity.collection];
+  //check that the user has sufficient permissions for this operation
+  if(!userPermissions || userPermissions.report!=true){
+    res.json(Error.insufficientPermissions("On "+req.params.entity));
+  }
+  else{
+    console.log(__dirname);
+    fs.readdir(appLocation+"/public/views/reports/"+req.params.entity, function(err, files){
+      if(err){
+        console.log(err);
+        res.json(Error.custom(err));
+      }
+      else{
+        res.json({data:files});
+      }
     });
   }
 });

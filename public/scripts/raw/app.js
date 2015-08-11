@@ -106,13 +106,13 @@
       });
 
   }]);
-
   //Services
   include "./services/permissions.js"
   include "./services/result-handler.js"
 
   //Directives
   include "./directives/gallery.js"
+  include "./directives/report.js"
 
   //Controllers
   include "./controllers/main.js"
@@ -124,5 +124,4 @@
   include "./controllers/dashboard.js"
   include "./controllers/admin.js"
   include "./controllers/sense-engine.js"
-
 })();

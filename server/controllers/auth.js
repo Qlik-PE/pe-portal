@@ -3,7 +3,8 @@ var btoa     = require("btoa");
 var atob     = require("atob");
 
 module.exports = {
-  isLoggedIn: function(req, res, next){    
+  isLoggedIn: function(req, res, next){
+    console.log('checking auth for '+req.params.entity);
     if(req.isAuthenticated()){
       next();
     }
@@ -17,7 +18,7 @@ module.exports = {
           next();
         }
         else {
-          res.json([{errorCode: 401, errorText: "User not logged in", redirect: "#login"}])
+          res.json({errorCode: 401, errorText: "User not logged in", redirect: "#login"})
         }
       });
     }
@@ -28,12 +29,12 @@ module.exports = {
           next();
         }
         else {
-          res.json([{errorCode: 401, errorText: "User not logged in", redirect: "#login"}])
+          res.json({errorCode: 401, errorText: "User not logged in", redirect: "#login"})
         }
       });
     }
     else{
-      res.json([{errorCode: 401, errorText: "User not logged in", redirect: "#login"}])
+      res.json({errorCode: 401, errorText: "User not logged in", redirect: "#login"})
     }
   }
 }

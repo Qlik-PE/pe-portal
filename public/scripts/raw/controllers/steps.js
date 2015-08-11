@@ -29,6 +29,19 @@ app.controller("stepController", ["$scope", "$resource", "$state", "$stateParams
     Step.get({stepId:$stateParams.stepId||"", validationid:$stateParams.Id||""}, function(result){
       if(resultHandler.process(result)){
         $scope.steps = result.data;
+        $scope.$watch("steps" ,function(n, o){
+          for(var i=0;i<o.length;i++){
+            if(o[i].status._id != n[i].status._id){
+              StatusHistory.save({},{
+                entityId: $scope.steps[0]._id,
+                oldStatus: o[i].status.name,
+                newStatus: n[i].status.name
+              }, function(result){
+                resultHandler.process(result);
+              });
+            }
+          }
+        }, true);
       }
     });
   }
@@ -45,7 +58,7 @@ app.controller("stepController", ["$scope", "$resource", "$state", "$stateParams
           }
         });
         $scope.setTab(0);
-        $scope.$watchCollection("steps[0]" ,function(o, n){
+        $scope.$watchCollection("steps[0]" ,function(n, o){
           //because this is fired for any change we'll implement a timeout to prevent saving too many times while a user is typing
           if($scope.saveTimeout){
             clearTimeout($scope.saveTimeout);
@@ -59,8 +72,13 @@ app.controller("stepController", ["$scope", "$resource", "$state", "$stateParams
                 oldStatus: o.status.name,
                 newStatus: n.status.name
               }, function(result){
-                if(resultHandler.process()){
-
+                if(resultHandler.process(result)){
+                  if($scope.stepStatusHistory){
+                    $scope.stepStatusHistory.splice(0,0,result);
+                  }
+                  else{
+                    $scope.stepStatusHistory = [result];
+                  }
                 }
               });
             }

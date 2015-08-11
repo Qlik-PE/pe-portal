@@ -4,13 +4,17 @@ app.controller("validationController", ["$scope", "$resource", "$state", "$state
   var Issues = $resource("api/issues/:issueId", {issueId:"@issueId"});
   var TechnologyTypes = $resource("api/technologytypes/:techtypeId", {techtypeId: "@techtypeId"});
 
-  $scope.permissions = userPermissions;  
+  $scope.permissions = userPermissions;
 
   if($stateParams.Id !="new"){
     Validations.get({validationId:$stateParams.Id||""}, function(result){
       if(resultHandler.process(result)){
         $scope.validations = result.data;
         $scope.imageUploadPath = "/api/validations/"+$stateParams.Id+"/image";
+        $scope.$watchCollection("validations[0]" ,function(o, n){
+          console.log(o);
+          console.log(n);
+        });
       }
     });
   }
@@ -131,6 +135,10 @@ app.controller("validationController", ["$scope", "$resource", "$state", "$state
         }
       }
     });  //currently we"re only allowing a save from the detail page, in which case we should only have 1 validation in the array
+  };
+
+  $scope.report = function(id, entity){
+    $scope.$root.$broadcast("showReportDialog", {id:id, entity: entity});
   };
 
 }]);

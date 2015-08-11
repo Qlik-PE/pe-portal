@@ -24,6 +24,7 @@
       <label>Read</label>
       <label>Update</label>
       <label>Delete</label>
+      <label>Report</label>
     </li>
     <li ng-repeat="entity in collections">
       <input class="form-control list-label" ng-disabled="true" ng-model="entity"/>
@@ -32,6 +33,7 @@
       <input class="form-control" type="checkbox" ng-change="saveRole()" ng-model="roles[activeRole].permissions[entity].read"/>
       <input class="form-control" type="checkbox" ng-change="saveRole()" ng-model="roles[activeRole].permissions[entity].update"/>
       <input class="form-control" type="checkbox" ng-change="saveRole()" ng-model="roles[activeRole].permissions[entity].delete"/>
+      <input class="form-control" type="checkbox" ng-change="saveRole()" ng-model="roles[activeRole].permissions[entity].report"/>
     </li>
   </ul>
 </div>

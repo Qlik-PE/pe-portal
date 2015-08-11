@@ -7,7 +7,7 @@
       <label>New Value</label>
     </li>
     <li ng-hide="stepStatusHistory.length==0" ng-repeat="item in stepStatusHistory">
-      <span>{{item.createdate | date:"mediumDate"}}</span>
+      <span>{{item.createdate | date:"MMM d y, hh:mm"}}</span>
       <span>{{item.createuser.name}}</span>
       <span>{{item.oldStatus}}</span>
       <span>{{item.newStatus}}</span>

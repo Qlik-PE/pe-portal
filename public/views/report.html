@@ -1,0 +1,13 @@
+<div class="report-container smokescreen" ng-class="{active: isModal==true}">
+  <div class="report-page">
+    <a class="button closeModal" ng-click="close()">X</a>
+    <label>Select Report</label>
+    <select class="form-control" ng-model="report" ng-options="option as option for option in reports">
+
+    </select>
+    <a class="button print" ng-click="print(entity, id)"></a>
+    <div class="report-print">
+      <ng-include src="getReportTemplate(entity, report)"></ng-include>
+    </div>
+  </div>
+</div>

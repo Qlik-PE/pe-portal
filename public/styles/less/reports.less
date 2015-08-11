@@ -1,0 +1,60 @@
+.report-container{
+  display: none;
+  &.active{
+    display: block;
+  }
+  .report-page{
+    position: relative;
+    width: 600px;
+    min-height: 800px;
+    padding: 10px;
+    margin: 50px auto;
+    background-color: white;
+    border-radius: 3px;
+    border: 1px solid @dark-grey;
+    box-shadow: @dark-grey 3px 2px 2px;
+
+    select{
+      display: inline-block;
+      width: 60%;
+    }
+
+    .button{
+      position: absolute;
+      width: 80px;
+      height: 40px;
+      color: white;
+      line-height: 40px;
+      text-align: center;
+      background-color: rgba(0,0,0,0.3);
+      &:hover{
+        background-color: rgba(0,0,0,0.8);
+      }
+      &.closeModal{
+        top: -20px;
+        right: -20px;
+        font-size: 18px;
+        height: 40px;
+        width: 40px;
+        border-radius: 20px;
+      }
+      &.print{
+        background-color: transparent;
+        color: rgba(0,0,0,0.3);
+        float: right;
+        &:hover{
+          color: rgba(0,0,0,0.8);
+          background-color: transparent;
+        }
+        position: relative;
+        &::before{
+          font-family: pe-portal;
+          font-size: 25px;
+          content: "\E809";
+          height: 100%;
+          width: 100%;
+        }
+      }
+    }
+  }
+}
