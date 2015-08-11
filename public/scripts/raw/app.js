@@ -20,38 +20,62 @@
       .state("dashboard", {
         url: "/dashboard",
         templateUrl : "/views/dashboard.html",
-        controller  : "dashboardController"
+        controller  : "dashboardController",
+        data:{
+          crumb: "Dashboard",
+          link: "#dashboard"
+        }
       })
       // route for the login and signup page
       .state("loginsignup", {
         url: "/loginsignup",
         templateUrl : "/views/loginsignup.html",
-        controller  : "authController"
+        controller  : "authController",
+        data:{
+          crumb: "Login & Signup",
+          link: "#loginsignup"
+        }
       })
       // route for the login page.
       //used if a session has expired of someone tries to navigate to a page that requires authentication
       .state("login", {
         url: "/login",
         templateUrl : "/views/login.html",
-        controller  : "authController"
+        controller  : "authController",
+        data:{
+          crumb: "Login",
+          link: "#login"
+        }
       })
       // route to manage users
       .state("users", {
         url: "/users",
         templateUrl : "/views/users/list.html",
-        controller  : "userController"
+        controller  : "userController",
+        data:{
+          crumb: "Users",
+          link: "#users"
+        }
       })
       // route to public validations page
       .state("publicvalidations", {
         url: "/public/validations",
         templateUrl: "/views/public/validations/index.html",
-        controller: "senseController"
+        controller: "senseController",
+        data:{
+          crumb: "Validations",
+          link: "#publicvalidations"
+        }
       })
       // route for viewing validations
       .state("validations", {
         url: "/validations",
         templateUrl: "/views/validations/list.html",
-        controller: "validationController"
+        controller: "validationController",
+        data:{
+          crumb: "Validations",
+          link: "#validations"
+        }
       })
       // route for viewing a specific validation
       .state("validations.detail", {
@@ -61,6 +85,10 @@
             templateUrl: "/views/validations/detail.html",
             controller: "validationController"
           }
+        },
+        data:{
+          crumb: "Validations",
+          link: "#validations"
         }
       })
       // route for viewing a specific validation
@@ -71,6 +99,10 @@
             templateUrl: "/views/validations/detail.html",
             controller: "validationController"
           }
+        },
+        data:{
+          crumb: "New Validation",
+          link: "#validations.new"
         }
 
       })
@@ -78,7 +110,11 @@
       .state("step",{
         url: "/step/:stepId",
         templateUrl: "/views/steps/detail.html",
-        controller: "stepController"
+        controller: "stepController",
+        data:{
+          crumb: "Validations",
+          link: "#validations"
+        }
       })
       .state("step.issues",{
         url: "/",
@@ -87,6 +123,10 @@
             templateUrl: "/views/steps/detail.html",
             controller: "stepController",
           }
+        },
+        data:{
+          crumb: "Validations",
+          link: "#validations"
         }
       })
       .state("issues", {
@@ -102,7 +142,11 @@
       .state("adminsettings", {
         url: "/admin",
         templateUrl: "/views/admin/index.html",
-        controller: "adminController"
+        controller: "adminController",
+        data:{
+          crumb: "Admin Settings",
+          link: "#adminsettings"
+        }
       });
 
   }]);
@@ -113,6 +157,7 @@
   //Directives
   include "./directives/gallery.js"
   include "./directives/report.js"
+  include "./directives/breadcrumbs.js"
 
   //Controllers
   include "./controllers/main.js"

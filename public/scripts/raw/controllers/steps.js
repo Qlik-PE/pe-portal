@@ -1,4 +1,5 @@
 app.controller("stepController", ["$scope", "$resource", "$state", "$stateParams", "userPermissions", "notifications", "resultHandler", function($scope, $resource, $state, $stateParams, userPermissions, notifications, resultHandler){
+  var Validation = $resource("api/validations/");
   var Step = $resource("api/steps/:stepId", {stepId: "@stepId"});
   var StepTemplate = $resource("api/templatesteps/:stepId", {stepId: "@stepId"});
   var StepTypes = $resource("api/steptypes/:typeId", {typeId: "@typeId"});
@@ -11,6 +12,7 @@ app.controller("stepController", ["$scope", "$resource", "$state", "$stateParams
   $scope.permissions = userPermissions;
   $scope.screenshots = [];
   $scope.step;
+  $scope.validation;
   $scope.saveTimeout;
 
   StepTypes.get({}, function(result){
@@ -52,6 +54,21 @@ app.controller("stepController", ["$scope", "$resource", "$state", "$stateParams
     Step.get({stepId: $stateParams.stepId}, function(result){
       if(resultHandler.process(result)){
         $scope.steps = result.data;
+        //set the breadcrumb
+        Validation.get({_id: $scope.steps[0].validationid}, function(result){
+          if(resultHandler.process(result)){
+            if($state.current.name == "step"){
+              $scope.$root.$broadcast('pushCrumb', {
+                text: result.data[0].title,
+                link: "/validations/"+result.data[0]._id
+              });
+              $scope.$root.$broadcast('pushCrumb', {
+                text: $scope.steps[0].name,
+                link: "/steps/"+$scope.steps[0]._id
+              });
+            }
+          }
+        });
         StatusHistory.get({entityId: $scope.steps[0]._id}, function(result){
           if(resultHandler.process(result)){
             $scope.stepStatusHistory = result.data;
