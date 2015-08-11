@@ -20,38 +20,62 @@
       .state("dashboard", {
         url: "/dashboard",
         templateUrl : "/views/dashboard.html",
-        controller  : "dashboardController"
+        controller  : "dashboardController",
+        data:{
+          crumb: "Dashboard",
+          link: "#dashboard"
+        }
       })
       // route for the login and signup page
       .state("loginsignup", {
         url: "/loginsignup",
         templateUrl : "/views/loginsignup.html",
-        controller  : "authController"
+        controller  : "authController",
+        data:{
+          crumb: "Login & Signup",
+          link: "#loginsignup"
+        }
       })
       // route for the login page.
       //used if a session has expired of someone tries to navigate to a page that requires authentication
       .state("login", {
         url: "/login",
         templateUrl : "/views/login.html",
-        controller  : "authController"
+        controller  : "authController",
+        data:{
+          crumb: "Login",
+          link: "#login"
+        }
       })
       // route to manage users
       .state("users", {
         url: "/users",
         templateUrl : "/views/users/list.html",
-        controller  : "userController"
+        controller  : "userController",
+        data:{
+          crumb: "Users",
+          link: "#users"
+        }
       })
       // route to public validations page
       .state("publicvalidations", {
         url: "/public/validations",
         templateUrl: "/views/public/validations/index.html",
-        controller: "senseController"
+        controller: "senseController",
+        data:{
+          crumb: "Validations",
+          link: "#publicvalidations"
+        }
       })
       // route for viewing validations
       .state("validations", {
         url: "/validations",
         templateUrl: "/views/validations/list.html",
-        controller: "validationController"
+        controller: "validationController",
+        data:{
+          crumb: "Validations",
+          link: "#validations"
+        }
       })
       // route for viewing a specific validation
       .state("validations.detail", {
@@ -61,6 +85,10 @@
             templateUrl: "/views/validations/detail.html",
             controller: "validationController"
           }
+        },
+        data:{
+          crumb: "Validations",
+          link: "#validations"
         }
       })
       // route for viewing a specific validation
@@ -71,6 +99,10 @@
             templateUrl: "/views/validations/detail.html",
             controller: "validationController"
           }
+        },
+        data:{
+          crumb: "New Validation",
+          link: "#validations.new"
         }
 
       })
@@ -78,7 +110,11 @@
       .state("step",{
         url: "/step/:stepId",
         templateUrl: "/views/steps/detail.html",
-        controller: "stepController"
+        controller: "stepController",
+        data:{
+          crumb: "Validations",
+          link: "#validations"
+        }
       })
       .state("step.issues",{
         url: "/",
@@ -87,6 +123,10 @@
             templateUrl: "/views/steps/detail.html",
             controller: "stepController",
           }
+        },
+        data:{
+          crumb: "Validations",
+          link: "#validations"
         }
       })
       .state("issues", {
@@ -102,7 +142,11 @@
       .state("adminsettings", {
         url: "/admin",
         templateUrl: "/views/admin/index.html",
-        controller: "adminController"
+        controller: "adminController",
+        data:{
+          crumb: "Admin Settings",
+          link: "#adminsettings"
+        }
       });
 
   }]);
@@ -279,6 +323,45 @@
     }
   }]);
 
+  app.directive('breadcrumbs', ['$state', '$interpolate', function ($state, $interpolate) {
+    return {
+      restrict: "E",
+      replace: true,
+      scope:{
+
+      },
+      templateUrl: function(element, attr){
+        return 'views/breadcrumbs.html'
+      },
+      link: function(scope){
+        scope.breadcrumbs;
+        scope.$on('$stateChangeSuccess', function() {
+          scope.activeItem = $state.current.name.split(".")[0];
+          scope.breadcrumbs = [];
+          var state = $state.$current;
+          if(state.self.name != "home"){
+            while(state.self.name != ""){
+              console.log(state);
+              scope.breadcrumbs.push({
+                text: state.data.crumb,
+                link: state.data.link
+              });
+              state = state.parent;
+            }
+            scope.breadcrumbs.push({text: "Home", link: "/"});
+          }
+          scope.breadcrumbs.reverse();
+        });
+        scope.$on('spliceCrumb', function(event, crumb){
+          scope.breadcrumbs.splice(-1, 1, crumb);
+        });
+        scope.$on('pushCrumb', function(event, crumb){
+          scope.breadcrumbs.push(crumb);
+        });
+      }
+    }
+  }]);
+
 
   //Controllers
   app.controller("mainController", ["$scope", function($scope){
@@ -358,6 +441,12 @@
             console.log(o);
             console.log(n);
           });
+          if($state.current.name == "validations.detail"){
+            $scope.$root.$broadcast('spliceCrumb', {
+              text: $scope.validations[0].title,
+              link: "/validations/"+$scope.validations[0]._id
+            });
+          }
         }
       });
     }
@@ -487,6 +576,7 @@
   }]);
 
   app.controller("stepController", ["$scope", "$resource", "$state", "$stateParams", "userPermissions", "notifications", "resultHandler", function($scope, $resource, $state, $stateParams, userPermissions, notifications, resultHandler){
+    var Validation = $resource("api/validations/");
     var Step = $resource("api/steps/:stepId", {stepId: "@stepId"});
     var StepTemplate = $resource("api/templatesteps/:stepId", {stepId: "@stepId"});
     var StepTypes = $resource("api/steptypes/:typeId", {typeId: "@typeId"});
@@ -499,6 +589,7 @@
     $scope.permissions = userPermissions;
     $scope.screenshots = [];
     $scope.step;
+    $scope.validation;
     $scope.saveTimeout;
 
     StepTypes.get({}, function(result){
@@ -540,6 +631,21 @@
       Step.get({stepId: $stateParams.stepId}, function(result){
         if(resultHandler.process(result)){
           $scope.steps = result.data;
+          //set the breadcrumb
+          Validation.get({_id: $scope.steps[0].validationid}, function(result){
+            if(resultHandler.process(result)){
+              if($state.current.name == "step"){
+                $scope.$root.$broadcast('pushCrumb', {
+                  text: result.data[0].title,
+                  link: "/validations/"+result.data[0]._id
+                });
+                $scope.$root.$broadcast('pushCrumb', {
+                  text: $scope.steps[0].name,
+                  link: "/steps/"+$scope.steps[0]._id
+                });
+              }
+            }
+          });
           StatusHistory.get({entityId: $scope.steps[0]._id}, function(result){
             if(resultHandler.process(result)){
               $scope.stepStatusHistory = result.data;

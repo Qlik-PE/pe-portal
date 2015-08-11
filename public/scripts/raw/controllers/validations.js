@@ -15,6 +15,12 @@ app.controller("validationController", ["$scope", "$resource", "$state", "$state
           console.log(o);
           console.log(n);
         });
+        if($state.current.name == "validations.detail"){
+          $scope.$root.$broadcast('spliceCrumb', {
+            text: $scope.validations[0].title,
+            link: "/validations/"+$scope.validations[0]._id
+          });
+        }
       }
     });
   }
