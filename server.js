@@ -6,7 +6,6 @@ var express = require("express"),
     mongoose = require("mongoose"),
     busboy = require("connect-busboy"),
     fs = require('fs'),
-    pdf = require('phantomjs-pdf'),
     request = require('request'),
     htmltopdf = require('wkhtmltopdf');
 
@@ -54,31 +53,16 @@ app.use(passport.session());
 app.get("/", function(req, res){
   res.render(__dirname+"/server/views/index.jade", {isAuthenticated: req.isAuthenticated(), user: req.user});
 });
-app.get("/sysprint/:report/:entity/:id", function(req, res){
-  console.log(req.params);
-  res.render(__dirname+"/server/views/print.jade");
-});
-
-app.get("/print/:report/:entity/:id", function(req, res){
-  //request.get({url:'http://localhost:3000/sysprint/'+req.params.report+'/'+req.params.entity+'/'+req.params.id, timeout:5000}, function(err, resp, body){
-    //htmltopdf("<h1>TEST</h1>", { pageSize: 'letter', output: __dirname+'/public/temp/'+req.user._id+'.pdf' });
-    //res.json({file:'/print/'+req.user._id+'.pdf'});
-  //});
-  //htmltopdf('http://localhost:3000/sysprint/'+req.params.report+'/'+req.params.entity+'/'+req.params.id, { pageSize: 'letter', output: __dirname+'/public/temp/'+req.user._id+'.pdf' });
-  //htmltopdf(req.body.data, { pageSize: 'letter', output: __dirname+'/public/temp/'+req.user._id+'.pdf' });
-  var options = {
-    html: 'http://localhost:3000/sysprint/'+req.params.report+'/'+req.params.entity+'/'+req.params.id
-  };
-  pdf.convert(options, function(result){
-    result.toFile(__dirname+'/public/temp/'+req.user._id+'.pdf');
-    res.json({file:'/print/'+req.user._id+'.pdf'});
-  });
-});
 
 app.post("/print", function(req, res){
   var html = req.body.data;
+  var url = "http://";
+  url += req.headers.host;
+  console.log(url);
+  url += "/css/main.css";
+  console.log(url);
   console.log(req.body);
-  request.get({url:'http://localhost:3000/css/main.css'}, function(err, resp, body){
+  request.get({url:url}, function(err, resp, body){
     if(err){
       console.log(err);
     }
