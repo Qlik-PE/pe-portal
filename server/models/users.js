@@ -56,6 +56,20 @@ UserSchema.methods = {
   },
   makeSalt: function() {
     return crypto.randomBytes(16).toString("base64");
+  },
+  generateResetToken: function(){
+    this.resetPasswordToken = crypto.randomBytes(16).toString("base64");
+    this.resetPasswordExpires = Date.now() + 900000 //15 minutes
+    this.save();
+    return this.resetPasswordToken;
+  },
+  updatePassword: function(password){
+    this.hashed_password = this.hashPassword(password);
+    this.save(function(err, result){
+      if(err){
+        console.log(err);
+      }
+    });
   }
 };
 

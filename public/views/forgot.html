@@ -1,0 +1,15 @@
+<div class="loginsignup">
+  <div class="row">
+    <div class="col-md-4"></div>
+    <div class="col-md-4" ng-show="currentState=='forgot'">
+      <h2>Forgot Password?</h2>
+      <form ng-submit="forgot()" method="post">
+        <input class="form-control" ng-model="email" placeholder="Email">
+        <button class="btn btn-submit btn-login" type="submit">Send Password Reset</button>
+      </form>
+    </div>
+    <div class="col-md-4" ng-show="currentState=='forgotsent'">
+      <span>An email has been sent containing instructions for resetting your password.</span>
+    </div>
+  </div>
+</div>

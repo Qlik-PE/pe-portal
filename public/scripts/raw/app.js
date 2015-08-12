@@ -47,6 +47,36 @@
           link: "#login"
         }
       })
+      // route for forgot password page.
+      .state("forgot", {
+        url: "/forgot",
+        templateUrl : "/views/forgot.html",
+        controller  : "authController",
+        data:{
+          crumb: "Forgot Password",
+          link: "#forgot"
+        }
+      })
+      // route for once a 'forgot password' email has been sent.
+      .state("forgotsent", {
+        url: "/forgotsent?email",
+        templateUrl : "/views/forgot.html",
+        controller  : "authController",
+        data:{
+          crumb: "Forgot Password",
+          link: "#forgot"
+        }
+      })
+      // route for resetting a password.
+      .state("reset", {
+        url: "/resetpassword?token",
+        templateUrl : "/views/passwordreset.html",
+        controller  : "authController",
+        data:{
+          crumb: "Reset Password",
+          link: "#reset"
+        }
+      })
       // route to manage users
       .state("users", {
         url: "/users",
