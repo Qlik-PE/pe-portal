@@ -1,6 +1,7 @@
 var User     = require("../models/users");
 var btoa     = require("btoa");
 var atob     = require("atob");
+var Error    = require("./error");
 
 module.exports = {
   isLoggedIn: function(req, res, next){
@@ -36,5 +37,49 @@ module.exports = {
     else{
       res.json({errorCode: 401, errorText: "User not logged in", redirect: "#login"})
     }
+  },
+  generateResetToken: function(req, res, next){
+    User.findOne({email: req.body.email}, function(err, result){
+      if(err){
+        res.json(Error.custom("User not found with email "+req.body.email));
+      }
+      else{
+        var token = result.generateResetToken();
+        req.token = token;
+        next();
+      }
+    });
+  },
+  getUserIdForReset: function(req, res, next){
+    User.findOne({resetPasswordToken: req.params.token}, function(err, result){
+      if(err){
+        res.json(Error.custom(err));
+      }
+      else if(result){
+        if(result.resetPasswordExpires.getTime() > Date.now()){
+          req.userId = result._id;
+          next();
+        }
+        else{
+          res.json(Error.custom("Token Expired"));
+        }
+      }
+      else{
+        res.json(Error.custom("Invalid Token"));
+      }
+    });
+  },
+  resetPassword: function(req, res, next){
+    console.log(req.body);
+    console.log(req.params);
+    User.findOne({_id: req.body.id}, function(err, result){
+      if(err){
+        res.json(Error.custom(err));
+      }
+      else{
+        result.updatePassword(req.body.password);
+        next();
+      }
+    });
   }
 }

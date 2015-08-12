@@ -1,9 +1,25 @@
 app.controller("authController", ["$scope", "$resource", "$state", "$stateParams", "resultHandler", function($scope, $resource, $state, $stateParams, resultHandler){
   var SignUp = $resource("/auth/signup");
+  var Forgot = $resource("/auth/forgot");
+  var UnknownUser = $resource("/auth/reset/:token", {token:"@token"});
   $scope.partnername = "";
   $scope.partner;
   $scope.partners = [];
   $scope.showSuggestions = false;
+  $scope.currentState = $state.current.name;
+  $scope.$on('$stateChangeSuccess', function() {
+    $scope.currentState = $state.current.name;
+    console.log($scope.currentState);
+  });
+
+  if($scope.currentState=="reset"){
+    $scope.resetToken = $stateParams.token;
+    UnknownUser.get({token: $scope.resetToken}, function(result){
+      if(resultHandler.process(result)){
+        $scope.userid = result.id;
+      }
+    });
+  }
 
   $scope.checkPartner = function(){
       if($scope.partnername.length>1){
@@ -48,6 +64,22 @@ app.controller("authController", ["$scope", "$resource", "$state", "$stateParams
     SignUp.save({}, user, function(result){
       if(resultHandler.process(result, "Registration")){
         window.location = "#login";
+      }
+    });
+  };
+
+  $scope.forgot = function(){
+    Forgot.save({email: $scope.email}, function(result){
+      if(resultHandler.process(result)){
+
+      }
+    });
+  };
+
+  $scope.resetPassword = function(){
+    UnknownUser.save({id: $scope.userid, password: $scope.password}, function(result){
+      if(resultHandler.process(result, "Password reset")){
+        
       }
     });
   };
