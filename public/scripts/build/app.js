@@ -117,8 +117,8 @@
           }
         },
         data:{
-          crumb: "Validations",
-          link: "#validations"
+          crumb: "New Validation",
+          link: "#validations/new"
         }
       })
       // route for viewing a specific validation
@@ -159,15 +159,23 @@
           link: "#validations"
         }
       })
-      .state("issues", {
+      .state("issuesold", {
         url: "/issues",
         templateUrl: "/views/issues/list.html",
-        controller: "issueController"
+        controller: "issueController",
+        data:{
+          crumb: "Issues",
+          link: "#issues"
+        }
       })
-      .state("issues.detail", {
-        url: "/:issueId",
+      .state("issues", {
+        url: "/issues/:issueId",
         templateUrl: "/views/issues/detail.html",
-        controller: "issueController"
+        controller: "issueController",
+        data:{
+          crumb: "Validations",
+          link: "#validations"
+        }
       })
       .state("adminsettings", {
         url: "/admin",
@@ -184,6 +192,7 @@
   app.service("userPermissions", ["$resource", "resultHandler", function($resource, resultHandler){
     var System = $resource("system/:path", {path: "@path"});
     this.permissions = {};
+    this.menu = {};
     var that = this;
     this.canCreate = function(entity){
       return this.permissions[entity] && this.permissions[entity].create && this.permissions[entity].create==true
@@ -206,8 +215,9 @@
     this.refresh = function(){
       System.get({path:"userpermissions"}, function(result){
         if(resultHandler.process(result)){
-          that.permissions = result.permissions;
-          that.role = result.name;
+          that.permissions = result.user.role.permissions;
+          that.role = result.user.role.name;
+          that.menu = result.menu;
         }
       });
     }
@@ -392,16 +402,34 @@
     }
   }]);
 
+  app.directive('header', ['userPermissions', '$state', '$interpolate', function (userPermissions, $state, $interpolate) {
+    return {
+      restrict: "E",
+      replace: true,
+      scope:{
+
+      },
+      templateUrl: "/views/header.html",
+      link: function(scope){
+        scope.userPermissions = userPermissions;
+      }
+    }
+  }]);
+
 
   //Controllers
   app.controller("mainController", ["$scope", function($scope){
     
   }]);
 
-  app.controller("authController", ["$scope", "$resource", "$state", "$stateParams", "resultHandler", function($scope, $resource, $state, $stateParams, resultHandler){
+  app.controller("authController", ["$scope", "$resource", "$state", "$stateParams", "resultHandler", "userPermissions", function($scope, $resource, $state, $stateParams, resultHandler, userPermissions){
     var SignUp = $resource("/auth/signup");
+    var Login = $resource("/auth/login");
     var Forgot = $resource("/auth/forgot");
     var UnknownUser = $resource("/auth/reset/:token", {token:"@token"});
+
+    $scope.userPermissions = userPermissions;
+
     $scope.partnername = "";
     $scope.partner;
     $scope.partners = [];
@@ -468,6 +496,19 @@
       });
     };
 
+    $scope.login = function(){
+      Login.save({
+        email: $scope.loginemail,
+        password: $scope.loginpassword
+      }, function(result){
+        if(resultHandler.process(result)){
+          userPermissions.refresh();
+          window.location = "#dashboard";
+        }
+      });
+    };
+
+
     $scope.forgot = function(){
       Forgot.save({email: $scope.email}, function(result){
         if(resultHandler.process(result)){
@@ -479,7 +520,7 @@
     $scope.resetPassword = function(){
       UnknownUser.save({id: $scope.userid, password: $scope.password}, function(result){
         if(resultHandler.process(result, "Password reset")){
-          
+
         }
       });
     };
@@ -493,16 +534,12 @@
     var TechnologyTypes = $resource("api/technologytypes/:techtypeId", {techtypeId: "@techtypeId"});
 
     $scope.permissions = userPermissions;
-
+    $scope.validationId = $stateParams.Id;
     if($stateParams.Id !="new"){
       Validations.get({validationId:$stateParams.Id||""}, function(result){
         if(resultHandler.process(result)){
-          $scope.validations = result.data;
+          $scope.validations = result.data.length>0?result.data:[{}];
           $scope.imageUploadPath = "/api/validations/"+$stateParams.Id+"/image";
-          $scope.$watchCollection("validations[0]" ,function(o, n){
-            console.log(o);
-            console.log(n);
-          });
           if($state.current.name == "validations.detail"){
             $scope.$root.$broadcast('spliceCrumb', {
               text: $scope.validations[0].title,
@@ -512,6 +549,17 @@
         }
       });
     }
+
+    $scope.$watchCollection("validations[0]" ,function(n, o){
+      if($scope.saveTimeout){
+        clearTimeout($scope.saveTimeout);
+      }
+      $scope.saveTimeout = setTimeout(function(){
+        if(n){
+          $scope.save(n._id||"");
+        }
+      }, 600);
+    });
 
     TechnologyTypes.get({}, function(result){
       if(resultHandler.process(result)){
@@ -533,7 +581,7 @@
           }
           else{
             $scope.$broadcast("techTypeChanged",$scope.validations[0].technology_type._id );
-            $scope.save();
+            $scope.save($scope.validations[0]._id);
             $scope.setTab(1);
           }
         }
@@ -596,8 +644,8 @@
       });
     };
 
-    $scope.save = function(){
-      var id = $stateParams.Id=="new"?"":$stateParams.Id;
+    $scope.save = function(id){
+      //var id = $stateParams.Id=="new"?"":$stateParams.Id;
       Validations.save({validationId:id}, $scope.validations[0], function(result){
         if(resultHandler.process(result, "Save")){
           if($stateParams.Id == "new"){
@@ -629,6 +677,12 @@
           }
         }
       });  //currently we"re only allowing a save from the detail page, in which case we should only have 1 validation in the array
+    };
+
+    $scope.disableEditing = function(){
+      var canUpdate = $scope.permissions.canUpdate('validations');
+      var isNew = $stateParams.Id == 'new';
+      return ((!canUpdate && !isNew) || isNew);
     };
 
     $scope.report = function(id, entity){
@@ -686,7 +740,7 @@
         }
       });
     }
-    else if ($state.current.name =="validations.new") {
+    else if ($state.current.name =="validations.detail" && $stateParams.Id=="new") {
       //do nothing as we have no steps yet
     }
     else{ //We should be working with an individual step
@@ -706,6 +760,16 @@
                   link: "/steps/"+$scope.steps[0]._id
                 });
               }
+              else if ($state.current.name == "step.issues") {
+                $scope.$root.$broadcast('spliceCrumb', {
+                  text: result.data[0].title,
+                  link: "/validations/"+result.data[0]._id
+                });
+                $scope.$root.$broadcast('pushCrumb', {
+                  text: $scope.steps[0].name,
+                  link: "/steps/"+$scope.steps[0]._id
+                });
+              }
             }
           });
           StatusHistory.get({entityId: $scope.steps[0]._id}, function(result){
@@ -713,7 +777,6 @@
               $scope.stepStatusHistory = result.data;
             }
           });
-          $scope.setTab(0);
           $scope.$watchCollection("steps[0]" ,function(n, o){
             //because this is fired for any change we'll implement a timeout to prevent saving too many times while a user is typing
             if($scope.saveTimeout){
@@ -765,7 +828,6 @@
       });
     });
 
-    $scope.activeTab = $state.current.name == "step.issues" ? 1 : 0;
 
     $scope.setTab = function(index){
       $scope.activeTab = index;
@@ -777,6 +839,13 @@
           }
         });
       }
+    }
+
+    if($state.current.name == "step.issues"){
+      $scope.setTab(1);
+    }
+    else{
+      $scope.setTab(0);
     }
 
     $scope.delete = function(id){
@@ -893,6 +962,71 @@
       Lightbox.openModal($scope.screenshots, index);
     };
 
+    $scope.$on('issueCreated', function(event, params){
+      if($scope.steps[0]){
+        if($scope.steps[0].issues){
+          $scope.steps[0].issues.push(params.issueId);
+        }
+        else{
+          $scope.steps[0].issues = [params.issueId];
+        }
+        Step.save({stepId: params.stepId}, $scope.steps[0], function(result){
+          resultHandler.process(result);
+        });
+      }
+      else{
+        Step.get({stepId: params.stepId}, function(result){
+          if(resultHandler.process(result)){
+            if(result.data[0]){
+              if(result.data[0].issues){
+                result.data[0].issues.push(params.issueId);
+              }
+              else{
+                result.data[0].issues = [params.issueId];
+              }
+              Step.save({stepId: params.stepId}, result.data[0], function(result){
+                resultHandler.process(result);
+              });
+            }
+          }
+        })
+      }
+    });
+
+    $scope.$on('issueDeleted', function(event, params){
+      // for(var i=0;i<$scope.issues.length;i++){
+      //   if($scope.issues[i]._id == id){
+      //     $scope.issues.splice(i,1);
+      //   }
+      // }
+      if($scope.steps[0]){
+        for(var i=0;i<$scope.steps[0].issues.length;i++){
+          if($scope.steps[0].issues[i]._id == id){
+            $scope.steps[0].issues.splice(i,1);
+          }
+        }
+        Step.save({stepId: params.stepId}, $scope.steps[0], function(result){
+          resultHandler.process(result);
+        });
+      }
+      else{
+        Step.get({stepId: params.stepId}, function(result){
+          if(resultHandler.process(result)){
+            if(result.data[0]){
+              for(var i=0;i<$scope.steps[0].issues.length;i++){
+                if($scope.steps[0].issues[i]._id == id){
+                  $scope.steps[0].issues.splice(i,1);
+                }
+              }
+              Step.save({stepId: params.stepId}, result.data[0], function(result){
+                resultHandler.process(result);
+              });
+            }
+          }
+        })
+      }
+    });
+
     function _arrayBufferToBase64( buffer ) {
       var binary = '';
       var bytes = new Uint8Array( buffer );
@@ -919,7 +1053,7 @@
     });  //this creates a GET query to api/issues/statuses
 
     if($state.current.name!="issues.new"){
-      if($stateParams.stepId){  //We have a validation to work with
+      if($stateParams.stepId){  //We have a step to work with
         Issue.get({issueId:$stateParams.issueId||"", step:$stateParams.stepId||""}, function(result){
           if(resultHandler.process(result)){
             $scope.issues = result.data;
@@ -932,9 +1066,21 @@
             $scope.issues = result.data;
             //first get the step, then the validation
             Step.get({stepId: $scope.issues[0].step}, function(step){
-              $scope.step = step.data[0].name;
+              $scope.step = step.data[0];
               Validation.get({validationId: step.data[0].validationid}, function(validation){
                 $scope.validation = validation.data[0].title;
+                $scope.$root.$broadcast('pushCrumb', {
+                  text: validation.data[0].title,
+                  link: "/validations/"+validation.data[0]._id
+                });
+                $scope.$root.$broadcast('pushCrumb', {
+                  text: $scope.step.name,
+                  link: "/step/"+$scope.step._id
+                });
+                $scope.$root.$broadcast('pushCrumb', {
+                  text: $scope.issues[0].name,
+                  link: "/issues/"+$scope.issues[0]._id
+                });
               });
             })
           }
@@ -960,6 +1106,8 @@
           for(var i=0;i<$scope.issues.length;i++){
             if($scope.issues[i]._id == id){
               $scope.issues.splice(i,1);
+              var stepId = $stateParams.stepId || $scope.step._id;
+              $scope.$root.$broadcast('issueDeleted', {issueId: id, stepId: stepId});
             }
           }
         }
@@ -982,6 +1130,9 @@
       data.step = $stateParams.stepId;
       Issue.save(data, function(result){
         if(resultHandler.process(result, "Create")){
+          var stepId = $stateParams.stepId || $scope.step._id;
+          //update the step issue count
+          $scope.$root.$broadcast('issueCreated', {issueId: result._id, stepId: stepId});
           if($scope.issues){
             $scope.issues.push(result);
           }

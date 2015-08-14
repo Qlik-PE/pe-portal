@@ -4,12 +4,12 @@
   <div class="row content-detail">
     <div class="content col-md-6">
       <label>Validation: </label>
-      <span ng-hide="$state.current.name=="new"">{{validation}}</span>
-      <select ng-show="$state.current.name=="new"" class="form-control" ng-change="save(issues[0]._id)" ng-model="issues[0].validation" ng-options="item.name for item in issueValidations track by item._id">
+      <span ng-hide="$state.current.name=='new'">{{validation}}</span>
+      <select ng-show="$state.current.name=='new'" class="form-control" ng-change="save(issues[0]._id)" ng-model="issues[0].validation" ng-options="item.name for item in issueValidations track by item._id">
       </select>
       <br>
       <label>Step: </label>
-      <span ng-hide="$state.current.name=="new"">{{step}}</span>
+      <span ng-hide="$state.current.name=='new'">{{step.name}}</span>
     </div>
     <div class="content col-md-12">
       <h2>Description</h2>

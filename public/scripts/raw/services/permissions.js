@@ -1,6 +1,7 @@
 app.service("userPermissions", ["$resource", "resultHandler", function($resource, resultHandler){
   var System = $resource("system/:path", {path: "@path"});
   this.permissions = {};
+  this.menu = {};
   var that = this;
   this.canCreate = function(entity){
     return this.permissions[entity] && this.permissions[entity].create && this.permissions[entity].create==true
@@ -23,8 +24,9 @@ app.service("userPermissions", ["$resource", "resultHandler", function($resource
   this.refresh = function(){
     System.get({path:"userpermissions"}, function(result){
       if(resultHandler.process(result)){
-        that.permissions = result.permissions;
-        that.role = result.name;
+        that.permissions = result.user.role.permissions;
+        that.role = result.user.role.name;
+        that.menu = result.menu;
       }
     });
   }
