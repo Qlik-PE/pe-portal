@@ -3,9 +3,9 @@
     <div class="col-md-4"></div>
     <div class="col-md-4">
       <h2>Login</h2>
-      <form action="auth/login" method="post">
-        <input class="form-control" name="email" placeholder="Email">
-        <input class="form-control" name="password" placeholder="Password" type="password">
+      <form ng-submit="login()">
+        <input class="form-control" ng-model="loginemail" placeholder="Email">
+        <input class="form-control" ng-model="loginpassword" placeholder="Password" type="password">
         <button class="btn btn-submit btn-login" type="submit">Login</button>
       </form>
       <a href="#forgot" class="forgotpassword">Forgot Password?</a>

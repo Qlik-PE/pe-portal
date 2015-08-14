@@ -11,7 +11,28 @@ var express = require("express"),
 //   res.redirect("/");
 // });
 
-router.post("/login", passport.authenticate("local",{successRedirect: "/#dashboard", failureRedirect: ""}));
+router.post("/login", function(req, res, next){
+  passport.authenticate('local', function(err, user){
+    if(err){
+      console.log('auth failed');
+      console.log(err);
+      res.json(Error.custom(err));
+    }
+    else{
+      req.logIn(user, function(err){
+        if(err){
+          console.log('login failed');
+          console.log(err);
+          res.json(Error.custom(err));
+        }
+        else{
+          res.json({});
+        }
+      })
+    }
+  })(req, res, next);
+});
+
 router.get("/logout", function(req, res){
   req.logout();
   res.redirect("/");

@@ -2,7 +2,7 @@
   <h2>User Roles</h2>
   <ul class="tabs roles-list">
     <li ng-class="{active:activeRole===$index}" ng-repeat="role in roles" ng-click="setRole($index)">
-      <a>{{role.name}}</a>
+      <input class="form-control"  ng-blur="saveRole()" ng-model="role.name"/>
     </li>
     <li ng-show="permissions.canCreate('userroles')" >
       <input class="form-control" ng-model="newrolename" placeholder="New Role"/>

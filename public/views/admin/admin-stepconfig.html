@@ -2,7 +2,7 @@
   <h2>Technology Type</h2>
   <ul class="tabs roles-list">
     <li ng-class="{active:activeTechType===$index}" ng-repeat="technologytype in technologytypes" ng-click="setTechType($index)">
-      <a>{{technologytype.name}}</a>
+      <input class="form-control"  ng-blur="saveTechType()" ng-model="technologytype.name"/>
     </li>
     <li ng-show="permissions.canCreate('technologytypes')" >
       <input class="form-control" placeholder="New Technology Type" ng-model="newtechtype"/>

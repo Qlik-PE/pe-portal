@@ -1,22 +1,22 @@
 <div class="content">
-  <h1><input class="form-control title"  ng-disabled="!permissions.canUpdate('validations')" ng-blur="save()" placeholder="Title" ng-model="validations[0].title"/></h1>
-  <span class="green">{{validations[0].status}}</span>
+  <h1><input class="form-control title" ng-disabled="!permissions.canUpdate('validations')" placeholder="Title" ng-model="validations[0].title"/></h1>
+  <label>Status:&nbsp;</label><span class="green">{{validations[0].status}}</span>
   <button ng-click="validate(validations[0]._id)" ng-hide="permissions.role!='admin' || validations[0].status=='Validated'" class="btn btn-default btn-validate">Validate</button>
   <button ng-click="unvalidate(validations[0]._id)" ng-hide="permissions.role!='admin' || validations[0].status!='Validated'" class="btn btn-default btn-validate">Unvalidate</button>
   <button ng-click="report(validations[0]._id, 'validations')" ng-hide="!permissions.canReport('validations')" class="btn btn-default btn-report">Report</button>
   <button ng-click="delete(validations[0]._id)" ng-hide="!permissions.canDelete('validations')" class="btn btn-default btn-delete">Delete</button>
   <div class="row content-detail">
-    <div class="content col-md-12">
+    <div class="content col-md-12">      
       <label  style="width: auto">Technology Type: </label>
-      <select style="width: 200px; height: 34px; line-height: 34px;" class="form-control" ng-disabled="!permissions.canUpdate('validations')" ng-change="setSteps()" ng-model="validations[0].technology_type" ng-options="item.name for item in technologytypes track by item._id">
+      <select style="width: 200px; height: 34px; line-height: 34px;" class="form-control" ng-disabled="disableEditing()" ng-change="setSteps()" ng-model="validations[0].technology_type" ng-options="item.name for item in technologytypes track by item._id">
       <select>
       <h2>Description</h2>
-      <textarea class="form-control" ng-disabled="!permissions.canUpdate('validations')" ng-blur="save()" ng-model="validations[0].content">{{validations[0].content}}</textarea>
+      <textarea class="form-control" ng-disabled="disableEditing()" ng-model="validations[0].content">{{validations[0].content}}</textarea>
       <ul class="tabs">
         <li ng-class="{active:activeTab===0}">
           <a ng-click="setTab(0)">Detail</a>
         </li>
-        <li ng-class="{active:activeTab===1}" ng-show="permissions.canRead('steps')">
+        <li ng-class="{active:activeTab===1}" ng-show="permissions.canRead('steps') && validationId!='new'">
           <a ng-click="setTab(1)">Steps</a>
         </li>
         <!-- <li ng-class="{active:activeTab===2}">

@@ -117,8 +117,8 @@
           }
         },
         data:{
-          crumb: "Validations",
-          link: "#validations"
+          crumb: "New Validation",
+          link: "#validations/new"
         }
       })
       // route for viewing a specific validation
@@ -159,15 +159,23 @@
           link: "#validations"
         }
       })
-      .state("issues", {
+      .state("issuesold", {
         url: "/issues",
         templateUrl: "/views/issues/list.html",
-        controller: "issueController"
+        controller: "issueController",
+        data:{
+          crumb: "Issues",
+          link: "#issues"
+        }
       })
-      .state("issues.detail", {
-        url: "/:issueId",
+      .state("issues", {
+        url: "/issues/:issueId",
         templateUrl: "/views/issues/detail.html",
-        controller: "issueController"
+        controller: "issueController",
+        data:{
+          crumb: "Validations",
+          link: "#validations"
+        }
       })
       .state("adminsettings", {
         url: "/admin",
@@ -188,6 +196,7 @@
   include "./directives/gallery.js"
   include "./directives/report.js"
   include "./directives/breadcrumbs.js"
+  include "./directives/header.js"
 
   //Controllers
   include "./controllers/main.js"

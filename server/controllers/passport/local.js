@@ -13,17 +13,15 @@ module.exports = function(passport, User){
               email: email
             }).populate("partner role").exec(function(err, user) {
               if (err) {
+								console.log("passport error");
                 return done(err);
               }
               if (!user) {
-                return done(null, false, {
-                  message: "Unknown user"
-                });
+								console.log('email not found');
+                return done('User Not Found with email '+email, false);
               }
               if (!user.authenticate(password)) {
-                return done(null, false, {
-                  message: "Invalid password"
-                });
+                return done('Invalid Password', false);
               }
               return done(null, user);
             });

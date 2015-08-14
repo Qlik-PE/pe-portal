@@ -17,39 +17,7 @@ html(ng-app="peportal")
   body    
     notifications-bar.notifications.container
     report
-    div.header
-      div.container        
-        div.logo
-          a(href="#/") Home
-        ul.nav.navbar-nav.navbar-right           
-            if isAuthenticated
-              li
-                a(ui-sref="publicvalidations") Validations    
-              li.dropdown
-                a.dropdown-toggle(
-                    href="#" 
-                    data-toggle="dropdown" 
-                    role="button" 
-                    aria-expanded="false" 
-                    data-count=notificationCount||""
-                  ) #{user.name}
-                  span.caret
-                ul.dropdown-menu(role="menu")
-                  if user.role.name != "user"
-                    li
-                      a(ui-sref="dashboard") Dashboard
-                    li
-                      a(ui-sref="validations") Manage Validations                   
-                    li
-                      a(ui-sref="users") Manage Users    
-                  if user.role.name == "admin"
-                    li
-                      a(ui-sref="adminsettings") Settings    
-                  li
-                    a(href="/auth/logout") Logout
-            else     
-              li(style="color: rgb(94,168,63);")
-                a(ui-sref="loginsignup") Login/Signup
+    header
     breadcrumbs
     div.container    
       div(ui-view)        

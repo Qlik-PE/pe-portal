@@ -47,7 +47,7 @@ app.controller("stepController", ["$scope", "$resource", "$state", "$stateParams
       }
     });
   }
-  else if ($state.current.name =="validations.new") {
+  else if ($state.current.name =="validations.detail" && $stateParams.Id=="new") {
     //do nothing as we have no steps yet
   }
   else{ //We should be working with an individual step
@@ -67,6 +67,16 @@ app.controller("stepController", ["$scope", "$resource", "$state", "$stateParams
                 link: "/steps/"+$scope.steps[0]._id
               });
             }
+            else if ($state.current.name == "step.issues") {
+              $scope.$root.$broadcast('spliceCrumb', {
+                text: result.data[0].title,
+                link: "/validations/"+result.data[0]._id
+              });
+              $scope.$root.$broadcast('pushCrumb', {
+                text: $scope.steps[0].name,
+                link: "/steps/"+$scope.steps[0]._id
+              });
+            }
           }
         });
         StatusHistory.get({entityId: $scope.steps[0]._id}, function(result){
@@ -74,7 +84,6 @@ app.controller("stepController", ["$scope", "$resource", "$state", "$stateParams
             $scope.stepStatusHistory = result.data;
           }
         });
-        $scope.setTab(0);
         $scope.$watchCollection("steps[0]" ,function(n, o){
           //because this is fired for any change we'll implement a timeout to prevent saving too many times while a user is typing
           if($scope.saveTimeout){
@@ -126,7 +135,6 @@ app.controller("stepController", ["$scope", "$resource", "$state", "$stateParams
     });
   });
 
-  $scope.activeTab = $state.current.name == "step.issues" ? 1 : 0;
 
   $scope.setTab = function(index){
     $scope.activeTab = index;
@@ -138,6 +146,13 @@ app.controller("stepController", ["$scope", "$resource", "$state", "$stateParams
         }
       });
     }
+  }
+
+  if($state.current.name == "step.issues"){
+    $scope.setTab(1);
+  }
+  else{
+    $scope.setTab(0);
   }
 
   $scope.delete = function(id){
@@ -231,7 +246,12 @@ app.controller("stepController", ["$scope", "$resource", "$state", "$stateParams
         };
         Screenshots.save(data, function(result){
           if(resultHandler.process(result, "Image Upload")){
-
+            if($scope.screenshots){
+              $scope.screenshots.push(result);
+            }
+            else{
+              $scope.screenshots = [result];
+            }
           }
         });
       };
@@ -253,6 +273,71 @@ app.controller("stepController", ["$scope", "$resource", "$state", "$stateParams
   $scope.openLightboxModal = function (index) {
     Lightbox.openModal($scope.screenshots, index);
   };
+
+  $scope.$on('issueCreated', function(event, params){
+    if($scope.steps[0]){
+      if($scope.steps[0].issues){
+        $scope.steps[0].issues.push(params.issueId);
+      }
+      else{
+        $scope.steps[0].issues = [params.issueId];
+      }
+      Step.save({stepId: params.stepId}, $scope.steps[0], function(result){
+        resultHandler.process(result);
+      });
+    }
+    else{
+      Step.get({stepId: params.stepId}, function(result){
+        if(resultHandler.process(result)){
+          if(result.data[0]){
+            if(result.data[0].issues){
+              result.data[0].issues.push(params.issueId);
+            }
+            else{
+              result.data[0].issues = [params.issueId];
+            }
+            Step.save({stepId: params.stepId}, result.data[0], function(result){
+              resultHandler.process(result);
+            });
+          }
+        }
+      })
+    }
+  });
+
+  $scope.$on('issueDeleted', function(event, params){
+    // for(var i=0;i<$scope.issues.length;i++){
+    //   if($scope.issues[i]._id == id){
+    //     $scope.issues.splice(i,1);
+    //   }
+    // }
+    if($scope.steps[0]){
+      for(var i=0;i<$scope.steps[0].issues.length;i++){
+        if($scope.steps[0].issues[i]._id == id){
+          $scope.steps[0].issues.splice(i,1);
+        }
+      }
+      Step.save({stepId: params.stepId}, $scope.steps[0], function(result){
+        resultHandler.process(result);
+      });
+    }
+    else{
+      Step.get({stepId: params.stepId}, function(result){
+        if(resultHandler.process(result)){
+          if(result.data[0]){
+            for(var i=0;i<$scope.steps[0].issues.length;i++){
+              if($scope.steps[0].issues[i]._id == id){
+                $scope.steps[0].issues.splice(i,1);
+              }
+            }
+            Step.save({stepId: params.stepId}, result.data[0], function(result){
+              resultHandler.process(result);
+            });
+          }
+        }
+      })
+    }
+  });
 
   function _arrayBufferToBase64( buffer ) {
     var binary = '';

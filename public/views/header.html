@@ -1,0 +1,26 @@
+<div class="header">
+  <div class="container">
+    <div class="logo">
+      <a href="#/">Home</a>
+    </div>
+    <ul class="nav navbar-nav navbar-right">
+        <li ng-if="userPermissions.role">
+          <a ui-sref="publicvalidations">Validations</a>
+        </li>
+        <li class="dropdown" ng-repeat="item in userPermissions.menu.items" role="button">
+          <a data-toggle="dropdown" href="{{item.href}}" class="dropdown-toggle green">
+            {{item.label}}
+            <span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu" role="menu" ng-if="item.items.length > 0">
+            <li ng-repeat="subItem in item.items">
+              <a href="{{subItem.href}}">{{subItem.label}}</a>
+            </li>
+          </ul>
+        </li>
+        <li ng-if="!userPermissions.role" style="color: rgb(94,168,63);">
+          <a ui-sref="loginsignup">Login/Signup</a>
+        </li>
+      </ul>
+    </div>
+  </div>
