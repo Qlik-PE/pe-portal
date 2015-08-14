@@ -939,7 +939,12 @@
           };
           Screenshots.save(data, function(result){
             if(resultHandler.process(result, "Image Upload")){
-
+              if($scope.screenshots){
+                $scope.screenshots.push(result);
+              }
+              else{
+                $scope.screenshots = [result];
+              }
             }
           });
         };
