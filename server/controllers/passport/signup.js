@@ -5,11 +5,10 @@ module.exports = function(passport, User){
 	passport.use("signup", new LocalStrategy({
             usernameField : "email",
             passwordField : "password",
-            passReqToCallback : true // allows us to pass back the entire request to the callback
+						passReqToCallback : true
         },
         function(req, email, password, done) {
             findOrCreateUser = function(){
-              console.log("here");
                 // find a user in Mongo with provided username
                 User.findOne({ "email" :  email }, function(err, user) {
                     // In case of any error, return using the done method
@@ -19,8 +18,7 @@ module.exports = function(passport, User){
                     }
                     // already exists
                     if (user) {
-                        console.log("User already exists with email: "+email);
-                        return done(null, false, "User Already Exists");
+                        return done("User already exists with email: "+email, false);
                     } else {
                         // if there is no user with that email
                         // create the user
@@ -31,33 +29,43 @@ module.exports = function(passport, User){
                         // set the user"s local credentials
                         newUser.salt = newUser.makeSalt();
                         newUser.hashed_password = newUser.hashPassword(password);
-                        newUser.email = req.param("email");
-												newUser.username = req.param("email");
+                        newUser.email = email;
+												newUser.username = email;
                         console.log(newUser);
                         // save the user
-												console.log("body partnerid is - "+req.body.partner);
-												console.log("newuser partnerid is - "+newUser.partner);
+												if(!req.body.partner&&!req.body.partnername){
+													return done("Partner is required", false);
+												}
 												if(!newUser.partner && req.body.partnername){
-													Partner.save(null, {name: req.body.partnername}, function(result){
+													var partner = new Partner()
+													partner.name = req.body.partnername;
+													partner.save(function(err, result){
+														if(err){
+															return done(err.message, false);
+														}
+														else{
 															newUser.partner = result._id
 															newUser.save(function(err) {
 			                            if (err){
-			                                console.log("Error in Saving user: "+err);
-			                                throw err;
+																		console.log(err.message);
+			                              return done(err.message, false);
 			                            }
-			                            console.log("User Registration succesful");
-			                            return done(null, newUser);
+																	else{
+				                            return done(null, newUser);
+																	}
 			                        });
+														}
 													});
 												}
 												else{
 													newUser.save(function(err) {
-															if (err){
-																	console.log("Error in Saving user: "+err);
-																	throw err;
-															}
-															console.log("User Registration succesful");
+														if (err){
+															console.log(err);
+															return done(err.message, false);
+														}
+														else{
 															return done(null, newUser);
+														}
 													});
 												}
 
