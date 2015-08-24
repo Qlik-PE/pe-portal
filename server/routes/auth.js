@@ -3,8 +3,7 @@ var express = require("express"),
     passport = require("passport"),
     Error = require("../controllers/error"),
     Auth = require("../controllers/auth"),
-    nodemailer = require("nodemailer"),
-    Signup = require("../controllers/signup");
+    nodemailer = require("nodemailer");
 
 // router.post("/login", passport.authenticate("local"), function(req, res){
 //   console.log(req.isAuthenticated());
@@ -38,10 +37,26 @@ router.get("/logout", function(req, res){
   res.redirect("/");
 });
 
-router.post("/signup", function(req, res){
-  Signup(req.body, function(result){
-    res.json(result);
-  });
+router.post("/signup", function(req, res, next){
+  passport.authenticate('signup', function(err, user){
+    console.log(user);
+    if(err){
+      console.log('should fail here');
+      res.json(Error.custom(err));
+    }
+    else{
+      req.logIn(user, function(err){
+        if(err){
+          console.log('login failed');
+          console.log(err);
+          res.json(Error.custom(err));
+        }
+        else{
+          res.json({});
+        }
+      })
+    }
+  })(req, res);
 });
 
 router.post("/forgot", Auth.generateResetToken, function(req, res){

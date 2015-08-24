@@ -26,21 +26,25 @@ app.controller("authController", ["$scope", "$resource", "$state", "$stateParams
   }
 
   $scope.checkPartner = function(){
-      if($scope.partnername.length>1){
-        //in this controller we"re using a jQuery GET instead of an angular $resource
-        //this is because I could not get the regex to parse properly with $resource
-        $.get("system/partners", {name: {$regex:$scope.partnername, $options:"gi"}})
-        .success(function(result){
-          if(resultHandler.process(result)){
-            if(result.data.length>0){
-              $scope.$apply(function(){
-                $scope.partners = result.data;
-                $scope.showSuggestions = true;
-              });
-            }
+    var rge = [];
+    if($scope.partnername && $scope.partnername.length>1){
+      rge.push({name: {$regex:$scope.partnername, $options:"gi"}});
+    }
+    if(rge.length>0){
+      //in this controller we"re using a jQuery GET instead of an angular $resource
+      //this is because I could not get the regex to parse properly with $resource
+      $.get("system/partners", {$or:rge})
+      .success(function(result){
+        if(resultHandler.process(result)){
+          if(result.data.length>0){
+            $scope.$apply(function(){
+              $scope.partners = result.data;
+              $scope.showSuggestions = true;
+            });
           }
-        })
-      }
+        }
+      })
+    }
   };
 
   $scope.hideSuggestions = function(){
@@ -58,6 +62,25 @@ app.controller("authController", ["$scope", "$resource", "$state", "$stateParams
   };
 
   $scope.signup = function(){
+    //check that an email has been entered
+    if(!$scope.email){
+      resultHandler.process({errCode: true, errText: "Please enter an Email"});
+      return;
+    }
+    //check that a name has been entered
+    if(!$scope.name){
+      resultHandler.process({errCode: true, errText: "Please enter a Name"});
+      return;
+    }
+    //check that we have a password and that the passwords match
+    if(!$scope.password){
+      resultHandler.process({errCode: true, errText: "Please enter a Password"});
+      return;
+    }
+    if($scope.password!=$scope.confirm){
+      resultHandler.process({errCode: true, errText: "Password confirmation does not match"});
+      return;
+    }
     var user = {
       partner: $scope.partner,
       partnername: $scope.partnername,
@@ -67,7 +90,8 @@ app.controller("authController", ["$scope", "$resource", "$state", "$stateParams
     };
     SignUp.save({}, user, function(result){
       if(resultHandler.process(result, "Registration")){
-        window.location = "#login";
+        userPermissions.refresh();
+        window.location = "#dashboard";
       }
     });
   };

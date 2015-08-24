@@ -24,6 +24,7 @@ router.get("/partners", function(req, res){ //used to check for existing partner
   var query = req.query || {};
   //query={name:/Qli/gi};
   var params = req.params;
+  console.log(query);
   MasterController.get(req.query, query, Partners, function(results){
     res.json(results);
   });
@@ -37,19 +38,21 @@ function buildMenu(user){
       href: "/auth/logout"
     }
   ];
-  if(user && user.role.name!='user'){
-    basicMenu.splice(0,0, {
-      label: "Dashboard",
-      href: "#dashboard"
-    });
-    basicMenu.splice(1,0, {
-      label: "Manage Validations",
-      href: "#validations"
-    });
-    basicMenu.splice(2,0, {
-      label: "Manage Users",
-      href: "#users"
-    });
+  if(user){
+    if(user.role.name!='user'){
+      basicMenu.splice(0,0, {
+        label: "Dashboard",
+        href: "#dashboard"
+      });
+      basicMenu.splice(1,0, {
+        label: "Manage Validations",
+        href: "#validations"
+      });
+      basicMenu.splice(2,0, {
+        label: "Manage Users",
+        href: "#users"
+      });
+    }
     topMenu = {
       items:[{
         label: user.email,
