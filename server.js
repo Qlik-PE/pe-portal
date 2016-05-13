@@ -5,24 +5,24 @@ var express = require("express"),
     bodyParser = require("body-parser"),
     mongoose = require("mongoose"),
     busboy = require("connect-busboy"),
-    fs = require('fs'),
     request = require('request'),
     htmltopdf = require('wkhtmltopdf');
 
+var config;
+
+try {
+  config = require(__dirname + '/config');
+} catch (e) {
+  config = {
+    port: 3005,
+    mongoConnection: "mongodb://localhost:27017/pe-portal",
+    sessionSecret: "qlikPEPortal"
+  };
+}
+
 app.use(busboy());
 
-mongoose.connect("mongodb://localhost:27017/pe-portal");
-
-//load the models
-require(__dirname+"/server/models/users");
-require(__dirname+"/server/models/partners");
-require(__dirname+"/server/models/validations");
-require(__dirname+"/server/models/steps");
-require(__dirname+"/server/models/step-types");
-require(__dirname+"/server/models/step-status");
-require(__dirname+"/server/models/attachments");
-require(__dirname+"/server/models/status-history");
-require(__dirname+"/server/models/issues");
+mongoose.connect(config.mongoConnection);
 
 //configure passport strategies
 require(__dirname+"/server/controllers/passport/passport")(passport);
@@ -46,7 +46,7 @@ app.use("/qsocks", express.static(__dirname + "/node_modules/qsocks"));
 app.use(bodyParser.json({limit: '5mb'}));
 app.use(bodyParser.urlencoded({limit: '2mb'}));
 
-app.use(expressSession({secret: "qlikPEPortal"})); //ATTENTION - need to find out what the secret key is
+app.use(expressSession({secret: config.sessionSecret})); //ATTENTION - need to find out what the secret key is
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -79,5 +79,5 @@ app.use("/api", apiRoutes);
 app.use("/attachments", attachmentRoutes);
 app.use("/auth", authRoutes);
 
-app.listen(3000);
-console.log("server listening on 3000");
+app.listen(config.port);
+console.log("server listening on " + config.port.toString());

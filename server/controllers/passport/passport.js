@@ -6,7 +6,6 @@ module.exports = function(passport){
   });
 
   passport.deserializeUser(function(id, done) {
-    console.log('here');
     User.findById(id).populate("role").exec(function(err, user) {
       done(err, user);
     });
@@ -17,4 +16,4 @@ module.exports = function(passport){
 
   //configure signup strategy
   require("./signup.js")(passport, User);
-}
+};
