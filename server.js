@@ -14,7 +14,7 @@ try {
   config = require(__dirname + '/config');
 } catch (e) {
   config = {
-    port: 3005,
+    port: 3000,
     mongoConnection: "mongodb://localhost:27017/pe-portal",
     sessionSecret: "qlikPEPortal"
   };
