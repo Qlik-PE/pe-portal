@@ -40,7 +40,7 @@ module.exports = {
   },
   generateResetToken: function(req, res, next){
     User.findOne({email: req.body.email}, function(err, result){
-      if(err){
+      if(err || result == null){
         res.json(Error.custom("User not found with email "+req.body.email));
       }
       else{
