@@ -1,6 +1,6 @@
 <div class="content">
   <h1><input class="form-control title"  placeholder="Title" ng-model="steps[0].name"/></h1>
-  <button ng-click="delete()" class="btn btn-default btn-delete">Delete</button>
+  <button ng-click="delete(steps[0]._id)" class="btn btn-default btn-delete">Delete</button>
   <div class="row content-detail">
     <div class="content col-md-12">
       <h2>Description</h2>
