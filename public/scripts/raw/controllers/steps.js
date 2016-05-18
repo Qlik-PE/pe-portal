@@ -118,16 +118,19 @@ app.controller("stepController", ["$scope", "$resource", "$state", "$stateParams
   $scope.$on("techTypeChanged", function(event, techTypeId){
     StepTemplate.get({techtypeId: techTypeId}, function(result){
       if(resultHandler.process(result)){
+        $scope.steps = [];
         for(var i=0;i<result.data.length;i++){
           var s = result.data[i];
-          s._id = null;
-          s.techtypeId = null;
+          delete s._id;
+          delete s.techtypeId;
           s.validationid = $stateParams.Id;
           s.status = "5559a3937730da518d2dc00f";
-          Step.save({}, s, function(stepresult){
-            if(i==result.data.length){
-              resultHandler.process(stepresult, "Setting steps ");
-              $scope.steps = result.data;
+          Step.save(s, function(stepresult){
+            if (resultHandler.process(stepresult, "Setting steps ")) {
+              $scope.steps.push(stepresult);
+            }
+            if (i == result.data.length) {
+              $scope.steps.sort(function (a,b) { return a.num - b.num });
             }
           });
         }
