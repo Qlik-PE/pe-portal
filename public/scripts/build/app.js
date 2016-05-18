@@ -900,12 +900,14 @@
 
     $scope.deleteScreenshot = function(index, next) {
       var screenshotToDelete = $scope.screenshots[index];
-      Screenshots.delete({_id: screenshotToDelete._id}, function(result) {
-        if(resultHandler.process(result, "Delete")) {
-          $scope.screenshots.splice(index, 1);
-          next();
-        }
-      });
+      if(screenshotToDelete && screenshotToDelete._id) {
+        Screenshots.delete({_id: screenshotToDelete._id}, function(result) {
+          if(resultHandler.process(result, "Delete")) {
+            $scope.screenshots.splice(index, 1);
+            next();
+          }
+        });
+      }
     };
 
     $scope.save = function(id){
