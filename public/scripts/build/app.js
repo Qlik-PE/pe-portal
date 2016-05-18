@@ -255,7 +255,8 @@
       restrict: "E",
       replace: true,
       scope: {
-        images: "="
+        images: "=",
+        deleteScreenshot: "&"
       },
       link: function($scope, element, attr){
         $scope.activeImage;
@@ -285,7 +286,12 @@
             "height": (height) + "px",
             "width": (width) + "px"
           });
-        }
+        };
+        $scope.delete = function() {
+          $scope.deleteScreenshot({index:$scope.activeImage, next: function() {
+            $scope.close();
+          }});
+        };
         $scope.prev = function(){
           if($scope.activeImage==0){
             $scope.activeImage=$scope.images.length-1;
@@ -888,6 +894,16 @@
               }
             }
           });
+        }
+      });
+    };
+
+    $scope.deleteScreenshot = function(index, next) {
+      var screenshotToDelete = $scope.screenshots[index];
+      Screenshots.delete({_id: screenshotToDelete._id}, function(result) {
+        if(resultHandler.process(result, "Delete")) {
+          $scope.screenshots.splice(index, 1);
+          next();
         }
       });
     };

@@ -3,7 +3,8 @@ app.directive('gallery', function(){
     restrict: "E",
     replace: true,
     scope: {
-      images: "="
+      images: "=",
+      deleteScreenshot: "&"
     },
     link: function($scope, element, attr){
       $scope.activeImage;
@@ -33,7 +34,12 @@ app.directive('gallery', function(){
           "height": (height) + "px",
           "width": (width) + "px"
         });
-      }
+      };
+      $scope.delete = function() {
+        $scope.deleteScreenshot({index:$scope.activeImage, next: function() {
+          $scope.close();
+        }});
+      };
       $scope.prev = function(){
         if($scope.activeImage==0){
           $scope.activeImage=$scope.images.length-1;

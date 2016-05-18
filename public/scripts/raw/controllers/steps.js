@@ -175,6 +175,16 @@ app.controller("stepController", ["$scope", "$resource", "$state", "$stateParams
     });
   };
 
+  $scope.deleteScreenshot = function(index, next) {
+    var screenshotToDelete = $scope.screenshots[index];
+    Screenshots.delete({_id: screenshotToDelete._id}, function(result) {
+      if(resultHandler.process(result, "Delete")) {
+        $scope.screenshots.splice(index, 1);
+        next();
+      }
+    });
+  };
+
   $scope.save = function(id){
     console.log("saving");
     Step.save({stepId:id, validationid: $stateParams.Id}, $scope.getStepById(id), function(result){

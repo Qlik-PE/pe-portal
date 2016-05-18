@@ -5,6 +5,6 @@
         <input onchange="angular.element(this).scope().uploadScreenshot()" type="file" name="file" id="file"/>
       </span>
   </form>
-  <gallery images="screenshots">
+  <gallery images="screenshots" delete-screenshot="deleteScreenshot(index, next)">
   </gallery>
 </div>
