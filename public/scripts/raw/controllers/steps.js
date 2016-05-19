@@ -1,4 +1,4 @@
-app.controller("stepController", ["$scope", "$resource", "$state", "$stateParams", "userPermissions", "notifications", "resultHandler", function($scope, $resource, $state, $stateParams, userPermissions, notifications, resultHandler){
+app.controller("stepController", ["$scope", "$resource", "$state", "$stateParams", "userPermissions", "notifications", "resultHandler", "confirmDialog", function($scope, $resource, $state, $stateParams, userPermissions, notifications, resultHandler, confirmDialog){
   var Validation = $resource("api/validations/");
   var Step = $resource("api/steps/:stepId", {stepId: "@stepId"});
   var StepTemplate = $resource("api/templatesteps/:stepId", {stepId: "@stepId"});
@@ -159,6 +159,9 @@ app.controller("stepController", ["$scope", "$resource", "$state", "$stateParams
   }
 
   $scope.delete = function(id){
+    if(!confirmDialog.delete("Step"))
+      return;
+
     //First we need to delete all issues related to the step
     Issues.delete({step:id}, function(result){
       if(resultHandler.process(result)){
@@ -179,6 +182,9 @@ app.controller("stepController", ["$scope", "$resource", "$state", "$stateParams
   };
 
   $scope.deleteScreenshot = function(index, next) {
+    if (!confirmDialog.delete("Screenshot"))
+      return;
+
     var screenshotToDelete = $scope.screenshots[index];
     if(screenshotToDelete && screenshotToDelete._id) {
       Screenshots.delete({_id: screenshotToDelete._id}, function(result) {

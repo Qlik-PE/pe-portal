@@ -1,4 +1,4 @@
-app.controller("validationController", ["$scope", "$resource", "$state", "$stateParams", "userPermissions", "notifications", "resultHandler", function($scope, $resource, $state, $stateParams, userPermissions, notifications, resultHandler){
+app.controller("validationController", ["$scope", "$resource", "$state", "$stateParams", "userPermissions", "notifications", "resultHandler", "confirmDialog", function($scope, $resource, $state, $stateParams, userPermissions, notifications, resultHandler, confirmDialog){
   var Validations = $resource("api/validations/:validationId", {validationId:"@id"});
   var Steps = $resource("api/steps/:stepId", {stepId:"@stepId"});
   var Issues = $resource("api/issues/:issueId", {issueId:"@issueId"});
@@ -63,6 +63,9 @@ app.controller("validationController", ["$scope", "$resource", "$state", "$state
     //first we need to get the list of steps for the validation
     //then for each step get the issues and delete them
     //then we delete the step and finally delete the validation
+    if(!confirmDialog.delete("Validation"))
+      return;
+
     Steps.get({validationid:id}, function(stepresult){
       if(resultHandler.process(stepresult)){
         if(stepresult.data.length>0){

@@ -1,4 +1,4 @@
-app.controller("issueController", ["$scope", "$resource", "$state", "$stateParams", "userPermissions", "resultHandler", function($scope, $resource, $state, $stateParams, userPermissions, resultHandler){
+app.controller("issueController", ["$scope", "$resource", "$state", "$stateParams", "userPermissions", "resultHandler", "confirmDialog", function($scope, $resource, $state, $stateParams, userPermissions, resultHandler, confirmDialog){
   var Issue = $resource("api/issues/:issueId", {issueId: "@issueId"});
   var IssueStatus = $resource("api/issuestatus/:statusId", {statusId: "@statusId"});
   var Step = $resource("api/steps/:stepId", {stepId: "@stepId"});
@@ -61,6 +61,9 @@ app.controller("issueController", ["$scope", "$resource", "$state", "$stateParam
   }
 
   $scope.delete = function(id){
+    if(!confirmDialog.delete("Issue"))
+      return;
+
     Issue.delete({issueId:id}, function(result){
       if(resultHandler.process(result, "Delete")){
         for(var i=0;i<$scope.issues.length;i++){

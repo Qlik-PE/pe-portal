@@ -1,4 +1,4 @@
-app.controller("userController", ["$scope", "$resource", "$state", "$stateParams", "userPermissions", "notifications", "resultHandler", function($scope, $resource, $state, $stateParams, userPermissions, notifications, resultHandler){
+app.controller("userController", ["$scope", "$resource", "$state", "$stateParams", "userPermissions", "notifications", "resultHandler", "confirmDialog", function($scope, $resource, $state, $stateParams, userPermissions, notifications, resultHandler, confirmDialog){
   var User = $resource("api/users/:userId", {userId: "@userId"});
   var UserRoles = $resource("api/userroles/:roleId", {roleId: "@roleId"});
 
@@ -17,6 +17,9 @@ app.controller("userController", ["$scope", "$resource", "$state", "$stateParams
   })
 
   $scope.delete = function(id){
+    if(!confirmDialog.delete("User"))
+      return;
+
     User.delete({userId:id}, function(result){
       if(resultHandler.process(result, "Delete")){
         for(var i=0;i<$scope.users.length;i++){

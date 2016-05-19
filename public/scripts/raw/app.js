@@ -191,6 +191,7 @@
   //Services
   include "./services/permissions.js"
   include "./services/result-handler.js"
+  include "./services/confirm-dialog.js"
 
   //Directives
   include "./directives/gallery.js"

@@ -1,4 +1,4 @@
-app.controller("adminController", ["$scope", "$resource", "$state", "$stateParams", "userPermissions", "resultHandler", function($scope, $resource, $state, $stateParams, userPermissions, resultHandler){
+app.controller("adminController", ["$scope", "$resource", "$state", "$stateParams", "userPermissions", "resultHandler", "confirmDialog", function($scope, $resource, $state, $stateParams, userPermissions, resultHandler, confirmDialog){
   var UserRoles = $resource("api/userroles/:roleId", {roleId: "@roleId"});
   var TechnologyTypes = $resource("api/technologytypes/:techtypeId", {techtypeId: "@techtypeId"});
   var Step = $resource("api/steps/:stepId", {stepId: "@stepId"});
@@ -162,6 +162,9 @@ app.controller("adminController", ["$scope", "$resource", "$state", "$stateParam
   };
 
   $scope.deleteStep = function(id){
+    if(!confirmDialog.delete("Step"))
+      return;
+
     //First we need to delete all issues related to the step
       Step.delete({stepId:id}, function(result){
         if(resultHandler.process(result, "Delete")){
@@ -198,6 +201,9 @@ app.controller("adminController", ["$scope", "$resource", "$state", "$stateParam
   };
 
   $scope.delete = function(index){
+    if(!confirmDialog.delete("Role"))
+      return;
+
     var roleToDelete = $scope.roles[$scope.activeRole];
     UserRoles.delete({roleId: roleToDelete._id}, function(result){
       if(resultHandler.process(result, "Delete")){

@@ -248,6 +248,12 @@
     }
   }]);
 
+  app.service("confirmDialog", [function(){
+      this.delete = function(entityToDelete){   //deals with the result in a generic way. Return true if the result is a success otherwise returns false
+          return confirm("Are you sure you want to delete this " + entityToDelete + "? This action cannot be undone.");
+      }
+  }]);
+
 
   //Directives
   app.directive('gallery', function(){
@@ -557,7 +563,7 @@
 
   }]);
 
-  app.controller("validationController", ["$scope", "$resource", "$state", "$stateParams", "userPermissions", "notifications", "resultHandler", function($scope, $resource, $state, $stateParams, userPermissions, notifications, resultHandler){
+  app.controller("validationController", ["$scope", "$resource", "$state", "$stateParams", "userPermissions", "notifications", "resultHandler", "confirmDialog", function($scope, $resource, $state, $stateParams, userPermissions, notifications, resultHandler, confirmDialog){
     var Validations = $resource("api/validations/:validationId", {validationId:"@id"});
     var Steps = $resource("api/steps/:stepId", {stepId:"@stepId"});
     var Issues = $resource("api/issues/:issueId", {issueId:"@issueId"});
@@ -622,6 +628,9 @@
       //first we need to get the list of steps for the validation
       //then for each step get the issues and delete them
       //then we delete the step and finally delete the validation
+      if(!confirmDialog.delete("Validation"))
+        return;
+
       Steps.get({validationid:id}, function(stepresult){
         if(resultHandler.process(stepresult)){
           if(stepresult.data.length>0){
@@ -721,7 +730,7 @@
 
   }]);
 
-  app.controller("stepController", ["$scope", "$resource", "$state", "$stateParams", "userPermissions", "notifications", "resultHandler", function($scope, $resource, $state, $stateParams, userPermissions, notifications, resultHandler){
+  app.controller("stepController", ["$scope", "$resource", "$state", "$stateParams", "userPermissions", "notifications", "resultHandler", "confirmDialog", function($scope, $resource, $state, $stateParams, userPermissions, notifications, resultHandler, confirmDialog){
     var Validation = $resource("api/validations/");
     var Step = $resource("api/steps/:stepId", {stepId: "@stepId"});
     var StepTemplate = $resource("api/templatesteps/:stepId", {stepId: "@stepId"});
@@ -882,6 +891,9 @@
     }
 
     $scope.delete = function(id){
+      if(!confirmDialog.delete("Step"))
+        return;
+
       //First we need to delete all issues related to the step
       Issues.delete({step:id}, function(result){
         if(resultHandler.process(result)){
@@ -902,6 +914,9 @@
     };
 
     $scope.deleteScreenshot = function(index, next) {
+      if (!confirmDialog.delete("Screenshot"))
+        return;
+
       var screenshotToDelete = $scope.screenshots[index];
       if(screenshotToDelete && screenshotToDelete._id) {
         Screenshots.delete({_id: screenshotToDelete._id}, function(result) {
@@ -1088,7 +1103,7 @@
     }
   }]);
 
-  app.controller("issueController", ["$scope", "$resource", "$state", "$stateParams", "userPermissions", "resultHandler", function($scope, $resource, $state, $stateParams, userPermissions, resultHandler){
+  app.controller("issueController", ["$scope", "$resource", "$state", "$stateParams", "userPermissions", "resultHandler", "confirmDialog", function($scope, $resource, $state, $stateParams, userPermissions, resultHandler, confirmDialog){
     var Issue = $resource("api/issues/:issueId", {issueId: "@issueId"});
     var IssueStatus = $resource("api/issuestatus/:statusId", {statusId: "@statusId"});
     var Step = $resource("api/steps/:stepId", {stepId: "@stepId"});
@@ -1151,6 +1166,9 @@
     }
 
     $scope.delete = function(id){
+      if(!confirmDialog.delete("Issue"))
+        return;
+
       Issue.delete({issueId:id}, function(result){
         if(resultHandler.process(result, "Delete")){
           for(var i=0;i<$scope.issues.length;i++){
@@ -1206,7 +1224,7 @@
     }
   }]);
 
-  app.controller("userController", ["$scope", "$resource", "$state", "$stateParams", "userPermissions", "notifications", "resultHandler", function($scope, $resource, $state, $stateParams, userPermissions, notifications, resultHandler){
+  app.controller("userController", ["$scope", "$resource", "$state", "$stateParams", "userPermissions", "notifications", "resultHandler", "confirmDialog", function($scope, $resource, $state, $stateParams, userPermissions, notifications, resultHandler, confirmDialog){
     var User = $resource("api/users/:userId", {userId: "@userId"});
     var UserRoles = $resource("api/userroles/:roleId", {roleId: "@roleId"});
 
@@ -1225,6 +1243,9 @@
     })
 
     $scope.delete = function(id){
+      if(!confirmDialog.delete("User"))
+        return;
+
       User.delete({userId:id}, function(result){
         if(resultHandler.process(result, "Delete")){
           for(var i=0;i<$scope.users.length;i++){
@@ -1298,7 +1319,7 @@
 
   }]);
 
-  app.controller("adminController", ["$scope", "$resource", "$state", "$stateParams", "userPermissions", "resultHandler", function($scope, $resource, $state, $stateParams, userPermissions, resultHandler){
+  app.controller("adminController", ["$scope", "$resource", "$state", "$stateParams", "userPermissions", "resultHandler", "confirmDialog", function($scope, $resource, $state, $stateParams, userPermissions, resultHandler, confirmDialog){
     var UserRoles = $resource("api/userroles/:roleId", {roleId: "@roleId"});
     var TechnologyTypes = $resource("api/technologytypes/:techtypeId", {techtypeId: "@techtypeId"});
     var Step = $resource("api/steps/:stepId", {stepId: "@stepId"});
@@ -1462,6 +1483,9 @@
     };
 
     $scope.deleteStep = function(id){
+      if(!confirmDialog.delete("Step"))
+        return;
+
       //First we need to delete all issues related to the step
         Step.delete({stepId:id}, function(result){
           if(resultHandler.process(result, "Delete")){
@@ -1498,6 +1522,9 @@
     };
 
     $scope.delete = function(index){
+      if(!confirmDialog.delete("Role"))
+        return;
+
       var roleToDelete = $scope.roles[$scope.activeRole];
       UserRoles.delete({roleId: roleToDelete._id}, function(result){
         if(resultHandler.process(result, "Delete")){
