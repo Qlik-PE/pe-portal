@@ -11,6 +11,7 @@ app.controller("adminController", ["$scope", "$resource", "$state", "$stateParam
     "validations",
     "steps",
     "issues",
+    "partners",
     "users",
     "userroles",
     "steptypes",
