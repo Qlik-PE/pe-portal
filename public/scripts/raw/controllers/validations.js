@@ -3,6 +3,7 @@ app.controller("validationController", ["$scope", "$resource", "$state", "$state
   var Steps = $resource("api/steps/:stepId", {stepId:"@stepId"});
   var Issues = $resource("api/issues/:issueId", {issueId:"@issueId"});
   var TechnologyTypes = $resource("api/technologytypes/:techtypeId", {techtypeId: "@techtypeId"});
+  var Partners = $resource("api/partners/:partnerId", {techtypeId: "@partnerId"});
 
   $scope.permissions = userPermissions;
   $scope.validationId = $stateParams.Id;
@@ -35,6 +36,12 @@ app.controller("validationController", ["$scope", "$resource", "$state", "$state
   TechnologyTypes.get({}, function(result){
     if(resultHandler.process(result)){
       $scope.technologytypes = result.data;
+    }
+  });
+
+  Partners.get({}, function(result){
+    if(resultHandler.process(result)){
+      $scope.partners = result.data;
     }
   });
 

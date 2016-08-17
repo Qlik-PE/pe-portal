@@ -54,6 +54,12 @@ var entities = {
       populates: "",
       exemptFromOwnership: true
     },
+    partners         : {
+      collection: "partners",
+      model: require("../../models/partners"),
+      populates: "",
+      exemptFromOwnership: true
+    },
     users         : {
       collection: "users",
       model: require("../../models/users"),
